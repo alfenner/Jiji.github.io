@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>Manipulatives</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="icon" type="image/png" href="images/favicon.png">
+
+  <script src="pixi.min.js"></script>
+  <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
+
+</head>
+<body>
+
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <!-- Tab links -->
+  <div class="tab">
+    <button class="tablinks" onclick="openCity(event, 'FractionWall')">Fraction Wall</button>
+    <button class="tablinks" onclick="openCity(event, 'London')">Tiler</button>
+  </div>
+
+  <!-- Tab content -->
+  <div id="London" class="tabcontent">
+    <script>
+    PIXI.settings.RESOLUTION = 2
+    var tiler = new PIXI.Application(800, 600, {backgroundColor : 0xFFFFFF});
+    document.getElementById("London").appendChild(tiler.view);
+    tiler.renderer.view.style.position = "absolute";
+    tiler.renderer.view.style.display = "block";
+    tiler.renderer.autoResize = true;
+    tiler.renderer.resize(window.innerWidth, window.innerHeight);
+    </script>
+  </div>
+
+  <div id="Paris" class="tabcontent">
+    <h3>Paris</h3>
+    <p>Paris is the capital of France.</p>
+  </div>
+
+  <div id="FractionWall" class="tabcontent">
+    <script>
+    PIXI.settings.RESOLUTION = 2
+    var wall = new PIXI.Application(800, 600, {backgroundColor : 0xFFFFFF});
+    document.getElementById("FractionWall").appendChild(wall.view);
+    wall.renderer.view.style.position = "absolute";
+    wall.renderer.view.style.display = "block";
+    wall.renderer.autoResize = true;
+    wall.renderer.resize(window.innerWidth, window.innerHeight);
+    </script>
+  </div>
+
+
+<script type = "text/javascript" src="js/fractionwall.js"></script>
+<script type = "text/javascript" src="js/patterning.js"></script>
+<script type = "text/javascript" src="nav.js"></script>
+<!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+</html>
