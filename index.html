@@ -49,24 +49,21 @@
     </script>
   </div>
 
-  <div id="Paris" class="tabcontent">
-    <h3>Paris</h3>
-    <p>Paris is the capital of France.</p>
-  </div>
-
   <div id="FractionWall" class="tabcontent">
     <script>
     PIXI.settings.RESOLUTION = 2
     var wall = new PIXI.Application(800, 600, {backgroundColor : 0xFFFFFF});
     document.getElementById("FractionWall").appendChild(wall.view);
-    wall.renderer.view.style.position = "absolute";
+    //wall.renderer.view.style.position = "absolute";
     wall.renderer.view.style.display = "block";
     wall.renderer.autoResize = true;
+    wall.renderer.backgroundColor = 0xd3d3d3
     wall.renderer.resize(window.innerWidth, window.innerHeight);
     </script>
   </div>
 
-
+<script type = "text/javascript" src = "js/transform.js"></script>
+<script type = "text/javascript" src = "js/pointinside.js"></script>
 <script type = "text/javascript" src="js/fractionwall.js"></script>
 <script type = "text/javascript" src="js/patterning.js"></script>
 <script type = "text/javascript" src="nav.js"></script>
