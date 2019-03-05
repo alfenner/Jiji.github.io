@@ -347,7 +347,7 @@ function onPolyMoveEnd() {
               currentTileIndex += 1
               if (currentTileIndex > 3){
                 console.log("trying to load next level")
-                loadLevel()
+                //loadLevel()
               }
             })
           }
