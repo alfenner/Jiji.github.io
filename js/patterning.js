@@ -418,7 +418,7 @@ document.addEventListener('keydown', function(event) {
         activePoly = polys[0]
       }
     }
-    if (event.keyCode == 38){
-
+    if (event.keyCode == 13){
+        loadLevel()
     }
 });

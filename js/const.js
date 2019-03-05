@@ -13,12 +13,13 @@ const TYPES = {
   EIGHTH_TRIANGLE: [[0,0],[0,2*dx],[2*dx,0]],
   EIGHTH_RECT: [[0,0],[2*dx,0],[2*dx,dx],[0,dx]],
   SIXTH_RECT: [[0,0],[2*dx,0],[2*dx,4/3*dx],[0,4/3*dx]],
-  SIXTEENTH_TRIANGLE: [[0,0],[0,2*dx],[dx,0]],
+  SIXTEENTH_TRIANGLE: [[0,0],[0,dx],[2*dx,dx]],
   PARALLELOGRAM: [[0,0],[2*dx,0],[4*dx,2*dx],[2*dx,2*dx]],
   SIXTH_TRIANGLE: [[0,0],[0,4/3*dx],[4*dx,4/3*dx]],
-  THIRD_TRIANGLE: [[0,0],[8/3*dx,0],[4/3*dx,4*dx]],
+  THIRD_TRIANGLE: [[0,0],[0,8/3*dx],[4*dx,4/3*dx]],
   EIGHTH_ISOCELES: [[0,0],[4*dx,0],[2*dx,dx]],
-  EIGHTH_RIGHT_TRIANGLE: [[0,0],[4*dx,dx],[0,dx]]
+  EIGHTH_RIGHT_TRIANGLE: [[0,0],[4*dx,dx],[0,dx]],
+  EIGHTH_ISOCELES_TWO: [[0,0],[2*dx,dx],[0,2*dx]]
 }
 
 function getValFromType(type) {
