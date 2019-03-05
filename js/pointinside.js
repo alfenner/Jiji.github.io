@@ -15,7 +15,6 @@ function isPointInPoly(point,poly)  {
 let Y = []
 let count = poly.length
 
-
 for (var i=0;i<count;i++) {
 
     let p1 = poly[i%count]
@@ -24,10 +23,8 @@ for (var i=0;i<count;i++) {
     let x1 = p1[0]
     let y1 = p1[1]
 
-
     let x2 = p2[0]
     let y2 = p2[1]
-
 
     let m = (y2-y1)/(x2-x1)
     let b = y1-m*x1
@@ -56,18 +53,20 @@ if (yi.isHorizontal) {
   }
 } else if (yi.isVertical) {
   if (xMin <= point[0] && point[0] <= xMax) {
-    if (point[1] < yi.yMax)
+    if (point[1] < yi.yMax) {
+      numberOfIntersectionPoints += 1
+    }
+  }
+} else if (yVal >= point[1]) {
+  if (yi.yMin <= yVal && yVal <= yi.yMax) {
     numberOfIntersectionPoints += 1
   }
-}
-else if (yVal >= point[1]) {
-if (yi.yMin <= yVal && yVal <= yi.yMax) {
-           numberOfIntersectionPoints += 1
-         }
-}
-
+  else if (yVal == point[1]){
+    console.log("ON THE LINE!")
+    return true
+  }
 }
 
+}
 return numberOfIntersectionPoints%2 == 0 ? false : true
-
 }

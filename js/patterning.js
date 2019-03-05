@@ -1,45 +1,148 @@
 
-let dots = [[]]
-let colors = {'orange':0xffaa32,'red': 0xff5121,'purple':0x9966FF,'blue':0x216ae0,'pink':0xf721ff}
+let dots = []
+
 let cordsFromGrid = []
 let polys = []
-let dx = 35
-let dy = 35
+let snapX = dx/3
+let snapY = dx/3
+let density = 4
+let dB = dx*2/3
+let wholeOrigin = []
+
+let completedTiles = []
+let completedTileSpaces = []
+let buttons = []
+let currentTileIndex = 0
+let currentLevelIndex = -1
 
 const types = {
-  'whole': [[4*dx,4*dx],[8*dx,4*dx],[8*dx,8*dx],[4*dx,8*dx]],
+  'whole': [[0,0],[4*dx,0],[4*dx,4*dx],[0,4*dx]],
   'fourthRect': [[0,0],[0,4*dx],[dx,4*dx],[dx,0]],
+  'thirdRect': [[0,0],[0,4*dx],[4/3*dx,4*dx],[4/3*dx,0]],
   'fourthRightTriangle': [[0,0],[0,4*dx],[2*dx,4*dx]],
   'fourthIsoceles': [[0,0],[2*dx,2*dx],[4*dx,0]],
   'halfRect': [[0,0],[0,4*dx],[2*dx,4*dx],[2*dx,0]],
   'fourthSquare': [[0,0],[0,2*dx],[2*dx,2*dx],[2*dx,0]],
-  'halfTriangle':[[0,0],[0,4*dx],[4*dx,0]]
+  'halfTriangle':[[0,0],[0,4*dx],[4*dx,0]],
+  'eighthTriangle': [[0,0],[0,2*dx],[2*dx,0]]
 }
 
-let whole = [[4*dx,4*dx],[8*dx,4*dx],[8*dx,8*dx],[4*dx,8*dx]]
-let fourthRect = [[0,0],[0,4*dx],[dx,4*dx],[dx,0]]
-let fourthRightTriangle = [[0,0],[0,4*dx],[2*dx,4*dx]]
-let fourthIsoceles = [[0,0],[2*dx,2*dx],[4*dx,0]]
-let halfRect = [[0,0],[0,4*dx],[2*dx,4*dx],[2*dx,0]]
-let fourthSquare = [[0,0],[0,2*dx],[2*dx,2*dx],[2*dx,0]]
 
 let activePoly;
+let theWhole;
 
 function layoutPolys() {
 for (let i=0;i<polys.length;i++) {
-  console.log("tweening")
-    createjs.Tween.get(polys[i]).to({x: dx+3*dx*i,y: 4*dx}, 500, createjs.Ease.getPowInOut(4))
+    createjs.Tween.get(polys[i]).to({x:  4*dx,y: 4*dx}, 500, createjs.Ease.getPowInOut(4))
 }
 }
 
+
+function drawCompletedTileSpaces(n) {
+
+  for (let i = 0; i<n; i++){
+    var graphics = new PIXI.Graphics();
+    graphics.lineStyle(5, 0x000000,3)
+
+    graphics.drawRoundedRect(3, 3, 2*dx, 2*dx,3);
+    graphics.alpha = 0.2
+
+    let texture = tiler.renderer.generateTexture(graphics);
+    let emptyRectSprite = new PIXI.Sprite(texture)
+    emptyRectSprite.x = windowWidth-2.2*dx
+    emptyRectSprite.y = i*2.2*dx
+    emptyRectSprite.alpha = 0.5
+    completedTileSpaces.push(emptyRectSprite)
+    tiler.stage.addChild(emptyRectSprite)
+
+  }
+
+}
+
+drawCompletedTileSpaces(4)
+
+// Takes the level index and loads new level.
+function loadLevel(){
+  for (p of polys){
+    tiler.stage.removeChild(p)
+  }
+  for (b of buttons){
+    tiler.stage.removeChild(b)
+  }
+  for (t of completedTiles) {
+    tiler.stage.removeChild(t)
+  }
+  currentLevelIndex += 1
+  currentTileIndex = 0
+  buttons = []
+  polys = []
+  drawWhole()
+  createButtons(LEVELS[currentLevelIndex])
+  layoutButtons()
+}
+
+loadLevel()
+
+
+// Pass it the level and it will layout the buttons for that new level.
+function createButtons(level) {
+  let colorIndex = 0
+  for (s of level.shapes ) {
+    let polyPoints = []
+    s.forEach((e) => {
+      polyPoints.push(e[0])
+      polyPoints.push(e[1])
+    })
+    var graphics = new PIXI.Graphics();
+    graphics.beginFill(COLORS[COLOR_KEYS[colorIndex]]);
+    graphics.drawPolygon(polyPoints);
+    graphics.endFill();
+    graphics.type = s
+    graphics.color = COLORS[COLOR_KEYS[colorIndex]]
+    graphics.interactive = true
+    graphics.on('pointerdown',newPoly)
+    colorIndex += 1
+    buttons.push(graphics)
+  }
+
+}
+
+function newPoly() {
+    createPolygon(this.type,this.color)
+    createjs.Tween.get(activePoly).to({x: wholeOrigin[0]+theWhole.width/2,y: wholeOrigin[1]-theWhole.height/2}, 1000, createjs.Ease.getPowInOut(4))
+}
+
+
+function layoutButtons(){
+  let y = dx/2
+  for (b of buttons){
+    tiler.stage.addChild(b)
+    b.x = dx
+    b.y = y
+    y = y+b.height+dx/4
+  }
+}
+
+
+
 function drawWhole(){
+  let whole = types['whole']
   let c = new PIXI.Container()
+
   var graphics = new PIXI.Graphics();
-  graphics.moveTo(4*dx,4*dx)
+  //graphics.moveTo(0,0)
   graphics.lineStyle(3, 0x000000);
   for (let i = 0;i <= whole.length;i++){
       graphics.lineTo(whole[i%4][0],whole[i%4][1])
   }
+  graphics.x = 1.5
+  graphics.y = 1.5
+
+  var texture = tiler.renderer.generateTexture(graphics);
+  theWhole = new PIXI.Sprite(texture)
+
+  theWhole.anchor.set(0.5)
+
   var grabber= new PIXI.Graphics();
   grabber.beginFill(0xFFFFFF)
   grabber.moveTo(4*dx,4*dx)
@@ -48,27 +151,46 @@ function drawWhole(){
       grabber.lineTo(whole[i%4][0],whole[i%4][1])
   }
   grabber.endFill()
-  c.addChild(graphics)
+  //c.addChild(graphics)
   c.addChild(grabber)
 
   c.interactive = true
   c.isWhole = true
-  c.on('pointerdown', onPolyTouched)
-  c.on('pointerup', onPolyMoveEnd)
-  c.on('pointermove', onPolyTouchMoved);
+  //c.on('pointerdown', onPolyTouched)
+  //c.on('pointerup', onPolyMoveEnd)
+  //c.on('pointermove', onPolyTouchMoved);
   c.polyCords = whole
   c.actualWidth = c.width
   c.actualHeight = c.height
+  //polys.push(c)
+  //wholeSprite.x = 0
+  //wholeSprite.y = 0
 
+  tiler.stage.addChild(theWhole)
 
-  tiler.stage.addChild(c)
+  let i = Math.floor(windowWidth/2/dx)
+  let j = Math.floor(windowHeight/2/dx)
+
+  theWhole.x = i*dx
+  theWhole.y = j*dy
+
+  wholeOrigin[0] = theWhole.x - theWhole.height/2
+  wholeOrigin[1] = theWhole.y - theWhole.height/2
+
+  //console.log("theWhole.width",theWhole.width)
+  //console.log("thewhole.height",theWhole.height)
+  //console.log("theWhole.x",theWhole.x)
+  //console.log("theWhole.y",theWhole.y)
+  //console.log("wholeOrigin[0]",wholeOrigin[0])
+  //console.log("wholeOrigin[1]",wholeOrigin[1])
+
 }
 
 function createPolygon(type,color) {
-  cords = types[type]
-  console.log("incoming cords",cords)
+  cords = type
+  //console.log("incoming cords",cords)
   var graphics = new PIXI.Graphics();
-      graphics.lineStyle(2,0x000000)
+      graphics.lineStyle(1,0x000000)
       graphics.beginFill(color);
       //graphics.moveTo(cords[0][0],cords[0][1])
 
@@ -77,11 +199,9 @@ function createPolygon(type,color) {
   }
 
   graphics.endFill();
-  console.log("graphics X Y",graphics.x,graphics.y)
 
     var texture = tiler.renderer.generateTexture(graphics);
     let tile = new PIXI.Sprite(texture)
-    let tileContainer = new PIXI.Container()
     tile.polyCords = offset(cords,[tile.width/2,tile.height/2])
     tile.anchor.set(0.5)
     tile.alpha = 0.5
@@ -90,11 +210,6 @@ function createPolygon(type,color) {
     tile.actualWidth = tile.width
     tile.actualHeight = tile.height
     tile.color = color
-    //tileContainer.addChild(tile)
-
-    //tileContainer.interactive = true;
-    //graphics.anchor.set(0.5);
-
     tile.interactive = true
     tile.active = false
     tile.buttonMode = true
@@ -103,17 +218,25 @@ function createPolygon(type,color) {
     tile.on('pointermove', onPolyTouchMoved);
     tiler.stage.addChild(tile)
     polys.push(tile)
-    activePoly = tile
-
-
-    console.log("tile H W",tile.width,tile.height)
-    console.log("tile X Y",tile.x,tile.y)
     tile.x = 0
     tile.y = 0
+    activePoly = tile
+}
+
+function resizeGrid(n){
+  let newDx = density/n*dx
+  dx = newDx
+  //console.log(dots)
+  for (let i = 0;i<dots.length;i++){
+    for (let j = 0;j<dots[0].length;j++){
+       createjs.Tween.get(dots[i][j]).to({x: i*newDx,y: j*newDx}, 1000, createjs.Ease.getPowInOut(4))
+    }
+  }
 }
 
 
 function drawGrid(n){
+  //console.log("windowWidth",windowWidth)
   let gridCont = new PIXI.Container()
   for (let i = 0;i<2*n;i++){
     let dotRow = []
@@ -125,23 +248,23 @@ function drawGrid(n){
       let cT = tiler.renderer.generateTexture(c)
       let cS = new PIXI.Sprite(cT)
       cS.on('pointerdown',onNodeClicked)
-      cS.x = 35*i
-      cS.y = 35*j
+      cS.x = dx*i
+      cS.y = dx*j
       cS.interactive = true
       cS.anchor.set(0.5)
       dotRow.push(cS)
-      tiler.stage.addChild(cS);
+      //tiler.stage.addChild(cS);
     }
     dots.push(dotRow)
   }
 }
 
-drawGrid(20)
+//drawGrid(20)
 
 function onNodeClicked() {
   cordsFromGrid.push([this.x,this.y])
   if (false){
-    console.log("drawing!!")
+    //console.log("drawing!!")
     cordsFromGrid.push(cordsFromGrid[0])
     createPolygon(cordsFromGrid)
   }
@@ -152,9 +275,6 @@ function onPolyTouched(event) {
   activePoly = this
   let touchedAtX = event.data.global.x
   let touchedAtY = event.data.global.y
-  console.log("touchedAtX,touchedAtY",touchedAtX,touchedAtY)
-  console.log("delta touch",[this.x-touchedAtX,this.y-touchedAtY])
-  console.log("this.polyCords",this.polyCords)
 
 
 if (isPointInPoly([touchedAtX-this.x,touchedAtY-this.y],this.polyCords)){
@@ -165,10 +285,9 @@ if (isPointInPoly([touchedAtX-this.x,touchedAtY-this.y],this.polyCords)){
     this.dragStartedAt = this.y
     this.data = event.data;
     this.alpha = 0.5;
-} else if (!isPointInPoly([touchedAtX-this.x,touchedAtY-this.y],this.polyCords)){
-      let point = new PIXI.Point(touchedAtX,touchedAtY)
+} else if (!isPointInPoly([touchedAtX-this.x,touchedAtY-this.y],this.polyCords)) {
       for (let p of polys) {
-        if (p.containsPoint(point) && p != this){
+        if (isPointInPoly([touchedAtX-p.x,touchedAtY-p.y],p.polyCords) && p != this){
           tiler.stage.addChild(p)
           p.dragging = true;
           p.wasDragged = false
@@ -184,11 +303,8 @@ if (isPointInPoly([touchedAtX-this.x,touchedAtY-this.y],this.polyCords)){
 
 function onPolyMoveEnd() {
 
-    console.log("my Sprie:",this)
-    console.log("my sprites width",this.width)
-
-    let dI = (this.x-this.actualWidth/2)/dx
-    let dJ = (this.y-this.actualHeight/2)/dy
+    let dI = (this.x-this.actualWidth/2)/snapX
+    let dJ = (this.y-this.actualHeight/2)/snapY
     let deltaI = Math.round(dI) - dI
     let deltaJ = Math.round(dJ) - dJ
     this.dragging = false;
@@ -199,12 +315,46 @@ function onPolyMoveEnd() {
     }
     if (this.isWhole){
       this.zIndex = 20
-      createjs.Tween.get(this).to({x: this.x+deltaI*dx-2,y: this.y+deltaJ*dx-2}, 500, createjs.Ease.getPowInOut(4))
+      createjs.Tween.get(this).to({x: this.x+deltaI*snapX-2,y: this.y+deltaJ*snapY-2}, 500, createjs.Ease.getPowInOut(4))
     }
 
     if (!this.isWhole) {
-        createjs.Tween.get(this).to({x: this.x+deltaI*dx,y: this.y+deltaJ*dx}, 500, createjs.Ease.getPowInOut(4))
+        createjs.Tween.get(this).to({x: this.x+deltaI*snapX,y: this.y+deltaJ*snapY}, 500, createjs.Ease.getPowInOut(4)).call(() => {
+          let filteredPolys = polysInRect(polys,theWhole)
+          if (isTiled(theWhole,filteredPolys)) {
+            let container = new PIXI.Container()
+            for (p of polys){
+              if (inRect(p,theWhole)){
+                container.addChild(p)
+              }
+              else {
+                tiler.stage.removeChild(p)
+              }
+            }
+
+            polys = []
+
+            completedTiles.push(container)
+            container.x = wholeOrigin[0]
+            container.y = wholeOrigin[1]
+            container.pivot.x = wholeOrigin[0]
+            container.pivot.y = wholeOrigin[1]
+
+            tiler.stage.addChild(container)
+
+            createjs.Tween.get(container.scale).to({x: 0.5,y: 0.5}, 500, createjs.Ease.getPowInOut(4))
+            createjs.Tween.get(container).to({x: completedTileSpaces[currentTileIndex].x,y: completedTileSpaces[currentTileIndex].y}, 500, createjs.Ease.getPowInOut(4)).call(()=> {
+              currentTileIndex += 1
+              if (currentTileIndex > 3){
+                console.log("trying to load next level")
+                loadLevel()
+              }
+            })
+          }
+        })
     }
+    console.log("In rect?",inRect(activePoly,theWhole))
+    console.log("polysInRect",polysInRect(polys,theWhole))
 }
 
 function onPolyTouchMoved() {
@@ -216,16 +366,17 @@ function onPolyTouchMoved() {
     }
 }
 
-createPolygon('fourthRect',colors['orange'])
-createPolygon('fourthRightTriangle',colors['purple'])
-createPolygon('fourthSquare',colors['pink'])
-createPolygon('fourthIsoceles',colors['red'])
-createPolygon('halfRect',colors['blue'])
-createPolygon('halfTriangle',colors['pink'])
+//createPolygon('fourthRect',colors['orange'])
+//createPolygon('fourthRightTriangle',colors['purple'])
+//createPolygon(TYPES.FOURTH_RIGHT_TRIANGLE,COLORS.PINK)
+//createPolygon('fourthIsoceles',colors['red'])
+//createPolygon(TYPES.HALF_RECT,COLORS.BLUE)
+//createPolygon('halfTriangle',colors['pink'])
+//createPolygon('thirdRect',colors['orange'])
 drawWhole()
 layoutPolys()
 
-console.log(polys.length)
+
 
 document.addEventListener('keydown', function(event) {
     if(event.keyCode == 39 && !activePoly.isWhole) {
@@ -236,6 +387,18 @@ document.addEventListener('keydown', function(event) {
         activePoly.actualWidth = h
         activePoly.actualHeight = w
       }
+
+      // Lets have this be a vertical flip.
+      if(event.keyCode == 38 && !activePoly.isWhole) {
+          createjs.Tween.get(activePoly.scale).to({y: activePoly.scale.y*(-1)}, 500, createjs.Ease.getPowInOut(4))
+          activePoly.polyCords = flipX(activePoly.polyCords)
+          let w = activePoly.actualWidth
+          let h = activePoly.actualHeight
+          activePoly.actualWidth = h
+          activePoly.actualHeight = w
+        }
+
+
     if (event.keyCode == 68){
       if (activePoly.isWhole){
         drawWhole()
@@ -248,5 +411,14 @@ document.addEventListener('keydown', function(event) {
     }
     if (event.keyCode == 8){
       tiler.stage.removeChild(activePoly)
+      let i = polys.indexOf(activePoly)
+      console.log("active Poly index",i)
+      polys.splice(i,0)
+      if (polys.length == 0){
+        activePoly = polys[0]
+      }
+    }
+    if (event.keyCode == 38){
+
     }
 });

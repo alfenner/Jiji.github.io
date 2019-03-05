@@ -17,12 +17,6 @@ graphics.endFill();
 
 var activeTexture = wall.renderer.generateTexture(graphics);
 
-const windowWidth = window.innerWidth
-const wallWidth = windowWidth/1.5
-const wallX = (windowWidth-wallWidth)/2
-const height = window.innerHeight/15
-
-
 
 const labels = {
   1: "One Whole",
@@ -40,10 +34,6 @@ const labels = {
 }
 
 // Constructors
-
-
-
-
 
 
 function distance(a,b){
