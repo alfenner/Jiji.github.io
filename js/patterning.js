@@ -393,6 +393,8 @@ function onPolyMoveEnd() {
     if (!this.isWhole) {
         createjs.Tween.get(this).to({x: this.x+deltaI*snapX,y: this.y+deltaJ*snapY}, 500, createjs.Ease.getPowInOut(4)).call(() => {
           let filteredPolys = polysInRect(polys,theWhole)
+          console.log("filteredPolysCount",polysInRect(polys,theWhole))
+          console.log("checkSumToOne",checkSumToOne(filteredPolys))
           if (checkSumToOne(filteredPolys) && isTiled(theWhole,filteredPolys)) {
             let container = new PIXI.Container()
             console.log("SUM TO ONE?",checkSumToOne(polys))

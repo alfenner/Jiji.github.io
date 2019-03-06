@@ -14,7 +14,8 @@ function checkSumToOne(polys){
     let v = getValFromType(p.type)
     acc = acc + v
   }
-  return acc == 1
+  
+  return 0.95 < acc && acc < 1.05
 }
 
 function flipX(cords){
