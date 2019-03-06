@@ -33,15 +33,15 @@
   <!-- Tab links -->
   <div class="tab">
     <button class="tablinks" onclick="openCity(event, 'FractionWall')">Fraction Wall</button>
-    <button class="tablinks" onclick="openCity(event, 'London')">Tiler</button>
+    <button class="tablinks" onclick="openCity(event, 'Tiler')">Tiler</button>
   </div>
 
   <!-- Tab content -->
-  <div id="London" class="tabcontent">
+  <div id="Tiler" class="tabcontent">
     <script>
     PIXI.settings.RESOLUTION = 2
     var tiler = new PIXI.Application(800, 600, {backgroundColor : 0xFFFFFF});
-    document.getElementById("London").appendChild(tiler.view);
+    document.getElementById("Tiler").appendChild(tiler.view);
     tiler.renderer.view.style.position = "absolute";
     tiler.renderer.view.style.display = "block";
     tiler.renderer.autoResize = true;
@@ -64,7 +64,7 @@
 
 <script type = "text/javascript" src = "js/const.js"></script>
 <script type = "text/javascript" src = "js/levels.js"></script>
-<script type = "text/javascript" src = "js/transform.js"></script>
+<script type = "text/javascript" src = "js/methods.js"></script>
 <script type = "text/javascript" src = "js/pointinside.js"></script>
 <script type = "text/javascript" src="js/fractionwall.js"></script>
 <script type = "text/javascript" src="js/patterning.js"></script>

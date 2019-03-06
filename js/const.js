@@ -25,20 +25,70 @@ const TYPES = {
 function getValFromType(type) {
   switch (type) {
     case TYPES.FOURTH_RECT:
-    return 0.25
+    return 1/4
+    break
+    case TYPES.THIRD_RECT:
+    return 1/3
+    break
+    case TYPES.FOURTH_RIGHT_TRIANGLE:
+    return 1/4
+    break
+    case TYPES.FOURTH_ISOCELES:
+    return 1/4
+    break
+    case TYPES.HALF_RECT:
+    return 1/2
+    break
+    case TYPES.FOURTH_SQUARE:
+    return 1/4
+    break
+    case TYPES.HALF_TRIANGLE:
+    return 1/2
+    break
+    case TYPES.EIGHTH_TRIANGLE:
+    return 1/8
+    break
+    case TYPES.EIGHTH_RECT:
+    return 1/8
+    break
+    case TYPES.SIXTH_RECT:
+    return 1/6
+    break
+    case TYPES.SIXTEENTH_TRIANGLE:
+    return 1/16
+    break
+    case TYPES.PARALLELOGRAM:
+    return 1/4
+    break
+    case TYPES.SIXTH_TRIANGLE:
+    return 1/6
+    break
+    case TYPES.THIRD_TRIANGLE:
+    return 1/3
+    break
+    case TYPES.EIGHTH_ISOCELES:
+    return 1/8
+    break
+    case TYPES.EIGHTH_RIGHT_TRIANGLE:
+    return 1/8
+    break
+    case TYPES.EIGHTH_ISOCELES_TWO:
+    return 1/8
     break
     default:
     console.log("balls")
   }
 }
 
-console.log("VALUE FROM TYPE",getValFromType(TYPES.FOURTH_RECT))
 
-const COLORS = {ORANGE: 0xffaa32,
+const COLORS = {
+ORANGE: 0xffaa32,
 RED: 0xff5121,
 PURPLE: 0x9966FF,
 BLUE: 0x216ae0,
-PINK: 0xf721ff}
+PINK: 0xf721ff,
+ORANGE: 0xffaa49,
+BROWN: 0x82521b}
 
 const COLOR_KEYS = Object.keys(COLORS)
 

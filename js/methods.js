@@ -8,7 +8,14 @@ function offset(cords,delta) {
   })
 }
 
-//function contains
+function checkSumToOne(polys){
+  let acc = 0
+  for (p of polys){
+    let v = getValFromType(p.type)
+    acc = acc + v
+  }
+  return acc == 1
+}
 
 function flipX(cords){
   return cords.map(e => {
@@ -37,6 +44,11 @@ function drawDots() {
 
 
 function isTiled(container,polygons) {
+
+  if (polygons.length == 0){
+    return false
+  }
+
   let countOutside = 0
 
   let isTiled = true
@@ -59,7 +71,6 @@ function isTiled(container,polygons) {
   for (p of polygons){
     if (!inRect(p,container)){
       console.log("NOT In CONTAINER")
-      return false
     }
   }
 
@@ -109,7 +120,6 @@ function inRect(r,isIn){
 function polysInRect(polys,rect){
   return polys.filter(p => rect.containsPoint(new PIXI.Point(p.x,p.y)))
 }
-
 
 
 function flipY(cords,y) {

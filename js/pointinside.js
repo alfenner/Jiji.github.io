@@ -47,13 +47,13 @@ for (var j=0;j<Y.length;j++) {
 
 if (yi.isHorizontal) {
   if (yi.yMin >= point[1])  {
-    if (xMin < point[0] && point[0] < xMax) {
+    if (xMin <= point[0] && point[0] <= xMax) {
       numberOfIntersectionPoints += 1
     }
   }
 } else if (yi.isVertical) {
   if (xMin <= point[0] && point[0] <= xMax) {
-    if (point[1] < yi.yMax) {
+    if (point[1] <= yi.yMax) {
       numberOfIntersectionPoints += 1
     }
   }

@@ -35,4 +35,4 @@ function clearContent() {
   }
 }
 
-initCity("FractionWall")
+initCity("Tiler")
