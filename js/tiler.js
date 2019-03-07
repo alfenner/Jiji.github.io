@@ -200,7 +200,7 @@ function drawWhole(){
 
   tiler.stage.addChild(theWhole)
 
-  let i = Math.floor(windowWidth/2/dx)
+  let i = Math.ceil(windowWidth/2/dx)
   let j = Math.floor(windowHeight/2/dx)
 
   theWhole.x = i*dx
@@ -332,19 +332,30 @@ if (isPointInPoly([touchedAtX-this.x,touchedAtY-this.y],this.polyCords)){
 }
 }
 
-let congLink = document.getElementById("non-congruent")
-console.log(congLink,"conglink")
-congLink.onclick = function() {
+
+
+function goToActivityOne() {
+  currentLevelIndex = -1
+  loadLevel()
+}
+
+function goToActivityTwo(){
   currentLevelIndex = 3
   loadLevel()
 }
 
-let nonCongLink = document.getElementById("congruent")
-console.log(congLink,"nononglink")
-nonCongLink.onclick = function() {
-  currentLevelIndex = -1
-  loadLevel()
-}
+let nonCongLink = document.getElementById("non-congruent")
+let nonCongLinkSideNav = document.getElementById("non-congruent-sidenav")
+
+let congLink = document.getElementById("congruent")
+let congLinkSideNav = document.getElementById("congruent-sidenav")
+
+nonCongLink.onclick = goToActivityTwo
+nonCongLinkSideNav.onclick = goToActivityTwo
+congLink.onclick = goToActivityOne
+congLinkSideNav.onclick = goToActivityOne
+
+
 
 function createActionButton(text,action) {
 
@@ -542,4 +553,5 @@ document.addEventListener('keydown', function(event) {
     if (event.keyCode == 13){
         loadLevel()
     }
+
 });
