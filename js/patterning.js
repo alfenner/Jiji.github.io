@@ -123,7 +123,7 @@ function newPoly() {
       currentType = this.type
       for (b of buttons){
         if (b.type != this.type){
-          b.alpha = 0.5
+          b.alpha = 0.1
           b.interactive = false
         }
       }
@@ -234,7 +234,7 @@ function createPolygon(type,color) {
     let tile = new PIXI.Sprite(texture)
     tile.polyCords = offset(cords,[tile.width/2,tile.height/2])
     tile.anchor.set(0.5)
-    tile.alpha = 0.5
+    tile.alpha = 0.8
     tile.type = type
 
     tile.actualWidth = tile.width
@@ -283,7 +283,7 @@ function drawGrid(n){
       cS.interactive = true
       cS.anchor.set(0.5)
       dotRow.push(cS)
-      //tiler.stage.addChild(cS);
+      tiler.stage.addChild(cS);
     }
     dots.push(dotRow)
   }
@@ -314,7 +314,7 @@ if (isPointInPoly([touchedAtX-this.x,touchedAtY-this.y],this.polyCords)){
     this.deltaTouch = [this.x-touchedAtX,this.y-touchedAtY]
     this.dragStartedAt = this.y
     this.data = event.data;
-    this.alpha = 0.5;
+    //this.alpha = 0.5;
 } else if (!isPointInPoly([touchedAtX-this.x,touchedAtY-this.y],this.polyCords)) {
       for (let p of polys) {
         if (isPointInPoly([touchedAtX-p.x,touchedAtY-p.y],p.polyCords) && p != this){
@@ -324,7 +324,7 @@ if (isPointInPoly([touchedAtX-this.x,touchedAtY-this.y],this.polyCords)){
           p.deltaTouch = [p.x-touchedAtX,p.y-touchedAtY]
           p.dragStartedAt = this.y
           p.data = event.data;
-          p.alpha = 0.5;
+        //  p.alpha = 0.5;
         }
     }
 }
@@ -473,7 +473,8 @@ function resetButtons(){
 
 document.addEventListener('keydown', function(event) {
     if(event.keyCode == 39 && !activePoly.isWhole) {
-        createjs.Tween.get(activePoly).to({rotation: activePoly.rotation + Math.PI/2}, 500, createjs.Ease.getPowInOut(4))
+        activePoly.rotation = activePoly.rotation + Math.PI/2
+        //createjs.Tween.get(activePoly).to({rotation: activePoly.rotation + Math.PI/2}, 500, createjs.Ease.getPowInOut(4))
         activePoly.polyCords = rotate(activePoly.polyCords)
         let w = activePoly.actualWidth
         let h = activePoly.actualHeight
@@ -482,11 +483,11 @@ document.addEventListener('keydown', function(event) {
       }
 
       // Lets have this be a vertical flip.
-      if(event.keyCode == 38 && !activePoly.isWhole) {
-          createjs.Tween.get(activePoly.scale).to({y: activePoly.scale.y*(-1)}, 500, createjs.Ease.getPowInOut(4))
-          activePoly.polyCords = flipX(activePoly.polyCords)
-        }
-
+    if(event.keyCode == 38 && !activePoly.isWhole) {
+        //createjs.Tween.get(activePoly.scale).to({y: activePoly.scale.y*(-1)}, 500, createjs.Ease.getPowInOut(4))
+        activePoly.scale.y = activePoly.scale.y*(-1)
+        activePoly.polyCords = flipX(activePoly.polyCords)
+    }
 
     if (event.keyCode == 68){
       if (activePoly.isWhole){

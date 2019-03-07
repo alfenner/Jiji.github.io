@@ -57,7 +57,7 @@ if (yi.isHorizontal) {
       numberOfIntersectionPoints += 1
     }
   }
-} else if (yVal >= point[1]) {
+} else if (yVal >= point[1]-1) {
   if (yi.yMin <= yVal && yVal <= yi.yMax) {
     numberOfIntersectionPoints += 1
   }

@@ -14,7 +14,7 @@ function checkSumToOne(polys){
     let v = getValFromType(p.type)
     acc = acc + v
   }
-  
+
   return 0.95 < acc && acc < 1.05
 }
 
@@ -89,7 +89,7 @@ function isTiled(container,polygons) {
         cS.on('pointerdown',onNodeClicked)
         cS.x = oX+dx/2+i*dx-3
         cS.y = oY+dy/2+j*dy-3
-        //tiler.stage.addChild(cS)
+        tiler.stage.addChild(cS)
     }
   }
   let recentered = []
@@ -107,7 +107,7 @@ function isTiled(container,polygons) {
    }
 })
   console.log("countOutside,rectsOutside",countOutside)
-  return countOutside < 10
+  return countOutside < 3
 }
 
 function inRect(r,isIn){
