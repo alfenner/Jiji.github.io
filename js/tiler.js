@@ -18,6 +18,7 @@ let currentType;
 let nextButton = {}
 
 
+
 const types = {
   'whole': [[0,0],[4*dx,0],[4*dx,4*dx],[0,4*dx]],
   'fourthRect': [[0,0],[0,4*dx],[dx,4*dx],[dx,0]],
@@ -30,6 +31,7 @@ const types = {
   'eighthTriangle': [[0,0],[0,2*dx],[2*dx,0]]
 }
 
+console.log("IS THIS SCRIPT EVEN FUNNING???")
 
 let activePoly;
 let theWhole;
@@ -65,7 +67,7 @@ function drawCompletedTileSpaces(n) {
 }
 
 drawCompletedTileSpaces(4)
-
+console.log("calling tile spaces")
 // Takes the level index and loads new level.
 function loadLevel(){
   nextButton.alpha = 0
@@ -330,7 +332,19 @@ if (isPointInPoly([touchedAtX-this.x,touchedAtY-this.y],this.polyCords)){
 }
 }
 
+let congLink = document.getElementById("non-congruent")
+console.log(congLink,"conglink")
+congLink.onclick = function() {
+  currentLevelIndex = 3
+  loadLevel()
+}
 
+let nonCongLink = document.getElementById("congruent")
+console.log(congLink,"nononglink")
+nonCongLink.onclick = function() {
+  currentLevelIndex = -1
+  loadLevel()
+}
 
 function createActionButton(text,action) {
 
@@ -393,11 +407,10 @@ function onPolyMoveEnd() {
     if (!this.isWhole) {
         createjs.Tween.get(this).to({x: this.x+deltaI*snapX,y: this.y+deltaJ*snapY}, 500, createjs.Ease.getPowInOut(4)).call(() => {
           let filteredPolys = polysInRect(polys,theWhole)
-          console.log("filteredPolysCount",polysInRect(polys,theWhole))
-          console.log("checkSumToOne",checkSumToOne(filteredPolys))
+
           if (checkSumToOne(filteredPolys) && isTiled(theWhole,filteredPolys)) {
+
             let container = new PIXI.Container()
-            console.log("SUM TO ONE?",checkSumToOne(polys))
             for (p of polys){
               if (inRect(p,theWhole)){
                 p.interactive = false
@@ -418,21 +431,35 @@ function onPolyMoveEnd() {
 
             polys = []
 
-            completedTiles.push(container)
             container.x = wholeOrigin[0]
             container.y = wholeOrigin[1]
             container.pivot.x = container.x
             container.pivot.y = container.y
 
-
-            // If
-
-
             tiler.stage.addChild(container)
 
             createjs.Tween.get(container.scale).to({x: 0.5,y: 0.5}, 500, createjs.Ease.getPowInOut(4))
-            createjs.Tween.get(container).to({x: completedTileSpaces[currentTileIndex].x,y: completedTileSpaces[currentTileIndex].y}, 500, createjs.Ease.getPowInOut(4)).call(()=> {
-              currentTileIndex += 1
+
+            completedTiles.push(container)
+
+            let animateTo = null
+            for (c of completedTileSpaces){
+              if (c.type == currentType) {
+                animateTo = [c.x,c.y]
+              }
+            }
+
+            if (animateTo == null){
+                animateTo = [completedTileSpaces[currentTileIndex].x,completedTileSpaces[currentTileIndex].y]
+                if (LEVELS[currentLevelIndex].congruent){
+                    completedTileSpaces[currentTileIndex].type = currentType
+                }
+                currentTileIndex += 1
+            }
+
+            console.log("animatTo",animateTo)
+
+            createjs.Tween.get(container).to({x: animateTo[0],y: animateTo[1]}, 500, createjs.Ease.getPowInOut(4)).call(()=> {
               if (currentTileIndex > 3){
                 console.log("trying to load next level")
                 createjs.Tween.get(nextButton).to({alpha: 1}, 200, createjs.Ease.getPowInOut(4))

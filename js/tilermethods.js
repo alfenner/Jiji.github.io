@@ -89,7 +89,7 @@ function isTiled(container,polygons) {
         cS.on('pointerdown',onNodeClicked)
         cS.x = oX+dx/2+i*dx-3
         cS.y = oY+dy/2+j*dy-3
-        tiler.stage.addChild(cS)
+        //tiler.stage.addChild(cS)
     }
   }
   let recentered = []

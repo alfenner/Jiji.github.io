@@ -1,5 +1,7 @@
 // State Variables
 
+console.log("IS THIS SCRIPT EVEN RUNNING!!!!???")
+
 // Denominator of the row that's currently place on the number line.
 let activeRow = 12
 
@@ -11,7 +13,7 @@ let swapping = false
 
 var graphics = new PIXI.Graphics();
 graphics.lineStyle(4, 0xc0ffee, 1)
-graphics.beginFill(0x4b0082);
+graphics.beginFill(0xFE6F61);
 graphics.drawRect(0, 0, 50, 100);
 graphics.endFill();
 
@@ -242,7 +244,7 @@ function onDragEnd() {
     if (this.y > 12*height) {animateTicks(activeRow)}
   } else {
     this.active = !this.active
-    this.tile.texture = this.active ? newTexture(this,0x604D8D) : newTexture(this,0xFFFFFF)
+    this.tile.texture = this.active ? newTexture(this,0xFE6F61) : newTexture(this,0xFFFFFF)
   }
     this.alpha = 1;
     this.dragging = false;
