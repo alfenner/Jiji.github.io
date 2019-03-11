@@ -1,5 +1,16 @@
+const windowWidth = window.innerWidth
+const windowHeight = window.innerHeight
+const wallWidth = windowWidth/1.5
+const wallX = (windowWidth-wallWidth)/2
+const height = window.innerHeight/15
 let dx = window.innerHeight/15
 let dy = dx
+
+
+const AXIS  = {
+  NORMAL: -1,
+  SIDE: 1
+}
 
 const TYPES = {
   WHOLE: [[0,0],[4*dx,0],[4*dx,4*dx],[0,4*dx]],
@@ -91,9 +102,3 @@ ORANGE: 0xffaa49,
 BROWN: 0x82521b}
 
 const COLOR_KEYS = Object.keys(COLORS)
-
-const windowWidth = window.innerWidth
-const windowHeight = window.innerHeight
-const wallWidth = windowWidth/1.5
-const wallX = (windowWidth-wallWidth)/2
-const height = window.innerHeight/15

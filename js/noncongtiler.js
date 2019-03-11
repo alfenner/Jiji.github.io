@@ -17,21 +17,8 @@ let currentLevelIndex = -1
 let currentType;
 let nextButton = {}
 
+const LEVELS = [LEVEL_FOUR,LEVEL_FIVE,LEVEL_SIX]
 
-
-const types = {
-  'whole': [[0,0],[4*dx,0],[4*dx,4*dx],[0,4*dx]],
-  'fourthRect': [[0,0],[0,4*dx],[dx,4*dx],[dx,0]],
-  'thirdRect': [[0,0],[0,4*dx],[4/3*dx,4*dx],[4/3*dx,0]],
-  'fourthRightTriangle': [[0,0],[0,4*dx],[2*dx,4*dx]],
-  'fourthIsoceles': [[0,0],[2*dx,2*dx],[4*dx,0]],
-  'halfRect': [[0,0],[0,4*dx],[2*dx,4*dx],[2*dx,0]],
-  'fourthSquare': [[0,0],[0,2*dx],[2*dx,2*dx],[2*dx,0]],
-  'halfTriangle':[[0,0],[0,4*dx],[4*dx,0]],
-  'eighthTriangle': [[0,0],[0,2*dx],[2*dx,0]]
-}
-
-console.log("IS THIS SCRIPT EVEN FUNNING???")
 
 let activePoly;
 let theWhole;
@@ -119,29 +106,15 @@ function createButtons(level) {
 
 function newPoly() {
 
-    console.log("POLY LENGTH",polys.length)
-    console.log("LEVELS[currentLevelIndex]",LEVELS[currentLevelIndex].congruent)
-    if (polys.length == 0 && LEVELS[currentLevelIndex].congruent == true){
-      currentType = this.type
-      for (b of buttons){
-        if (b.type != this.type){
-          b.alpha = 0.1
-          b.interactive = false
-        }
-      }
-    }
-
-    if (currentType == this.type || LEVELS[currentLevelIndex].congruent == false){
-    console.log("creating a new polygon")
     createPolygon(this.type,this.color)
     let newPolyX = this.x + this.width/2
     let newPolyY = this.y + this.height/2
     activePoly.x = newPolyX
     activePoly.y = newPolyY
     currentType = this.type
-    createjs.Tween.get(activePoly).to({x: wholeOrigin[0]+theWhole.width/2,y: wholeOrigin[1]-theWhole.height/2}, 1000, createjs.Ease.getPowInOut(4))
+    createjs.Tween.get(activePoly).to({x: wholeOrigin[0]+theWhole.width/2,y: wholeOrigin[1]-theWhole.height/2}, 500, createjs.Ease.getPowInOut(4))
     setTimeout(() => {for (p of polys){p.interactive = true}} ,500)
-  }
+
 }
 
 
@@ -158,7 +131,7 @@ function layoutButtons(){
 
 
 function drawWhole(){
-  let whole = types['whole']
+  let whole = TYPES.WHOLE
   let c = new PIXI.Container()
 
   var graphics = new PIXI.Graphics();
@@ -245,6 +218,7 @@ function createPolygon(type,color) {
     //tile.interactive = true
     tile.active = false
     tile.buttonMode = true
+    tile.axis = AXIS.NORMAL
     tile.on('pointerdown', onPolyTouched)
     tile.on('pointerup', onPolyMoveEnd)
     tile.on('pointermove', onPolyTouchMoved);
@@ -332,7 +306,7 @@ if (isPointInPoly([touchedAtX-this.x,touchedAtY-this.y],this.polyCords)){
 }
 }
 
-
+/*
 
 function goToActivityOne() {
   currentLevelIndex = -1
@@ -354,7 +328,7 @@ nonCongLink.onclick = goToActivityTwo
 nonCongLinkSideNav.onclick = goToActivityTwo
 congLink.onclick = goToActivityOne
 congLinkSideNav.onclick = goToActivityOne
-
+*/
 
 
 function createActionButton(text,action) {
@@ -462,9 +436,6 @@ function onPolyMoveEnd() {
 
             if (animateTo == null){
                 animateTo = [completedTileSpaces[currentTileIndex].x,completedTileSpaces[currentTileIndex].y]
-                if (LEVELS[currentLevelIndex].congruent){
-                    completedTileSpaces[currentTileIndex].type = currentType
-                }
                 currentTileIndex += 1
             }
 
@@ -501,6 +472,8 @@ function onPolyTouchMoved() {
 //createPolygon('thirdRect',colors['orange'])
 drawWhole()
 layoutPolys()
+let polygons = initPolys(PREANIM_SHAPES,PREANIM_LOCATIONS)
+dumpPolys(polygons,wholeOrigin)
 
 function resetButtons(){
   for (b of buttons){
@@ -518,13 +491,22 @@ document.addEventListener('keydown', function(event) {
         let h = activePoly.actualHeight
         activePoly.actualWidth = h
         activePoly.actualHeight = w
+        activePoly.axis = activePoly.axis*(-1)
       }
 
       // Lets have this be a vertical flip.
     if(event.keyCode == 38 && !activePoly.isWhole) {
         //createjs.Tween.get(activePoly.scale).to({y: activePoly.scale.y*(-1)}, 500, createjs.Ease.getPowInOut(4))
-        activePoly.scale.y = activePoly.scale.y*(-1)
-        activePoly.polyCords = flipX(activePoly.polyCords)
+        if (activePoly.axis == AXIS.NORMAL) {
+          console.log("Flipping X")
+          activePoly.polyCords = flipX(activePoly.polyCords)
+          activePoly.scale.y = activePoly.scale.y*(-1)
+        } else {
+          console.log("flipping Y")
+
+          activePoly.polyCords = flipX(activePoly.polyCords)
+          activePoly.scale.x = activePoly.scale.x*(-1)
+        }
     }
 
     if (event.keyCode == 68){
@@ -545,9 +527,6 @@ document.addEventListener('keydown', function(event) {
       polys.splice(i,1)
       if (polys.length == 0){
         activePoly = polys[0]
-        if (LEVELS[currentLevelIndex].congruent){
-          resetButtons()
-        }
       }
     }
     if (event.keyCode == 13){

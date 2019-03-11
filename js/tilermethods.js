@@ -26,6 +26,7 @@ function flipX(cords){
 
 function flipY(cords){
   return cords.map(e => {
+      console.log("flip y is calleeeeddd?")
     return [-e[0],e[1]]
   })
 }
@@ -122,7 +123,34 @@ function polysInRect(polys,rect){
   return polys.filter(p => rect.containsPoint(new PIXI.Point(p.x,p.y)))
 }
 
+// Is there a way to make this so I dont' have to pass in the rederer?
+function returnPolygon(type,color,renderer) {
+  let cords = type
+  //console.log("incoming cords",cords)
+  var graphics = new PIXI.Graphics();
+      graphics.lineStyle(1,0x000000)
+      graphics.beginFill(color);
+      //graphics.moveTo(cords[0][0],cords[0][1])
 
-function flipY(cords,y) {
+  for (let i  = 0;i<=cords.length;i++){
+      graphics.lineTo(cords[i%cords.length][0],cords[i%cords.length][1])
+  }
 
+    graphics.endFill();
+
+    var texture = renderer.generateTexture(graphics);
+    let tile = new PIXI.Sprite(texture)
+    tile.polyCords = offset(cords,[tile.width/2,tile.height/2])
+    tile.anchor.set(0.5)
+    tile.alpha = 0.8
+    tile.type = type
+
+    tile.actualWidth = tile.width
+    tile.actualHeight = tile.height
+    tile.color = color
+    tile.active = false
+    tile.buttonMode = true
+    tile.x = 0
+    tile.y = 0
+    return tile
 }
