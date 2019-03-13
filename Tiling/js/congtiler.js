@@ -458,6 +458,7 @@ function onPolyMoveEnd() {
 
             createjs.Tween.get(container).to({x: animateTo[0],y: animateTo[1]}, 500, createjs.Ease.getPowInOut(4)).call(()=> {
               if (currentTileIndex > 3){
+                nextButton.interactive = true
                 createjs.Tween.get(nextButton).to({alpha: 1}, 200, createjs.Ease.getPowInOut(4))
               }
             })

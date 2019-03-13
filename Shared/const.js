@@ -2,7 +2,7 @@ const windowWidth = window.innerWidth
 const windowHeight = window.innerHeight
 const wallWidth = windowWidth/1.5
 const wallX = (windowWidth-wallWidth)/2
-const height = window.innerHeight/15
+const height = window.innerHeight/18
 let dx = window.innerHeight/15
 let dy = dx
 

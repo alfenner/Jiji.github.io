@@ -1,8 +1,4 @@
 
-console.log("RUNNING NUMBER LINE SCRIPT")
-
-
-
 
 const PROBLEM_ONE = [[4,5],[1,5],[0,5],[3,5]]
 
@@ -14,7 +10,7 @@ function createNumberChip(frac) {
     let w = dim/4
 
     var block = new PIXI.Graphics();
-    block.beginFill(COLORS.BLUE);
+    block.beginFill(COLORS.PINK);
     block.drawRoundedRect(0, 0, w, h,5);
     block.endFill();
 
@@ -55,7 +51,6 @@ function createNumberChip(frac) {
     tileContainer.active = false
     tileContainer.interactive = true;
 
-    tileContainer.buttonMode = true;
     tileContainer.x = dim
     tileContainer.y = 0
     tileContainer.d = den
@@ -119,6 +114,10 @@ function onDragMove()
     if (this.dragging)
     {
         var newPosition = this.data.getLocalPosition(this.parent);
+        if (newPosition.y < 2*dim || newPosition.y > 4*dim){
+          this.dragging = false
+          this.alpha = 1
+        }
         this.position.x = newPosition.x;
         this.position.y = 3*dim
     }
@@ -126,16 +125,13 @@ function onDragMove()
 
 
 
-function createFractionChip(num,den) {
-
-}
-
 
 
 
 document.addEventListener('keydown', function(event) {
 
     if (event.keyCode == 40 && activeChip.scale.y == 1) {
+      event.preventDefault()
       activeChip.scale.y = activeChip.scale.y*(-1)
       activeChip.d.scale.y = activeChip.d.scale.y*(-1)
       activeChip.n.scale.y = activeChip.n.scale.y*(-1)
@@ -145,6 +141,7 @@ document.addEventListener('keydown', function(event) {
     }
 
     if (event.keyCode == 38 && activeChip.scale.y == -1) {
+      event.preventDefault()
       activeChip.scale.y = activeChip.scale.y*(-1)
       activeChip.d.scale.y = activeChip.d.scale.y*(-1)
       activeChip.n.scale.y = activeChip.n.scale.y*(-1)
