@@ -1,21 +1,21 @@
 
 
-
-
 function createFrame(n,w,h){
   let dx = w/n
   let boxes = []
   let frame = new PIXI.Container()
   for (let i = 0;i<n;i++){
     let g = new PIXI.Graphics()
-        g.drawRoundedRect(1,1,)
-        g.lineStyle(2, 0x000000, 2)
-        g.beginFill(0xFFFFFF);
+        g.drawRoundedRect(0,0)
+        g.lineStyle(2, 0xFFFFFF, 2)
+        g.beginFill(0xc0ffee);
         g.drawRoundedRect(i*dx, 0, dx, h,1);
         g.endFill();
         let tg = stacking.renderer.generateTexture(g)
-        let s = new PIXI.Sprite(tg)
+        let s = new PIXI.Sprite()
+        s.texture = tg
         boxes.push(s)
+        stacking.stage.addChild(s)
         frame.addChild(s)
   }
 
@@ -26,13 +26,12 @@ function createFrame(n,w,h){
   frame.on('pointermove',onDragMove)
   frame.on('pointerup',onDragEnd)
 
-  console.log("frame",frame.width,frame.height)
-
   boxes.map((c,i) => {
       //b.on('pointerdown',onDragStart)
       //b.on('pointermove',onDragMove)
       //b.on('pointerup',onDragEnd)})
     })
+  frame.boxes
 
   return frame
 }
@@ -57,24 +56,18 @@ function onDragStart(event)
     this.data = event.data;
     this.alpha = 0.5;
     this.dragging = true;
-    console.log("DRAGGING START")
 }
 
 function onDragEnd()
 {
     this.alpha = 1;
-
     this.dragging = false;
-    // set the interaction data to null
     this.data = null;
 }
 
 function onDragMove()
 {
-    console.log("WERE DRAGGING")
-    if (this.dragging)
-    {
-
+    if (this.dragging){
         var newPosition = this.data.getLocalPosition(this.parent);
         if (true){
           //this.dragging = false
@@ -84,9 +77,6 @@ function onDragMove()
         this.position.y = newPosition.y;
     }
 }
-
-//let f = createFrame(7,100,20)
-//stacking.stage.addChild(f)
 
 document.addEventListener('keydown', function(event) {
 
@@ -101,7 +91,15 @@ document.addEventListener('keydown', function(event) {
     }
 })
 
-// Denominator of the row that's currently place on the number line.
+let f = createFrame(7,100,20)
+stacking.stage.addChild(f)
+f.x = 100
+f.y = 100
+// createjs.Tween.get(f).to({width: 500}, 1000, createjs.Ease.getPowInOut(4))
+
+
+
+/* Denominator of the row that's currently place on the number line.
 let activeRow = 12
 
 // Numerator of Active Row (this is the fraction that will be shaded)
@@ -365,3 +363,5 @@ function onDragMove() {
         })
     }
 }
+
+*/
