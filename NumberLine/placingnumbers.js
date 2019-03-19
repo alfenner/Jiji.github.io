@@ -7,17 +7,20 @@ const dim = window.innerWidth/12
 
 var pinkCircle = new PIXI.Graphics();
 pinkCircle.lineStyle(2, 0x000000, 2)
-pinkCircle.beginFill(COLORS.PINK);
+pinkCircle.beginFill(COLORS.GRAY);
 pinkCircle.drawCircle(dim/5+1, dim/5+1,dim/5);
 pinkCircle.endFill();
 let pinkCircleTexture = numberline.renderer.generateTexture(pinkCircle)
 
+function createSubmitButton() {
+
+}
 
 function createMeasureBlock(width,num,den) {
 
   let blockContainer = new PIXI.Container()
   var block = new PIXI.Graphics();
-  block.beginFill(COLORS.PINK);
+  block.beginFill(COLORS.BLUE);
   block.drawRoundedRect(0, 0, width, dim/4,5);
   block.endFill();
   let blockTexture = numberline.renderer.generateTexture(block)
@@ -29,6 +32,7 @@ function createMeasureBlock(width,num,den) {
   text.anchor.set(0.5)
   text.x = width/2
   text.y = width/8
+  text.style.fill = 0xFFFFFF
   blockContainer.addChild(text)
 
   blockContainer.interactive = true
@@ -214,6 +218,8 @@ function onLblDragStart(event)
     this.alpha = 0.5;
     this.dragging = true;
     activeChip = this
+    this.parent.addChild(this)
+    // Should be "active Label"
 }
 
 
@@ -256,6 +262,7 @@ function onBlockDragStart(event)
     this.alpha = 0.5;
     this.dragging = true;
     activeChip = this
+    this.parent.addChild(this)
 }
 
 
@@ -296,6 +303,7 @@ function onPinDragStart(event)
     this.alpha = 0.5;
     this.dragging = true;
     activeChip = this
+    this.parent.addChild(this)
 }
 
 
