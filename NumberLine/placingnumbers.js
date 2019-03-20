@@ -1,9 +1,13 @@
 
 
+
 const PROBLEM_ONE_PINS = [1,1,1,1,1,1,1,1,1]
 const PROBLEM_ONE = [[1,1],[3,2],[2,1],[0,1],[1,2]]
 
 const dim = window.innerWidth/12
+
+let blocksOnLine = []
+
 
 var pinkCircle = new PIXI.Graphics();
 pinkCircle.lineStyle(2, 0x000000, 2)
@@ -16,7 +20,56 @@ function createSubmitButton() {
 
 }
 
-function createMeasureBlock(width,num,den) {
+let WHOLE_BLOCK = {
+  num: 1,
+  den: 1
+}
+
+let HALF_BLOCK = {
+  num: 1,
+  den: 2
+}
+
+let THIRD_BLOCK = {
+  num: 1,
+  den: 3
+}
+
+let FOURTH_BLOCK = {
+  num: 1,
+  den: 4
+}
+
+let SIXTH_BLOCK = {
+  num: 1,
+  den: 6
+}
+
+
+
+
+
+
+function createBlockWidget(blocks,linewidth){
+  console.log("blocks",blocks)
+  for (let i = 0;i<blocks.length;i++){
+    let block = new PIXI.Graphics();
+    block.beginFill(COLORS.BLUE);
+    block.drawRoundedRect(dim, dim/8+i*3*dim/8,linewidth/blocks[i].den*blocks[i].num, dim/4,5);
+    block.endFill();
+    block.num = blocks[i].num
+    block.den = blocks[i].den
+    block.interactive = true
+    block.on('pointerdown',onBlockWidgetSelected)
+    numberline.stage.addChild(block)
+  }
+}
+
+createBlockWidget([HALF_BLOCK,THIRD_BLOCK,FOURTH_BLOCK],10*dim)
+
+
+function createMeasureBlock(width,num,den,label) {
+  console.log("num,den",num,den)
 
   let blockContainer = new PIXI.Container()
   var block = new PIXI.Graphics();
@@ -25,22 +78,26 @@ function createMeasureBlock(width,num,den) {
   block.endFill();
   let blockTexture = numberline.renderer.generateTexture(block)
   let blockSprite = new PIXI.Sprite(blockTexture)
+  blockSprite.alpha = 0.7
   blockContainer.addChild(blockSprite)
   blockContainer.hitSpot = blockSprite
 
   let text = new PIXI.Text(num+'/'+den,{fontFamily : 'Chalkboard SE', fontSize: 12, fill : 0x000000, align : 'center'});
   text.anchor.set(0.5)
   text.x = width/2
-  text.y = width/8
+  text.y = dim/8
   text.style.fill = 0xFFFFFF
-  blockContainer.addChild(text)
+  if (label){
+      blockContainer.addChild(text)
+  }
 
+  blockContainer.text = text
   blockContainer.interactive = true
   blockContainer.on('pointerdown',onBlockDragStart)
     .on('pointermove',onBlockDragMove)
     .on('pointerup',onBlockDragEnd)
 
-
+  blocksOnLine.push(blockContainer)
   return blockContainer
 }
 
@@ -55,13 +112,11 @@ function createPin() {
     circle.drawCircle(dim/5+1, dim/5+1,dim/5);
     circle.endFill();
 
-
     var circleTexture = numberline.renderer.generateTexture(circle);
     let circleSprite = new PIXI.Sprite(circleTexture)
     circleSprite.alpha = 0.5
     circleSprite.anchor.set(0.5)
     circleSprite.texture = pinkCircleTexture
-
 
     var stem = new PIXI.Graphics();
     stem.lineStyle(2, 0x000000, 10)
@@ -77,8 +132,7 @@ function createPin() {
 
     pinContainer.x = 0
     pinContainer.y = 0
-    //pinContainer.pivot.x = 100
-    //pinContainer.pivot.y = 100
+    pinContainer.draggable = true
 
     return pinContainer
 }
@@ -202,10 +256,13 @@ function makeNumberLine(den) {
   return line
 }
 
-let b = createMeasureBlock(75,1,4)
-numberline.stage.addChild(b)
-b.x = dim
-b.y = 3*dim - b.height/2
+function onBlockWidgetSelected() {
+    let b = createMeasureBlock(this.width,this.num,this.den)
+    numberline.stage.addChild(b)
+    b.x = dim
+    b.y = 3*dim - b.height
+}
+
 
 // Label Actions
 
@@ -254,7 +311,9 @@ function onLblDragMove()
 
 function onBlockDragStart(event)
 {
-    console.log("BALLLLLLLLLLS")
+    let touchedAtX = event.data.global.x
+    let touchedAtY = event.data.global.y
+    this.deltaTouch = [this.x-touchedAtX,this.y-touchedAtY]
     // store a reference to the data
     // the reason for this is because of multitouch
     // we want to track the movement of this particular touch
@@ -269,6 +328,11 @@ function onBlockDragStart(event)
 function onBlockDragEnd()
 {
     this.alpha = 1;
+    if (this.x+this.width/2 < dim){
+      let i = blocksOnLine.indexOf(this)
+      blocksOnLine.splice(i,1)
+      numberline.stage.removeChild(this)
+    }
 
     this.dragging = false;
     // set the interaction data to null
@@ -280,12 +344,13 @@ function onBlockDragMove(){
     if (this.dragging){
         var newPosition = this.data.getLocalPosition(this.parent);
         //let position = new PIXI.Point(newPosition.x,newPosition.y)
-        if (newPosition.y < 2.75*dim || newPosition.y > 3.25*dim){
+        if (newPosition.y < 2.75*dim || newPosition.y > 3*dim){
           this.dragging = false
           this.alpha = 1
         }
-        this.position.x = newPosition.x-this.width/2;
-        this.position.y = 3*dim-this.height/2
+        //this.position.x = newPosition.x-this.width/2;
+        this.x = newPosition.x + this.deltaTouch[0]
+
     }
 }
 
@@ -297,13 +362,13 @@ function onBlockDragMove(){
 function onPinDragStart(event)
 {
     // store a reference to the data
-    // the reason for this is because of multitouch
-    // we want to track the movement of this particular touch
-    this.data = event.data;
-    this.alpha = 0.5;
-    this.dragging = true;
-    activeChip = this
-    this.parent.addChild(this)
+    if (this.draggable) {
+      this.data = event.data;
+      this.alpha = 0.5;
+      this.dragging = true;
+      activeChip = this
+      this.parent.addChild(this)
+    }
 }
 
 
