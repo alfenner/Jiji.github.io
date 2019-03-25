@@ -31,7 +31,7 @@ const EIGHTH_BLOCK = {
 const PROBLEM_1 = {
   blocks: [WHOLE_BLOCK,HALF_BLOCK,FOURTH_BLOCK],
   indexOfMarkedBlock: null,
-  pinKeys: [1,1,1,1,1,1,1,1,1],
+  pinKeys: [1,1,1,1,1],
   max: 2,
   min: 0,
   minPartition: 8,
