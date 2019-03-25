@@ -35,5 +35,5 @@ const PROBLEM_1 = {
   max: 2,
   min: 0,
   minPartition: 8,
-  labels: [[2,1],[1,1],[1,2],[3,2],[0,1]]
+  labels: [[2,1],[1,1],[3,2],[0,1]]
 }
