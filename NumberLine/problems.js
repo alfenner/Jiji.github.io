@@ -45,7 +45,7 @@ const PROBLEM_1 = {
 }
 
 const DAY1_WARM_UP_P1 = {
-  blocks: [HALF_BLOCK,FOURTH_BLOCK,EIGHTH_BLOCK],
+  blocks: [],
   indexOfMarkedBlock: null,
   pinKeys: [0,1,0],
   presetPinKeys: [1,0,1],
@@ -62,7 +62,7 @@ const DAY1_WARM_UP_P1 = {
 }
 
 const DAY1_WARM_UP_P2 = {
-  blocks: [HALF_BLOCK,THIRD_BLOCK,SIXTH_BLOCK],
+  blocks: [],
   indexOfMarkedBlock: null,
   pinKeys: [0,1,1,0],
   presetPinKeys: [1,0,0,1],
