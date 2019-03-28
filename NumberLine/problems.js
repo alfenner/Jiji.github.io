@@ -29,6 +29,7 @@ const EIGHTH_BLOCK = {
 }
 
 const DAY4_CLASSWORK_P1 = {
+  prompt: "Space pins evenly and then label them",
   blocks: [HALF_BLOCK,FOURTH_BLOCK,EIGHTH_BLOCK],
   indexOfMarkedBlock: null,
   pinKeys: [0,1,1,1,0],
@@ -45,6 +46,7 @@ const DAY4_CLASSWORK_P1 = {
 }
 
 const DAY4_CLASSWORK_P2 = {
+  prompt: "Go!",
   blocks: [THIRD_BLOCK,SIXTH_BLOCK],
   indexOfMarkedBlock: null,
   pinKeys: [0,1,1,0],
@@ -61,6 +63,7 @@ const DAY4_CLASSWORK_P2 = {
 }
 
 const DAY4_CLASSWORK_P3 = {
+  prompt: "Go!",
   blocks: [WHOLE_BLOCK,HALF_BLOCK,FOURTH_BLOCK],
   indexOfMarkedBlock: null,
   pinKeys: [0,1,1,1,1,1,1,1,0],
@@ -77,6 +80,7 @@ const DAY4_CLASSWORK_P3 = {
 }
 
 const DAY4_CLASSWORK_P4 = {
+  prompt: "Go!",
   blocks: [THIRD_BLOCK,SIXTH_BLOCK],
   indexOfMarkedBlock: null,
   pinKeys: [0,1,1,1,1,1,0],
@@ -93,6 +97,7 @@ const DAY4_CLASSWORK_P4 = {
 }
 
 const DAY4_CLASSWORK_P5 = {
+  prompt: "Go!",
   blocks: [THIRD_BLOCK,EIGHTH_BLOCK],
   indexOfMarkedBlock: null,
   pinKeys: [0,1,1,1,1,1,1,1,0],
@@ -110,6 +115,7 @@ const DAY4_CLASSWORK_P5 = {
 
 
 const DAY1_WARM_UP_P1 = {
+  prompt: "Use the pin to make two equal parts",
   blocks: [],
   indexOfMarkedBlock: null,
   pinKeys: [0,1,0],
@@ -127,6 +133,7 @@ const DAY1_WARM_UP_P1 = {
 }
 
 const DAY1_WARM_UP_P2 = {
+  prompt: "Use the pins to make three equal parts",
   blocks: [],
   indexOfMarkedBlock: null,
   pinKeys: [0,1,1,0],
@@ -143,7 +150,26 @@ const DAY1_WARM_UP_P2 = {
   endPins: true,
 }
 
+const DAY1_2ND_WARM_UP_P1 = {
+  prompt: "Create pins to make three equal parts",
+  blocks: [],
+  indexOfMarkedBlock: null,
+  pinKeys: [0,1,1,0],
+  presetPinKeys: [1,0,0,1],
+  pinWidget: true,
+  partitionsPerWhole: 3,
+  max: 1,
+  min: 0,
+  tolerance: 0.2,
+  partitionsPerLine: 3,
+  presetLabels: [],
+  labels: [],
+  unique: true,
+  endPins: true,
+}
+
 const DAY1_WARM_UP_P3 = {
+  prompt: "Go!",
   blocks: [],
   indexOfMarkedBlock: null,
   pinKeys: [1,0,0,1],
@@ -161,6 +187,7 @@ const DAY1_WARM_UP_P3 = {
 }
 
 const DAY1_CLASSWORK_P1 = {
+  prompt: "Go!",
   blocks: [HALF_BLOCK,FOURTH_BLOCK,EIGHTH_BLOCK],
   indexOfMarkedBlock: null, // DON'T KNOW THAT THIS IS OR WAS SUPPOSED TO BE FOR
   pinKeys: [0,0,0],
@@ -179,6 +206,7 @@ const DAY1_CLASSWORK_P1 = {
 }
 
 const DAY1_CLASSWORK_P5 = {
+  prompt: "Create pins to make six equal parts and set the labels",
   blocks: [HALF_BLOCK,THIRD_BLOCK,SIXTH_BLOCK],
   indexOfMarkedBlock: null, // DON'T KNOW THAT THIS IS OR WAS SUPPOSED TO BE FOR
   pinKeys: [0,0,0,0,0,0,0],
@@ -197,11 +225,12 @@ const DAY1_CLASSWORK_P5 = {
 }
 
 const DAY2_CLASSWORK_P1 = {
+  prompt: "Use the pins to create equal parts and then label them",
   blocks: [FOURTH_BLOCK,SIXTH_BLOCK,EIGHTH_BLOCK],
   indexOfMarkedBlock: null,
-  pinKeys: [1,0,0,0,0],
+  pinKeys: [0,1,1,1,1],
   presetPinKeys: [1,0,0,0,0],
-  pinWidget: true,
+  pinWidget: false,
   partitionsPerWhole: 2,
   max: 1,
   min: 0,
@@ -209,12 +238,13 @@ const DAY2_CLASSWORK_P1 = {
   tolerance: 0.2,
   partitionsPerLine: 4,
   presetLabels: [[0,1]],
-  labels: [[1,2],[2,2],[3,2],[4,2]],
+  labels: [[1,2],[2,2],[4,2]],
   unique: false,
   endPins: true,
 }
 
 const DAY3_CLASSWORK_P1 = {
+  prompt: "Go!",
   blocks: [],
   indexOfMarkedBlock: null,
   pinKeys: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -234,6 +264,7 @@ const DAY3_CLASSWORK_P1 = {
 }
 
 const DAY3_CLASSWORK_P2 = {
+  prompt: "Go!",
   blocks: [],
   indexOfMarkedBlock: null,
   pinKeys: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -252,7 +283,7 @@ const DAY3_CLASSWORK_P2 = {
   endPins: true,
 }
 
-const TEST_QUE = [DAY1_WARM_UP_P2,DAY1_CLASSWORK_P5,DAY1_CLASSWORK_P1,DAY2_CLASSWORK_P1,DAY3_CLASSWORK_P1]
+const TEST_QUE = [DAY1_WARM_UP_P2,DAY1_2ND_WARM_UP_P1,DAY4_CLASSWORK_P1,DAY1_CLASSWORK_P5,DAY2_CLASSWORK_P1,DAY3_CLASSWORK_P1]
 
 const DAY_ONE_WARM_UP_SEQ = [DAY1_WARM_UP_P1,DAY1_WARM_UP_P2,DAY1_WARM_UP_P2]
 

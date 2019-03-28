@@ -417,9 +417,16 @@ presetPins = problem.presetPinKeys.map((e,i) => {
 
   createBlockWidget(problem.blocks,wholeWidth)
 
+  dropNotification(currentProblem.prompt)
+
+
   console.log("PINS AFTER SETUP",pinsInPlay)
 
+
 }
+
+//dropNotification("Check Your Pins!")
+
 
 loadProblem(PROBLEM_QUE[0])
 

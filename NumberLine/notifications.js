@@ -6,7 +6,7 @@ function createNotification(messege){
   var graphics = new PIXI.Graphics();
   graphics.lineStyle(1, 0x000000, 3)
   graphics.beginFill(0xFFFFFF);
-  graphics.drawRoundedRect(0, 0,8*dx,dx ,5);
+  graphics.drawRoundedRect(0, 0,15*dx,dx ,5);
   graphics.endFill();
 
     var texture = numberline.renderer.generateTexture(graphics);
@@ -28,7 +28,6 @@ function createNotification(messege){
     tileContainer.y = -2*dx
 
     tileContainer.tile = tile
-
 
     return tileContainer
 }
