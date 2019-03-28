@@ -28,21 +28,86 @@ const EIGHTH_BLOCK = {
   den: 8
 }
 
-const PROBLEM_1 = {
-  blocks: [WHOLE_BLOCK,HALF_BLOCK,FOURTH_BLOCK],
+const DAY4_CLASSWORK_P1 = {
+  blocks: [HALF_BLOCK,FOURTH_BLOCK,EIGHTH_BLOCK],
   indexOfMarkedBlock: null,
   pinKeys: [0,1,1,1,0],
   presetPinKeys: [1,0,0,0,1],
   pinWidget: false,
-  partitionsPerWhole: 2,
-  max: 2,
+  partitionsPerWhole: 4,
+  max: 1,
   min: 0,
   tolerance: 0.2,
   partitionsPerLine: 4,
-  presetLabels: [[0,1],[2,1]],
-  labels: [[2,1],[1,1],[3,2],[0,1]],
-  presetPins: []
+  presetLabels: [[0,1],[1,1]],
+  labels: [[1,2]],
+  unique: true,
 }
+
+const DAY4_CLASSWORK_P2 = {
+  blocks: [THIRD_BLOCK,SIXTH_BLOCK],
+  indexOfMarkedBlock: null,
+  pinKeys: [0,1,1,0],
+  presetPinKeys: [1,0,0,1],
+  pinWidget: false,
+  partitionsPerWhole: 3,
+  max: 1,
+  min: 0,
+  tolerance: 0.2,
+  partitionsPerLine: 3,
+  presetLabels: [[0,1],[1,1]],
+  labels: [[2,3]],
+  unique: true,
+}
+
+const DAY4_CLASSWORK_P3 = {
+  blocks: [WHOLE_BLOCK,HALF_BLOCK,FOURTH_BLOCK],
+  indexOfMarkedBlock: null,
+  pinKeys: [0,1,1,1,1,1,1,1,0],
+  presetPinKeys: [1,0,0,0,0,0,0,0,1],
+  pinWidget: false,
+  partitionsPerWhole: 4,
+  max: 2,
+  min: 0,
+  tolerance: 0.2,
+  partitionsPerLine: 8,
+  presetLabels: [[0,1],[2,1]],
+  labels: [[1,1],[3,2],[1,2]],
+  unique: true,
+}
+
+const DAY4_CLASSWORK_P4 = {
+  blocks: [THIRD_BLOCK,SIXTH_BLOCK],
+  indexOfMarkedBlock: null,
+  pinKeys: [0,1,1,1,1,1,0],
+  presetPinKeys: [1,0,0,0,0,0,1],
+  pinWidget: false,
+  partitionsPerWhole: 3,
+  max: 2,
+  min: 0,
+  tolerance: 0.2,
+  partitionsPerLine: 6,
+  presetLabels: [[0,1],[2,1]],
+  labels: [[1,3],[4,3],[3,3]],
+  unique: true,
+}
+
+const DAY4_CLASSWORK_P5 = {
+  blocks: [THIRD_BLOCK,EIGHTH_BLOCK],
+  indexOfMarkedBlock: null,
+  pinKeys: [0,1,1,1,1,1,1,1,0],
+  presetPinKeys: [1,0,0,0,0,0,0,0,1],
+  pinWidget: false,
+  partitionsPerWhole: 3,
+  max: 1,
+  min: 0,
+  tolerance: 0.2,
+  partitionsPerLine: 8,
+  presetLabels: [[0,1],[1,1]],
+  labels: [[1,3],[4,3],[3,3]],
+  unique: true,
+}
+
 
 const DAY1_WARM_UP_P1 = {
   blocks: [],
@@ -132,7 +197,7 @@ const DAY1_CLASSWORK_P5 = {
 }
 
 const DAY2_CLASSWORK_P1 = {
-  blocks: [HALF_BLOCK,THIRD_BLOCK,FOURTH_BLOCK],
+  blocks: [FOURTH_BLOCK,SIXTH_BLOCK,EIGHTH_BLOCK],
   indexOfMarkedBlock: null,
   pinKeys: [1,0,0,0,0],
   presetPinKeys: [1,0,0,0,0],
@@ -197,5 +262,7 @@ const DAY_TWO_CLASSWORK_SEQ = [DAY2_CLASSWORK_P1,DAY2_CLASSWORK_P1,DAY2_CLASSWOR
 
 const DAY_THREE_CLASSWORK_SEQ = [DAY3_CLASSWORK_P1,DAY3_CLASSWORK_P1,DAY3_CLASSWORK_P1]
 
+const DAY_FOUR_CLASSWORK_SEQ = [DAY4_CLASSWORK_P1,DAY4_CLASSWORK_P2,DAY4_CLASSWORK_P3,DAY4_CLASSWORK_P4,DAY4_CLASSWORK_P5]
 
-const ACTIVITY_QUE = [TEST_QUE,DAY_ONE_WARM_UP_SEQ,DAY_ONE_CLASSWORK_SEQ,DAY_TWO_CLASSWORK_SEQ,DAY_THREE_CLASSWORK_SEQ]
+
+const ACTIVITY_QUE = [TEST_QUE,DAY_ONE_WARM_UP_SEQ,DAY_ONE_CLASSWORK_SEQ,DAY_TWO_CLASSWORK_SEQ,DAY_THREE_CLASSWORK_SEQ,DAY_FOUR_CLASSWORK_SEQ]

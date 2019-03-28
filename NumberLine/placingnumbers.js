@@ -18,6 +18,7 @@ backGround.beginFill(0xFFFFFF)
 backGround.drawRoundedRect(0,0,windowWidth,windowHeight)
 backGround.endFill()
 backGround.interactive = true
+backGround.static = false
 numberline.stage.addChild(backGround)
 
 // CONSTANTS
@@ -39,6 +40,9 @@ blueCircle.beginFill(COLORS.BLUE);
 blueCircle.drawCircle(dim/5+1, dim/5+1,dim/5);
 blueCircle.endFill();
 
+let expectedPins = 0
+
+
 
 // STATE VARIABLES
 let blocksOnLine = []
@@ -47,12 +51,16 @@ let blocksOnLine = []
 let pinsCurrentlySet = []
 let feedBlocks;
 
+let pinsOffLineCount = 0
+
 let presetPins = []
 let presetLabels = []
-let pinsOnLine = []
+let pinsInPlay = []
 let labelsOnLine = []
 let problemIndex = 0
 let ticksOnLine = []
+
+let blocksInWidget = []
 
 let firstTry = true
 let pinWidget = {}
@@ -73,6 +81,15 @@ let globalLabelRef = []
 
 let activityQue;
 
+function areAllPinsSet(pins){
+  let set = true
+  for (p of pinsInPlay) {
+    if (p.onLine == false){
+      set = false
+    }
+  }
+  return set
+}
 
 function removeElement(e,arr){
   if (arr.length != 0){
@@ -92,28 +109,32 @@ function createPinWidget(){
   plus.x = 0
   plus.y = 0
   p.addChild(plus)
-  p.on('pointerdown',generatePinFromWidget)
+  p.on('pointerdown',createPinFromWidget)
   p.originalLocation = [0,0]
   p.x = dim
   p.y = 1.5*dim
   pinWidget = p
+  p.static = false
+  p.isSet = false
   numberline.stage.addChild(p)
 }
 
-function generatePinFromWidget(){
+function createPinFromWidget(){
+  pinsOffLineCount += 1
   let p = createPin()
       p.on('pointerdown',onPinDragStart)
        .on('pointermove',onPinDragMove)
        .on('pointerup',onPinDragEnd)
   p.x = dim
   p.y = 1.5*dim
-  createjs.Tween.get(p).to({x: 6*dim,y: 1.5*dim}, 500, createjs.Ease.getPowInOut(4))
+  createjs.Tween.get(p).to({x: dim+1.1*p.width*pinsOffLineCount,y: 1.5*dim}, 500, createjs.Ease.getPowInOut(4))
   p.onLine = false
   p.isSet = false
   p.mutable = true
-  pinsOnLine.push(p)
+  pinsInPlay.push(p)
   globalPinRef.push(p)
   numberline.stage.addChild(p)
+  numberline.stage.addChild(pinWidget)
 }
 
 function setTicks(numberOfTicks){
@@ -176,11 +197,23 @@ function createActionButton(text,action) {
 }
 
 function freezeView(){
-
+  for (c of [...pinsInPlay,...blocksOnLine,...labelsOnLine,pinWidget,...blocksInWidget]){
+      c.interactive = false
+  }
 }
 
+function unfreezeView(){
+  for (c of [...pinsInPlay,...blocksOnLine,...labelsOnLine,pinWidget,...blocksInWidget]){
+    if (c.isSet == false){
+        c.interactive = true
+      }
+  }
+}
+
+
+
 function refreshGame(){
-    for (e of [...pinsOnLine,...labelsOnLine]){
+    for (e of [...pinsInPlay,...labelsOnLine]){
       e.onLine = false
     }
     firstTry = false
@@ -203,12 +236,13 @@ function getMaxLabelX(lbls){
 
 function checkAnswer() {
 
+console.log("Active Pins",pinsInPlay.length)
 
   if (this.checkAnswer) {
 
     let validSetting = true
 
-    for (e of [...pinsOnLine,...labelsOnLine]){
+    for (e of [...pinsInPlay,...labelsOnLine]){
       if (!e.onLine){
           validSetting = false
       }
@@ -219,13 +253,9 @@ function checkAnswer() {
     }
     blocksOnLine = []
 
-    console.log("First try?",firstTry)
-    console.log("currentProblem unique?",currentProblem.unique)
     // Compute the "min step"
     if (firstTry && !currentProblem.unique) {
-      console.log('recomputing maxLbl X')
       let maxlblX = getMaxLabelX(labelsOnLine)
-      console.log("Max Label X",maxlblX)
       minStep = (maxlblX-dim)/currentProblem.partitionsPerLine
     } else if (currentProblem.labels.length == 0) {
        minStep = 10*dim/currentProblem.partitionsPerLine
@@ -239,7 +269,8 @@ function checkAnswer() {
       numberline.stage.addChild(b)})
 
     if (validSetting){
-      animateFeedBack([...feedBlocks],[dim,2.7*dim],[...pinsOnLine],[...labelsOnLine],0)
+      freezeView()
+      animateFeedBack([...feedBlocks],[dim,2.7*dim],[...pinsInPlay],[...labelsOnLine],0)
       this.checkAnswer = false
       for (b of blocksOnLine){
         //numberline.stage.removeChild(b)
@@ -248,6 +279,7 @@ function checkAnswer() {
       dropNotification("Make sure to set all the pins!")
     }
   } else {
+    unfreezeView()
     this.checkAnswer = true
     this.text.text = "Go"
     for (b of feedBlocks){
@@ -258,12 +290,11 @@ function checkAnswer() {
 }
 
 let goButton = createActionButton("Go",checkAnswer)
+goButton.static = false
 numberline.stage.addChild(goButton)
 
 
 function loadProblem(problem) {
-
-  console.log("PINS ON START",pinsOnLine)
 
   currentProblem = problem
   lineMax = problem.max
@@ -280,7 +311,7 @@ function loadProblem(problem) {
   })
 
   if (!currentProblem.pinWidget){
-    pinsOnLine = problem.pinKeys.map((e,i) => {
+    pinsInPlay = problem.pinKeys.map((e,i) => {
       let p = createPin()
       if (e != 0){
         p.on('pointerdown',onPinDragStart)
@@ -289,6 +320,8 @@ function loadProblem(problem) {
         p.x = dim+1.2*p.width*i
         p.y = 1.5*dim
         p.isSet = false
+        p.mutable = false
+        p.static = false
       } else if (e == 0){
         // "Dummy Pins"
         p.isSet = true
@@ -296,6 +329,7 @@ function loadProblem(problem) {
         p.x = dim + lineWidth/problem.partitionsPerLine*i
         p.y = 2.5*dim
         p.onLine = true
+        p.static = true
         p.interactive = false
       }
         numberline.stage.addChild(p)
@@ -304,31 +338,25 @@ function loadProblem(problem) {
     return p
   })
 
-  globalPinRef = pinsOnLine
+  globalPinRef = pinsInPlay
 
-  pinsOnLine = pinsOnLine.filter(p => p.onLine == false)
+  pinsInPlay = pinsInPlay.filter(p => p.onLine == false)
 
 }
 
 if (problem.presetLabels.length != 0){
-  console.log("loading up the labels!!! MOOOO")
   presetLabels = problem.presetLabels.map((e) => {return createFractionLbl(e)})
-  console.log('presetLabels.count',presetLabels.length)
   presetLabels.map(l => {
     l.x = dim + wholeWidth*l._n/l._d
     l.y = 3*dim
     flipLbl(l)
+    l.static = true
     numberline.stage.addChild(l)
   })
 }
 
-if (currentProblem.ticks){
-
-}
-
 if (currentProblem.pinWidget) {
     createPinWidget()
-    //pinsOnLine = []
 }
 
 presetPins = problem.presetPinKeys.map((e,i) => {
@@ -336,10 +364,10 @@ presetPins = problem.presetPinKeys.map((e,i) => {
       let p = createStaticPin()
       p.x = dim + lineWidth/problem.partitionsPerLine*i
       p.y = 2.5*dim
-      p.onLine = true
-      p.interactive = false
       numberline.stage.addChild(p)
       return p
+    } else {
+      expectedPins += 1
     }
   })
 
@@ -389,7 +417,7 @@ presetPins = problem.presetPinKeys.map((e,i) => {
 
   createBlockWidget(problem.blocks,wholeWidth)
 
-  console.log("PINS AFTER SETUP",pinsOnLine)
+  console.log("PINS AFTER SETUP",pinsInPlay)
 
 }
 
@@ -411,8 +439,8 @@ function globalPointerUp() {
     }
     if (activeEntity.isPin){
 
-      let i = pinsOnLine.indexOf(activeEntity)
-      pinsOnLine.splice(i,1)
+      let i = pinsInPlay.indexOf(activeEntity)
+      pinsInPlay.splice(i,1)
     }
     numberline.stage.removeChild(activeEntity)
   }
@@ -447,9 +475,9 @@ function loadNextGame(nextGame){
   goButton.text.text = "Go"
   goButton.checkAnswer = true
   firstTry = true
-  console.log("pins at the end of game",pinsOnLine)
+  console.log("pins at the end of game",pinsInPlay)
   console.log("labels at the end of the game",labelsOnLine)
-  pinsOnLine = []
+  pinsInPlay = []
   labelsOnLine = []
   pinsCurrentlySet = []
 
@@ -515,17 +543,19 @@ function animateFeedBack(blocks,start,pins,labels,i){
       for (p of pins) {
         if (!currentProblem.pinWidget){
           createjs.Tween.get(p).to({x: p.originalLocation[0],y: p.originalLocation[1]}, 500, createjs.Ease.getPowInOut(4))
-        } else {
-          dropNotification("Check Your Pins!")
         }
       }
+
+      if (pins.length != 0) {
+          dropNotification("Check Your Pins!")
+        }
 
       for (l of labels){
           createjs.Tween.get(l).to({x: l.originalLocation[0],y: l.originalLocation[1]}, 500, createjs.Ease.getPowInOut(4))
       }
 
     labelsOnLine = labels
-    pinsOnLine = pins
+    pinsInPlay = pins
     goButton.text.text = "Try Again"
     refreshGame()
     return
@@ -552,6 +582,8 @@ function animateFeedBack(blocks,start,pins,labels,i){
           if (Math.abs(start[0] - expectedLocation) < dT*minStep && Math.abs(l.x - expectedLocation) < dT*minStep){
             setLabel = true
             nearestLabel = l
+            l.isSet = true
+            l.interactive = false
             removeElement(l,labels)
           }
       }
@@ -572,8 +604,8 @@ function animateFeedBack(blocks,start,pins,labels,i){
       }
 
     if (setPin && setLabel) {
-      createjs.Tween.get(nearestPin).to({x: start[0],y: 2.5*dim}, 500, createjs.Ease.getPowInOut(4)).call(() => {
-      createjs.Tween.get(nearestLabel).to({x: start[0],y: 3*dim},500,createjs.Ease.getPowInOut(4)).call(() => {
+      createjs.Tween.get(nearestPin).to({x: animateTo[0]+minStep,y: 2.5*dim}, 500, createjs.Ease.getPowInOut(4)).call(() => {
+      createjs.Tween.get(nearestLabel).to({x: animateTo[0]+minStep,y: 3*dim},500,createjs.Ease.getPowInOut(4)).call(() => {
             nearestPin.set = true
             nearestLabel.set = true
             i += 1
@@ -582,13 +614,13 @@ function animateFeedBack(blocks,start,pins,labels,i){
         })
       })
     } else if (setPin){
-      createjs.Tween.get(nearestPin).to({x: start[0],y: 2.5*dim}, 500, createjs.Ease.getPowInOut(4)).call(() => {
+      createjs.Tween.get(nearestPin).to({x: animateTo[0]+minStep,y: 2.5*dim}, 500, createjs.Ease.getPowInOut(4)).call(() => {
             nearestPin.isSet = true
             i += 1
             animateFeedBack(blocks,newStart,pins,labels,i)
       })
     } else if (setLabel) {
-      createjs.Tween.get(nearestLabel).to({x: start[0],y: 3*dim}, 500, createjs.Ease.getPowInOut(4)).call(() => {
+      createjs.Tween.get(nearestLabel).to({x: animateTo[0]+minStep,y: 3*dim}, 500, createjs.Ease.getPowInOut(4)).call(() => {
           nearestLabel.set = true
           i += 1
           animateFeedBack(blocks,newStart,pins,labels,i)
@@ -612,7 +644,9 @@ function createBlockWidget(blocks,wholeWidth) {
     block.num = blocks[i].num
     block.den = blocks[i].den
     block.interactive = true
+    block.isSet = false
     block.on('pointerdown',onBlockWidgetSelected)
+    blocksInWidget.push(block)
     numberline.stage.addChild(block)
   }
 }
@@ -680,6 +714,7 @@ function createFeedBlock(width,num,den,label) {
   }
 
   blockContainer.text = text
+  blockContainer.static = false
   blockContainer.isFeedBlock = true
 
   return blockContainer
@@ -706,7 +741,7 @@ function createStaticPin() {
     pinContainer.addChild(stem)
 
     pinContainer.active = false
-    pinContainer.interactive = true;
+    pinContainer.interactive = false;
     pinContainer.mutable = false
 
     pinContainer.x = 0
@@ -714,6 +749,7 @@ function createStaticPin() {
     pinContainer.draggable = true
     pinContainer.onLine = true
     pinContainer.isPin = true
+    pinContainer.static = true
     pinContainer.circleSprite = circleSprite
 
     return pinContainer
@@ -833,6 +869,7 @@ function createFractionLbl(frac) {
     tileContainer.n = num
     tileContainer._d = d
     tileContainer._n = n
+    tileContainer.isSet = false
     tileContainer.pivot.x = 0
     tileContainer.pivot.y = dim/2
     tileContainer.onLine = false
@@ -892,12 +929,6 @@ function onLblDragMove()
 
     if (this.dragging) {
         var newPosition = this.data.getLocalPosition(this.parent);
-        //let position = new PIXI.Point(newPosition.x,newPosition.y)
-        if (false){
-          this.dragging = false
-          this.alpha = 1
-        }
-        // this.circleSprite.alpha = 1 - Math.abs(this.expectedLocation - this.x)/this.expectedLocation
         this.onLine = true
         this.position.x = newPosition.x;
         this.position.y = 3*dim
@@ -941,12 +972,6 @@ function onBlockDragMove(){
 
     if (this.dragging){
         var newPosition = this.data.getLocalPosition(this.parent);
-        //let position = new PIXI.Point(newPosition.x,newPosition.y)
-        if (false){
-          this.dragging = false
-          this.alpha = 1
-        }
-        //this.position.x = newPosition.x-this.width/2;
         this.x = newPosition.x + this.deltaTouch[0]
     }
 }
@@ -967,16 +992,23 @@ function onPinDragStart(event)
       this.onLine = true
       this.parent.addChild(this)
     }
+    if (areAllPinsSet(pinsInPlay)){
+      pinsOffLineCount = 0
+    }
 }
+
+
+
+
 
 
 function onPinDragEnd()
 {
     this.alpha = 1;
 
-    if (this.x+this.width/2 < dim){
-        let i = pinsOnLine.indexOf(this)
-        pinsOnLine.splice(i,1)
+    if (this.x+this.width/2 < dim && this.mutable == true){
+        let i = pinsInPlay.indexOf(this)
+        pinsInPlay.splice(i,1)
         numberline.stage.removeChild(this)
     }
 
@@ -1014,7 +1046,6 @@ function flipLbl(lbl){
     lbl.n.scale.y = lbl.n.scale.y*(-1)
   }
 }
-
 
 
 document.addEventListener('keydown', function(event) {
