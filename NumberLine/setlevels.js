@@ -5,7 +5,7 @@ document.getElementById("dayOneClasswork").addEventListener("click", queClasswor
 document.getElementById("dayTwoClasswork").addEventListener("click", queClassworkDayTwo)
 document.getElementById("dayThreeClasswork").addEventListener("click", queClassworkDayThree)
 document.getElementById("dayFourClasswork").addEventListener("click", queClassworkDayFour)
-
+document.getElementById("dayOneSettingLabels").addEventListener("click", quePostWarmupDayOne)
 
 function queTestProblems(){
     window.localStorage['activityIndex'] = 0
@@ -29,4 +29,9 @@ function queClassworkDayThree(){
 
 function queClassworkDayFour(){
     window.localStorage['activityIndex'] = 5
+}
+
+
+function quePostWarmupDayOne(){
+    window.localStorage['activityIndex'] = 6
 }
