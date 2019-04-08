@@ -1,11 +1,22 @@
-// BACKGROUND SET UP
+// Problem que setup
 
+let PROBLEM_QUE;
+
+const TEACHER_MODE = window.localStorage['teacherMode']
 const QUE_INDEX = window.localStorage['activityIndex']
 if (QUE_INDEX){
-  PROBLEM_QUE = ACTIVITY_QUE[QUE_INDEX]
+    console.log("HEY I GOT MY QUE INDEX")
+    PROBLEM_QUE = ACTIVITY_QUE[QUE_INDEX]
 } else {
   PROBLEM_QUE = ACTIVITY_QUE[0]
 }
+
+if (TEACHER_MODE == 'true'){
+  console.log("hey it's teacher mode!!!")
+  PROBLEM_QUE = PROBLEM_QUE.filter(e => e.discussionQuestion == true)
+  console.log("HERES THE FILTERED SHIT",PROBLEM_QUE)
+}
+
 
 let numberOfProblems = PROBLEM_QUE.length
 
@@ -21,7 +32,6 @@ backGround.static = false
 numberline.stage.addChild(backGround)
 
 // CONSTANTS
-
 
 const dim = window.innerWidth/12
 const centerLine = window.innerHeight/2
@@ -98,7 +108,11 @@ function createPrompt(prompt){
     let tile = new PIXI.Sprite(texture)
     tile.anchor.set(0.5)
 
-    let den = new PIXI.Text(prompt,{fontFamily : 'Chalkboard SE', fontSize: dx/2, fill : 0x000000, align : 'center'});
+    let promptLength = prompt.length
+    console.log("promptLength",promptLength)
+    let textSize = promptLength*0.5*topMargin > 10*dim ? 15*dim/(promptLength) : 0.5*topMargin
+
+    let den = new PIXI.Text(prompt,{fontFamily : 'Chalkboard SE', fontSize: textSize, fill : 0x000000, align : 'center'});
     den.anchor.set(0.5)
 
     let tileContainer = new PIXI.Container()
@@ -210,7 +224,7 @@ function createActionButton(text,action) {
   var graphics = new PIXI.Graphics();
   graphics.lineStyle(0, 0xb7b7b7, 1)
   graphics.beginFill(COLORS.ORANGE);
-  graphics.drawRoundedRect(0, 0,4*dx,dx ,5);
+  graphics.drawRoundedRect(0, 0,2*dim,0.5*dim ,5);
   graphics.endFill();
 
     var texture = numberline.renderer.generateTexture(graphics);
@@ -245,14 +259,16 @@ function freezeView(){
   for (c of [...pinsInPlay,...blocksOnLine,...labelsOnLine,pinWidget,...blocksInWidget]){
       c.interactive = false
   }
+  goButton.interactive = false
 }
 
 function unfreezeView(){
-  for (c of [...pinsInPlay,...blocksOnLine,...labelsOnLine,pinWidget,...blocksInWidget]){
+  for (c of [...pinsInPlay,...blocksOnLine,...labelsOnLine,pinWidget,...blocksInWidget,goButton]){
     if (c.isSet == false){
         c.interactive = true
       }
   }
+  goButton.interactive = true
 }
 
 
@@ -337,18 +353,24 @@ if (this.text.text == "Next Problem"){
       dropNotification("Make sure to set all the pins!")
     }
   } else {
-    unfreezeView()
     this.checkAnswer = true
     this.text.text = "Go"
-    for (b of feedBlocks){
-      b.x = -b.width
-      b.y = 3*dim
+    unfreezeView()
+    if (currentProblem.dontReset){
+      for (b of feedBlocks){
+        b.x = -b.width
+        b.y = 3*dim
+      }
+    } else {
+       resetGame()
     }
+
   }
 }
 
 let goButton = createActionButton("Go",checkAnswer)
 goButton.static = false
+
 numberline.stage.addChild(goButton)
 
 let resetButton = createActionButton("Reset Problem",resetGame)
@@ -632,9 +654,15 @@ function animateFeedBack(blocks,start,pins,labels,i){
           allPinsSet = false
         }
     }
+
+    if (currentProblem.pinWidget){
+      allPinsSet = true
+    }
+
     // No leftover pins, no leftover labels, all required pins are set
-    if ((pins.length == 0 || currentProblem.dontScorePins) && labels.length == 0 && allPinsSet){
+    if ((pins.length == 0 || currentProblem.dontScorePins || currentProblem.pinWidget) && labels.length == 0 && allPinsSet){
       console.log("HELLO THE FUCKING GAME IS OVER!!!!!")
+      goButton.interactive = true
       goButton.text.text = "Next Problem"
       //dropGameOverModal(loadNextGame)
       return
@@ -656,6 +684,7 @@ function animateFeedBack(blocks,start,pins,labels,i){
     labelsOnLine = labels
     pinsInPlay = pins
     goButton.text.text = "Try Again"
+    goButton.interactive = true
     refreshGame()
     return
   }
@@ -907,7 +936,7 @@ function createPin() {
     let w = dim/4
 
     var circle = new PIXI.Graphics();
-    circle.lineStyle(2, 0x000000, 2)
+    circle.lineStyle(1, 0x000000)
     circle.beginFill(0xFFFFFF);
     // why dim/5? - cause that's what I decided.
     circle.drawCircle(dim/5+1, dim/5+1,dim/5);

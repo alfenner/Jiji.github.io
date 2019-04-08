@@ -28,6 +28,8 @@ const EIGHTH_BLOCK = {
   den: 8
 }
 
+// My Stuff
+
 const DAY4_CLASSWORK_P1 = {
   prompt: "Space pins evenly and then label them",
   blocks: [HALF_BLOCK,FOURTH_BLOCK,EIGHTH_BLOCK],
@@ -77,6 +79,7 @@ const DAY4_CLASSWORK_P3 = {
   presetLabels: [[0,1],[2,1]],
   labels: [[1,1],[3,2],[1,2]],
   unique: true,
+  dontReset: true
 }
 
 const DAY4_CLASSWORK_P4 = {
@@ -114,6 +117,28 @@ const DAY4_CLASSWORK_P5 = {
 }
 
 
+
+const DAY1_2ND_WARM_UP_P1 = {
+  prompt: "Create pins to make three equal parts",
+  blocks: [],
+  indexOfMarkedBlock: null,
+  pinKeys: [0,1,1,0],
+  presetPinKeys: [1,0,0,1],
+  pinWidget: true,
+  partitionsPerWhole: 3,
+  max: 1,
+  min: 0,
+  tolerance: 0.2,
+  partitionsPerLine: 3,
+  presetLabels: [],
+  labels: [],
+  unique: true,
+  endPins: true,
+  dontScorePins: true,
+}
+
+// Active Stuff
+
 const DAY1_WARM_UP_P1 = {
   prompt: "Divide the line segment into equal lengths",
   blocks: [],
@@ -130,6 +155,7 @@ const DAY1_WARM_UP_P1 = {
   labels: [],
   unique: true,
   endPins: true,
+  //discussionQuestion: true
 }
 
 const DAY1_WARM_UP_P2 = {
@@ -169,24 +195,46 @@ const DAY1_WARM_UP_P3 = {
 }
 
 
-const DAY1_2ND_WARM_UP_P1 = {
-  prompt: "Create pins to make three equal parts",
+const DAY1_POSTWARMUP_P1 = {
+  prompt: "Go!",
   blocks: [],
   indexOfMarkedBlock: null,
-  pinKeys: [0,1,1,0],
-  presetPinKeys: [1,0,0,1],
-  pinWidget: true,
-  partitionsPerWhole: 3,
+  pinKeys: [0,0,0,0,0],
+  pinWidget: false,
+  numberOfTicks: 5,
+  partitionsPerWhole: 4,
   max: 1,
   min: 0,
+  ticksEvery: null,
   tolerance: 0.2,
-  partitionsPerLine: 3,
-  presetLabels: [],
-  labels: [],
+  presetPinKeys: [],
+  partitionsPerLine: 4,
+  presetLabels: [[0,1],[1,1]],
+  labels: [[3,4],[2,4]],
   unique: true,
   endPins: true,
 }
 
+const DAY1_POSTWARMUP_P2 = {
+  prompt: "Go!",
+  blocks: [],
+  indexOfMarkedBlock: null,
+  pinKeys: [0,0,0,0,0,0,0],
+  pinWidget: false,
+  numberOfTicks: 7,
+  partitionsPerWhole: 6,
+  max: 1,
+  min: 0,
+  ticksEvery: null,
+  tolerance: 0.1,
+  presetPinKeys: [],
+  partitionsPerLine: 6,
+  presetLabels: [[0,1],[1,1]],
+  labels: [[2,6],[5,6],[4,6]],
+  unique: true,
+  endPins: true,
+  discussionQuestion: true
+}
 
 const DAY1_CLASSWORK_P1 = {
   prompt: "Place the markers to represent one half, then label the tick-mark with a fraction.",
@@ -224,11 +272,12 @@ const DAY1_CLASSWORK_P2 = {
   labels: [[3,4],[2,4],[1,4]],
   unique: true,
   endPins: true,
+  discussionQuestion: true
 }
 
 const DAY1_CLASSWORK_P3 = {
-  prompt: "Place the markers to represent one half, then label the tick-mark with a fraction.",
-  blocks: [HALF_BLOCK,FOURTH_BLOCK,EIGHTH_BLOCK],
+  prompt: "Place the markers to represent thirds, then label the tick-marks with a fraction.",
+  blocks: [THIRD_BLOCK,FOURTH_BLOCK,SIXTH_BLOCK],
   indexOfMarkedBlock: null, // DON'T KNOW THAT THIS IS OR WAS SUPPOSED TO BE FOR
   pinKeys: [0,1,1,0],
   presetPinKeys: [1,0,0,1],
@@ -243,6 +292,7 @@ const DAY1_CLASSWORK_P3 = {
   labels: [[2,3]],
   unique: true,
   endPins: true,
+  //dontScorePins: true, // If there is a pin widget we don't score the pins by default
 }
 
 const DAY1_CLASSWORK_P4 = {
@@ -266,7 +316,7 @@ const DAY1_CLASSWORK_P4 = {
 
 
 const DAY1_CLASSWORK_P5 = {
-  prompt: "Create pins to make six equal parts and set the labels",
+  prompt: "Place the markers to represent sixths, then label the tick-marks with a fraction.",
   blocks: [HALF_BLOCK,THIRD_BLOCK,SIXTH_BLOCK],
   indexOfMarkedBlock: null, // DON'T KNOW THAT THIS IS OR WAS SUPPOSED TO BE FOR
   pinKeys: [0,0,0,0,0,0,0],
@@ -282,6 +332,8 @@ const DAY1_CLASSWORK_P5 = {
   labels: [[4,6],[2,6],[5,6]],
   unique: true,
   endPins: true,
+  dontScorePins: true,
+  discussionQuestion: true
 }
 
 const DAY2_CLASSWORK_P1 = {
@@ -341,7 +393,8 @@ const DAY2_CLASSWORK_P3 = {
   labels: [[5,4],[6,4],[3,4],[7,4],[2,4]],
   unique: false,
   endPins: true,
-  dontScorePins: true
+  dontScorePins: true,
+  discussionQuestion: true,
 }
 
 const DAY2_CLASSWORK_P4 = {
@@ -381,7 +434,8 @@ const DAY2_CLASSWORK_P5 = {
   labels: [[9,6],[2,6],[4,6],[5,6],[7,6]],
   unique: false,
   endPins: true,
-  dontScorePins: true
+  dontScorePins: true,
+  discussionQuestion: true,
 }
 
 
@@ -424,6 +478,7 @@ const DAY3_CLASSWORK_P2 = {
   labels: [[3,4],[1,4],[6,4],[5,4]],
   unique: true,
   endPins: true,
+  discussionQuestion: true
 }
 
 const DAY3_CLASSWORK_P3 = {
@@ -485,75 +540,15 @@ const DAY3_CLASSWORK_P5 = {
   labels: [[1,6],[5,6],[11,6]],
   unique: true,
   endPins: true,
+  discussionQuestion: true
 }
 
 
-const DAY1_POSTWARMUP_P1 = {
-  prompt: "Go!",
-  blocks: [],
-  indexOfMarkedBlock: null,
-  pinKeys: [0,0,0,0,0],
-  pinWidget: false,
-  numberOfTicks: 5,
-  partitionsPerWhole: 4,
-  max: 1,
-  min: 0,
-  ticksEvery: null,
-  tolerance: 0.2,
-  presetPinKeys: [],
-  partitionsPerLine: 4,
-  presetLabels: [[0,1],[1,1]],
-  labels: [[3,4],[2,4]],
-  unique: true,
-  endPins: true,
-}
+const DAY_ONE_WARM_UP_SEQ = [DAY1_WARM_UP_P1,DAY1_WARM_UP_P2,DAY1_WARM_UP_P3]
 
-const DAY1_POSTWARMUP_P2 = {
-  prompt: "Go!",
-  blocks: [],
-  indexOfMarkedBlock: null,
-  pinKeys: [0,0,0,0,0,0,0],
-  pinWidget: false,
-  numberOfTicks: 7,
-  partitionsPerWhole: 6,
-  max: 1,
-  min: 0,
-  ticksEvery: null,
-  tolerance: 0.1,
-  presetPinKeys: [],
-  partitionsPerLine: 6,
-  presetLabels: [[0,1],[1,1]],
-  labels: [[2,6],[5,6],[4,6]],
-  unique: true,
-  endPins: true,
-}
+const DAY_ONE_CLASSWORK_SEQ = [DAY1_POSTWARMUP_P1,DAY1_POSTWARMUP_P2,DAY1_CLASSWORK_P3,DAY1_CLASSWORK_P2,DAY1_CLASSWORK_P3,DAY1_CLASSWORK_P4,DAY1_CLASSWORK_P5]
 
-const DAY1_POSTWARMUP_P3 = {
-  prompt: "Go!",
-  blocks: [],
-  indexOfMarkedBlock: null,
-  pinKeys: [0,0,0,0,0],
-  pinWidget: false,
-  numberOfTicks: 5,
-  partitionsPerWhole: 4,
-  max: 1,
-  min: 0,
-  ticksEvery: null,
-  tolerance: 0.2,
-  presetPinKeys: [],
-  partitionsPerLine: 4,
-  presetLabels: [[0,1],[1,1]],
-  labels: [[3,4],[2,4]],
-  unique: true,
-  endPins: true,
-}
-
-
-const TEST_QUE = [DAY1_WARM_UP_P2,DAY1_2ND_WARM_UP_P1,DAY4_CLASSWORK_P1,DAY1_CLASSWORK_P5,DAY2_CLASSWORK_P1,DAY3_CLASSWORK_P1]
-
-const DAY_ONE_WARM_UP_SEQ = [DAY1_WARM_UP_P1,DAY1_WARM_UP_P2,DAY1_WARM_UP_P2]
-
-const DAY_ONE_CLASSWORK_SEQ = [DAY1_CLASSWORK_P1,DAY1_CLASSWORK_P2,DAY1_CLASSWORK_P3,DAY1_CLASSWORK_P5]
+const DAY_ONE_POSTWARMUP_SEQ = [DAY1_POSTWARMUP_P1,DAY1_POSTWARMUP_P2]
 
 const DAY_TWO_CLASSWORK_SEQ = [DAY2_CLASSWORK_P1,DAY2_CLASSWORK_P2,DAY2_CLASSWORK_P3,DAY2_CLASSWORK_P4,DAY2_CLASSWORK_P5]
 
@@ -561,6 +556,6 @@ const DAY_THREE_CLASSWORK_SEQ = [DAY3_CLASSWORK_P1,DAY3_CLASSWORK_P2,DAY3_CLASSW
 
 const DAY_FOUR_CLASSWORK_SEQ = [DAY4_CLASSWORK_P3,DAY4_CLASSWORK_P2,DAY4_CLASSWORK_P3,DAY4_CLASSWORK_P4,DAY4_CLASSWORK_P5]
 
-const DAY_ONE_POSTWARMUP_SEQ = [DAY1_POSTWARMUP_P1,DAY1_POSTWARMUP_P2]
+const TEST_QUE = DAY_FOUR_CLASSWORK_SEQ
 
-const ACTIVITY_QUE = [TEST_QUE,DAY_ONE_WARM_UP_SEQ,DAY_ONE_CLASSWORK_SEQ,DAY_TWO_CLASSWORK_SEQ,DAY_THREE_CLASSWORK_SEQ,DAY_FOUR_CLASSWORK_SEQ,DAY_ONE_POSTWARMUP_SEQ]
+const ACTIVITY_QUE = [TEST_QUE,DAY_ONE_WARM_UP_SEQ,DAY_ONE_POSTWARMUP_SEQ,DAY_ONE_CLASSWORK_SEQ,DAY_TWO_CLASSWORK_SEQ,DAY_THREE_CLASSWORK_SEQ,DAY_FOUR_CLASSWORK_SEQ]
