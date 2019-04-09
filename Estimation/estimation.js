@@ -15,12 +15,12 @@ const DIM = WINDOW_WIDTH/15
 const TOP_MARGIN = DIM/2
 const CONTAINER_HEIGHT = 3*DIM+4
 const CONTAINER_WIDTH = 3*DIM+4
-const LEFT_CONTAINER_CENTER_X = WINDOW_WIDTH/4
-const RIGHT_CONTAINER_CENTER_X = WINDOW_WIDTH/4*3
+const LEFT_CONTAINER_CENTER_X = WINDOW_WIDTH/3
+const RIGHT_CONTAINER_CENTER_X = WINDOW_WIDTH/3*2
 const CONTAINER_CENTER_Y = 2/3*WINDOW_HEIGHT
 const CONTAINER_BOTTOM = CONTAINER_CENTER_Y+CONTAINER_HEIGHT/2
 const CONTAINER_TOP = CONTAINER_CENTER_Y-CONTAINER_HEIGHT/2
-const CENTER_CONTAINER_X = WINDOW_WIDTH/2
+const CENTER_CONTAINER_X = LEFT_CONTAINER_CENTER_X
 const FRACTION_CENTER = [1/2*WINDOW_WIDTH,1/4*WINDOW_HEIGHT]
 const FRACT_DIM = [DIM,2*DIM]
 const GO_BUTTON_CENTER = [DIM,TOP_MARGIN]
@@ -68,7 +68,7 @@ water.width = adjustableContainer.width
 
 let feedBackContainer = createContainer(3*DIM)
 app.stage.addChild(feedBackContainer)
-feedBackContainer.x = 3/4*WINDOW_WIDTH
+feedBackContainer.x = 2/3*WINDOW_WIDTH
 feedBackContainer.y = 2/3*WINDOW_HEIGHT
 feedBackContainer.alpha = 0
 
@@ -320,6 +320,7 @@ function prepareForToleranceFeedback(){
 
 }
 
+/*
 function animateFeedBlocks(blocks,fricks){
   if (blocks.length == 0){
     //reset()
@@ -335,6 +336,18 @@ function animateFeedBlocks(blocks,fricks){
         animateFeedBlocks(blocks,fricks)
     })
   }
+}
+*/
+
+function animateFeedBlocks(blocks,fricks){
+    fricks.forEach(f=>{
+        app.stage.addChild(f)
+        createjs.Tween.get(f).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4))
+    })
+    blocks.forEach(b=>{
+        createjs.Tween.get(b).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4))
+    })
+    setTimeout(()=>{prepareForToleranceFeedback()},1000)
 }
 
 function animateFeedBack(){

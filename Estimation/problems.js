@@ -8,7 +8,7 @@ const SET_ONE_P1  = {
 
 
 const SET_ONE_P2  = {
-  num: 3,
+  num: 7,
   den: 4,
   multichoice: false,
 }
