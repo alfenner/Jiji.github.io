@@ -15,8 +15,8 @@ const DIM = WINDOW_WIDTH/15
 const TOP_MARGIN = DIM/2
 const CONTAINER_HEIGHT = 3*DIM+4
 const CONTAINER_WIDTH = 3*DIM+4
-const LEFT_CONTAINER_CENTER_X = WINDOW_WIDTH/3
-const RIGHT_CONTAINER_CENTER_X = WINDOW_WIDTH/3*2
+const LEFT_CONTAINER_CENTER_X = WINDOW_WIDTH/4
+const RIGHT_CONTAINER_CENTER_X = WINDOW_WIDTH/4*3
 const CONTAINER_CENTER_Y = 2/3*WINDOW_HEIGHT
 const CONTAINER_BOTTOM = CONTAINER_CENTER_Y+CONTAINER_HEIGHT/2
 const CONTAINER_TOP = CONTAINER_CENTER_Y-CONTAINER_HEIGHT/2
@@ -68,7 +68,7 @@ water.width = adjustableContainer.width
 
 let feedBackContainer = createContainer(3*DIM)
 app.stage.addChild(feedBackContainer)
-feedBackContainer.x = 2/3*WINDOW_WIDTH
+feedBackContainer.x = 3/4*WINDOW_WIDTH
 feedBackContainer.y = 2/3*WINDOW_HEIGHT
 feedBackContainer.alpha = 0
 
@@ -128,7 +128,7 @@ function adjustWaterLevel(val){
   water.height = val
   water.width = adjustableContainer.width
   water.y = adjustableContainer.y+adjustableContainer.height/2
-  water.x = adjustableContainer.x+adjustableContainer.width/2
+  water.x = adjustableContainer.x+CONTAINER_WIDTH/2
 }
 
 function createSlider(width) {
@@ -210,9 +210,7 @@ function createFeedBlock(h,w){
 function createPartitionBlock(h,w){
   let blockGraphic = new PIXI.Graphics();
   blockGraphic.lineStyle(2, 0x000000)
-  blockGraphic.beginFill(0xFFFFFF);
   blockGraphic.drawRoundedRect(0,0,h,w,1);
-  blockGraphic.endFill();
   blockGraphic.alpha = 0
   app.stage.addChild(blockGraphic)
   return blockGraphic
@@ -240,13 +238,14 @@ function animateAnswer(num,den,numCords,denCords){
     frameBlocks.push(b)
   }
 
-  createjs.Tween.get(adjustableContainer).to({x: LEFT_CONTAINER_CENTER_X}, 1000, createjs.Ease.getPowInOut(4))
+  //createjs.Tween.get(adjustableContainer).to({x: LEFT_CONTAINER_CENTER_X}, 1000, createjs.Ease.getPowInOut(4))
   createjs.Tween.get(feedBackContainer).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{
     animateFrameBlocks([...frameBlocks],()=>{
-      animateFeedBlocks([...feedBlocks],[...feedFricks])
+      setTimeout(()=> {animateFeedBlocks([...feedBlocks],[...feedFricks])},1000)
+
     })
   })
-  createjs.Tween.get(water).to({x: LEFT_CONTAINER_CENTER_X+CONTAINER_WIDTH/2}, 1000, createjs.Ease.getPowInOut(4))
+  //createjs.Tween.get(water).to({x: LEFT_CONTAINER_CENTER_X+CONTAINER_WIDTH/2}, 1000, createjs.Ease.getPowInOut(4))
   createjs.Tween.get(slider).to({alpha: 0}, 100, createjs.Ease.getPowInOut(4)).call(()=>{
     slider.interactive = false
   })
@@ -262,7 +261,9 @@ function reset(){
   frac.n.text = currentProblem.num
   frac.d.text = currentProblem.den
 
+
   feedBlocks.forEach(b=>{app.stage.removeChild(b)})
+  console.log("REMOVING feed FRICKS")
   feedFricks.forEach(f=>{app.stage.removeChild(f)})
   frameBlocks.forEach(b=>{app.stage.removeChild(b)})
   frameFricks.forEach(f=>{app.stage.removeChild(f)})
@@ -300,6 +301,7 @@ function animateFrameBlocks(blocks,callback){
 
   feedBlocks.forEach(b=>{app.stage.addChild(b)})
   frameFricks.forEach(f=>{app.stage.addChild(f)})
+  app.stage.addChild(feedBackContainer)
 
   setTimeout(()=>{
     blocks.forEach((b,i) => {
@@ -315,7 +317,7 @@ function prepareForToleranceFeedback(){
       animateToleranceFeedBack()
   })
   feedFricks.forEach(f=> {
-    f.alpha = 0
+    createjs.Tween.get(f).to({alpha: 0}, 1000, createjs.Ease.getPowInOut(4))
   })
 
 }
