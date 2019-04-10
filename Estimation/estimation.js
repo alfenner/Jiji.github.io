@@ -2,6 +2,7 @@
 // Constants
 const WINDOW_WIDTH = window.innerWidth
 const WINDOW_HEIGHT = window.innerHeight
+const LINE_WIDTH = 5 // Should be some fraction of DIM or window
 const DIM = WINDOW_WIDTH/15
 const TOP_MARGIN = DIM/2
 const CONTAINER_HEIGHT = 3*DIM+4
@@ -15,6 +16,9 @@ const CENTER_CONTAINER_X = LEFT_CONTAINER_CENTER_X
 const FRACTION_CENTER = [1/2*WINDOW_WIDTH,1/4*WINDOW_HEIGHT]
 const FRACT_DIM = [DIM,2*DIM]
 const GO_BUTTON_CENTER = [DIM,TOP_MARGIN]
+const TOLERANCE = 0.10*CONTAINER_HEIGHT
+const DELTA_BRIDGE = LEFT_CONTAINER_CENTER_X+0.7*CONTAINER_WIDTH - (RIGHT_CONTAINER_CENTER_X-0.7*CONTAINER_WIDTH)
+const BRIDGE_LENGTH = Math.sqrt(TOLERANCE*TOLERANCE+DELTA_BRIDGE*DELTA_BRIDGE)+LINE_WIDTH/2
 
 // COMPUTED CONSTANTS
 const CORRECT_ANS_Y = () => {
@@ -193,35 +197,53 @@ function createPlatformRight(){
 }
 
 
-function createBridge(){
+function animateBridge(startTheBlock){
+  let deltaBridge_X = BRIDGE_END_CORDS()[0] - BRIDGE_START_CORDS()[0]
+  let deltaBridge = BRIDGE_END_CORDS()[1] - BRIDGE_START_CORDS()[1]
+  let theta = Math.PI/2+Math.atan(deltaBridge/deltaBridge_X)
+
+
+
   let start = BRIDGE_START_CORDS()
   let end = BRIDGE_END_CORDS()
   console.log("check answer",CHECK_ANSWER())
+  let bridgeGraphic = new PIXI.Graphics()
+  let bridgeContainer = new PIXI.Container()
+  bridgeContainer.x = BRIDGE_START_CORDS()[0]-2.5
+  bridgeContainer.y = BRIDGE_START_CORDS()[1]
   if (CHECK_ANSWER()){
-    let bridgeGraphic = new PIXI.Graphics()
+    console.log("ANSWER IS FUCKING CORRECT!!!")
     bridgeGraphic.lineStyle(5,COLORS.DARK_GRAY)
-    bridgeGraphic.moveTo(start[0],start[1])
-    bridgeGraphic.lineTo(end[0],end[1])
+    bridgeGraphic.moveTo(0,0)
+    bridgeGraphic.lineTo(0,-BRIDGE_LENGTH)
     bridgeGraphic.alpha = 0
-    app.stage.addChild(bridgeGraphic)
-    walkWayRef.push(bridgeGraphic)
-    createjs.Tween.get(bridgeGraphic).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4))
+    bridgeContainer.addChild(bridgeGraphic)
+    app.stage.addChild(bridgeContainer)
+    walkWayRef.push(bridgeContainer)
+    createjs.Tween.get(bridgeGraphic).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{
+      createjs.Tween.get(bridgeGraphic).to({rotation: theta}, 2000, createjs.Ease.getPowInOut(1)).call(()=>{startTheBlock()})
+    })
   } else {
     let bridgeGraphic = new PIXI.Graphics()
     bridgeGraphic.lineStyle(5,COLORS.DARK_GRAY)
+    let deltaBridge_X = BRIDGE_END_CORDS()[0] - BRIDGE_START_CORDS()[0]
     let deltaBridge = BRIDGE_END_CORDS()[1] - BRIDGE_START_CORDS()[1]
     let above = deltaBridge > 0 ? true : false
-    if (above){
-      bridgeGraphic.moveTo(start[0],start[1]-2.5)
-      bridgeGraphic.lineTo(start[0],start[1]+deltaBridge)
+    if (!CHECK_ANSWER()){
+      theta = Math.PI
+      bridgeGraphic.moveTo(0,0)
+      bridgeGraphic.lineTo(0,-BRIDGE_LENGTH)
     } else {
-      bridgeGraphic.moveTo(start[0],start[1]+2.5)
-      bridgeGraphic.lineTo(start[0],start[1]+deltaBridge)
+      bridgeGraphic.moveTo(0,0)
+      bridgeGraphic.lineTo(0,-BRIDGE_LENGTH)
     }
     bridgeGraphic.alpha = 0
-    app.stage.addChild(bridgeGraphic)
-    walkWayRef.push(bridgeGraphic)
-    createjs.Tween.get(bridgeGraphic).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4))
+    bridgeContainer.addChild(bridgeGraphic)
+    app.stage.addChild(bridgeContainer)
+    walkWayRef.push(bridgeContainer)
+    createjs.Tween.get(bridgeGraphic).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{
+      createjs.Tween.get(bridgeGraphic).to({rotation: theta}, 2000, createjs.Ease.getPowInOut(1)).call(()=>{startTheBlock()})
+    })
   }
 }
 
@@ -423,8 +445,7 @@ function animateToleranceFeedBack(){
 
   createPlatformLeft()
   createPlatformRight()
-  createBridge()
-  animateJiji()
+  animateBridge(animateJiji)
 
   actionButton.text.text = "Next"
   createjs.Tween.get(actionButton).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
