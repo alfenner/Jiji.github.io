@@ -1,12 +1,3 @@
-// Background
-let backGround = new PIXI.Graphics()
-backGround.beginFill(0xFFFFFF)
-backGround.drawRoundedRect(0,0,windowWidth,windowHeight)
-backGround.endFill()
-backGround.interactive = true
-backGround.static = false
-app.stage.addChild(backGround)
-backGround.on('pointerup',()=> {slider.dragging = false})
 
 // Constants
 const WINDOW_WIDTH = window.innerWidth
@@ -24,6 +15,49 @@ const CENTER_CONTAINER_X = LEFT_CONTAINER_CENTER_X
 const FRACTION_CENTER = [1/2*WINDOW_WIDTH,1/4*WINDOW_HEIGHT]
 const FRACT_DIM = [DIM,2*DIM]
 const GO_BUTTON_CENTER = [DIM,TOP_MARGIN]
+
+// COMPUTED CONSTANTS
+const CORRECT_ANS_Y = () => {
+  return CONTAINER_BOTTOM - CONTAINER_HEIGHT*currentProblem.num/currentProblem.den
+}
+
+const SUBMITTED_ANS_Y = () => {
+  return slider.y + slider.height/2
+}
+
+const BRIDGE_START_CORDS = () => {
+  let x = LEFT_CONTAINER_CENTER_X+0.7*CONTAINER_WIDTH
+  let y = SUBMITTED_ANS_Y()
+  return [x,y]
+}
+
+const BRIDGE_END_CORDS = () => {
+  let x = RIGHT_CONTAINER_CENTER_X-0.7*CONTAINER_WIDTH
+  let y = CORRECT_ANS_Y()
+  return [x,y]
+}
+
+const JIJI_START_CORDS = () => {
+  let y = SUBMITTED_ANS_Y()
+  let x = 0.1*WINDOW_WIDTH
+  return [x,y]
+}
+
+const JIJI_END_CORDS = () => {
+  let y = CORRECT_ANS_Y()
+  let x = WINDOW_WIDTH*1.1
+  return [x,y]
+}
+
+const CHECK_ANSWER = () => {
+   let tolerance = Math.abs(CONTAINER_HEIGHT)*0.10
+   let difference = Math.abs(BRIDGE_START_CORDS()[1]-BRIDGE_END_CORDS()[1])
+   console.log("difference",difference)
+   console.log("tolerance",tolerance)
+  return difference < tolerance ? true : false
+}
+
+
 let num_cords;
 let den_cords;
 //const
@@ -34,12 +68,25 @@ let feedBlocks = []
 let feedFricks = []
 let frameBlocks = []
 let frameFricks = []
+let walkWayRef = []
 let problemIndex = 0
 let problemCount = PROBLEM_SET_ONE.length
 let currentProblem = PROBLEM_SET_ONE[problemIndex%problemCount]
 
 
+
 // Sprites & Containers
+
+// Background
+let backGround = new PIXI.Graphics()
+backGround.beginFill(0xFFFFFF)
+backGround.drawRoundedRect(0,0,windowWidth,windowHeight)
+backGround.endFill()
+backGround.interactive = true
+backGround.static = false
+app.stage.addChild(backGround)
+backGround.on('pointerup',()=> {slider.dragging = false})
+
 
 let frac = createFraction(currentProblem.num,currentProblem.den)
 app.stage.addChild(frac)
@@ -49,14 +96,19 @@ num_cords = [FRACTION_CENTER[0],FRACTION_CENTER[1]-5/4*frac.width]
 den_cords = [FRACTION_CENTER[0],FRACTION_CENTER[1]-frac.width/4]
 
 
-
-let slider = createSlider(DIM)
-app.stage.addChild(slider)
-
 let adjustableContainer = createContainer(3*DIM)
 app.stage.addChild(adjustableContainer)
 adjustableContainer.x = CENTER_CONTAINER_X
 adjustableContainer.y = 2/3*WINDOW_HEIGHT
+
+let slider = createSlider(DIM)
+app.stage.addChild(slider)
+slider.on('pointerdown',onSliderStart)
+slider.on('pointerup',onSliderEnd)
+slider.on('pointermove',onSliderMove)
+slider.x = adjustableContainer.x+adjustableContainer.width/2
+slider.y = adjustableContainer.y-slider.height/2
+
 
 let water = createWater()
 app.stage.addChild(water)
@@ -73,11 +125,12 @@ feedBackContainer.y = 2/3*WINDOW_HEIGHT
 feedBackContainer.alpha = 0
 
 let actionButton = createActionButton("Go",submitAnswer)
-
 app.stage.addChild(actionButton)
 actionButton.x = GO_BUTTON_CENTER[0]
 actionButton.y = GO_BUTTON_CENTER[1]
 app.stage.addChild(adjustableContainer)
+
+// FUNCTIONS
 
 
 function submitAnswer(){
@@ -88,6 +141,90 @@ function submitAnswer(){
     animateAnswer(currentProblem.num,currentProblem.den)
   }
 }
+
+// FEEDBACK SHIT
+function animateTo(obj,loc,callback){
+    createjs.Tween.get(obj).to({x:loc[0],y:loc[1]}, 1000, createjs.Ease.getPowInOut(1)).call(callback)
+}
+
+
+function animateJiji(){
+  let jiji = createJijiAsset(1,2)
+  app.stage.addChild(jiji)
+  let start = JIJI_START_CORDS()
+  jiji.x = start[0]
+  jiji.y = start[1]
+  //jiji.alpha = 0
+
+  let endSeq = () => {
+    setTimeout(()=>{
+          createjs.Tween.get(jiji).to({alpha: 0}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{app.stage.removeChild(jiji)})
+    },1000)
+  }
+
+
+  let a3 = () => {animateTo(jiji,JIJI_END_CORDS(),endSeq)}
+  let a2 = CHECK_ANSWER() ? () => {animateTo(jiji,BRIDGE_END_CORDS(),a3)} : endSeq
+  let a1 = () => {animateTo(jiji,BRIDGE_START_CORDS(),a2)}
+  a1()
+}
+
+
+function createPlatformLeft(){
+  let platformGraphic = new PIXI.Graphics()
+  platformGraphic.lineStyle(5,COLORS.DARK_GRAY)
+  platformGraphic.moveTo(0,SUBMITTED_ANS_Y())
+  platformGraphic.lineTo(BRIDGE_START_CORDS()[0],SUBMITTED_ANS_Y())
+  platformGraphic.alpha = 0
+  app.stage.addChild(platformGraphic)
+  walkWayRef.push(platformGraphic)
+  createjs.Tween.get(platformGraphic).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4))
+}
+
+function createPlatformRight(){
+  let platformGraphic = new PIXI.Graphics()
+  platformGraphic.lineStyle(5,COLORS.DARK_GRAY)
+  platformGraphic.moveTo(BRIDGE_END_CORDS()[0],CORRECT_ANS_Y())
+  platformGraphic.lineTo(WINDOW_WIDTH,CORRECT_ANS_Y())
+  platformGraphic.alpha = 0
+  app.stage.addChild(platformGraphic)
+  walkWayRef.push(platformGraphic)
+  createjs.Tween.get(platformGraphic).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4))
+}
+
+
+function createBridge(){
+  let start = BRIDGE_START_CORDS()
+  let end = BRIDGE_END_CORDS()
+  console.log("check answer",CHECK_ANSWER())
+  if (CHECK_ANSWER()){
+    let bridgeGraphic = new PIXI.Graphics()
+    bridgeGraphic.lineStyle(5,COLORS.DARK_GRAY)
+    bridgeGraphic.moveTo(start[0],start[1])
+    bridgeGraphic.lineTo(end[0],end[1])
+    bridgeGraphic.alpha = 0
+    app.stage.addChild(bridgeGraphic)
+    walkWayRef.push(bridgeGraphic)
+    createjs.Tween.get(bridgeGraphic).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4))
+  } else {
+    let bridgeGraphic = new PIXI.Graphics()
+    bridgeGraphic.lineStyle(5,COLORS.DARK_GRAY)
+    let deltaBridge = BRIDGE_END_CORDS()[1] - BRIDGE_START_CORDS()[1]
+    let above = deltaBridge > 0 ? true : false
+    if (above){
+      bridgeGraphic.moveTo(start[0],start[1]-2.5)
+      bridgeGraphic.lineTo(start[0],start[1]+deltaBridge)
+    } else {
+      bridgeGraphic.moveTo(start[0],start[1]+2.5)
+      bridgeGraphic.lineTo(start[0],start[1]+deltaBridge)
+    }
+    bridgeGraphic.alpha = 0
+    app.stage.addChild(bridgeGraphic)
+    walkWayRef.push(bridgeGraphic)
+    createjs.Tween.get(bridgeGraphic).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4))
+  }
+}
+
 
 
 function createContainer(width){
@@ -147,12 +284,6 @@ function createSlider(width) {
   return sliderGraphic
 }
 
-slider.on('pointerdown',onSliderStart)
-slider.on('pointerup',onSliderEnd)
-slider.on('pointermove',onSliderMove)
-slider.x = adjustableContainer.x+adjustableContainer.width/2
-slider.y = adjustableContainer.y-slider.height/2
-
 function createActionButton(text,action) {
 
     let graphics = new PIXI.Graphics();
@@ -187,7 +318,6 @@ function createActionButton(text,action) {
 }
 
 function createFrick(a,b){
-  console.log("a,b",a,b)
   let frickGraphic = new PIXI.Graphics()
   frickGraphic.lineStyle(2, 0x000000)
   frickGraphic.moveTo(a[0],a[1])
@@ -217,8 +347,6 @@ function createPartitionBlock(h,w){
 }
 
 function animateAnswer(num,den,numCords,denCords){
-  console.log("num cords, dencords",num_cords,den_cords)
-
   let dy = CONTAINER_WIDTH/den
   let animateTo = [RIGHT_CONTAINER_CENTER_X-CONTAINER_WIDTH/2,CONTAINER_BOTTOM]
   for (let i = 0;i<num;i++){
@@ -256,11 +384,15 @@ function animateAnswer(num,den,numCords,denCords){
 
 function reset(){
 
-  problemIndex += 1
+  if (CHECK_ANSWER()){
+    problemIndex += 1
+  }
   currentProblem = PROBLEM_SET_ONE[problemIndex]
   frac.n.text = currentProblem.num
   frac.d.text = currentProblem.den
 
+  walkWayRef.forEach(w=>{app.stage.removeChild(w)})
+  walkWayRef = []
 
   feedBlocks.forEach(b=>{app.stage.removeChild(b)})
   console.log("REMOVING feed FRICKS")
@@ -288,8 +420,15 @@ function reset(){
 }
 
 function animateToleranceFeedBack(){
+
+  createPlatformLeft()
+  createPlatformRight()
+  createBridge()
+  animateJiji()
+
   actionButton.text.text = "Next"
   createjs.Tween.get(actionButton).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
+
 }
 
 function animateFrameBlocks(blocks,callback){
@@ -361,7 +500,20 @@ function onSliderStart(event){
     this.dragging = true
 }
 
+function createJijiAsset(n,d) {
 
+    var block = new PIXI.Graphics();
+    block.lineStyle(2,COLORS.DARK_GRAY,2)
+    block.beginFill(0xFFFFFF);
+    block.drawRoundedRect(1, 1, DIM, DIM,5);
+    block.endFill();
+
+    var blockTexture = app.renderer.generateTexture(block);
+    let tile = new PIXI.Sprite(blockTexture)
+    tile.anchor.set(1)
+
+    return tile
+}
 
 function createFraction(n,d) {
 

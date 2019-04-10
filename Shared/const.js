@@ -100,6 +100,8 @@ BLUE: 0x216ae0,
 PINK: 0xf721ff,
 ORANGE: 0xffaa49,
 BROWN: 0x82521b,
-GRAY: 0xe6eaf2}
+GRAY: 0xe6eaf2,
+DARK_GRAY: 0xa4a9b2
+}
 
 const COLOR_KEYS = Object.keys(COLORS)
