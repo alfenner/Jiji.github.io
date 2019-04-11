@@ -1,7 +1,5 @@
 
 // Constants
-const WINDOW_WIDTH = window.innerWidth
-const WINDOW_HEIGHT = window.innerHeight
 const LINE_WIDTH = 5 // Should be some fraction of DIM or window
 const DIM = WINDOW_WIDTH/15
 const TOP_MARGIN = DIM/2
@@ -21,7 +19,7 @@ const DELTA_BRIDGE = LEFT_CONTAINER_CENTER_X+0.7*CONTAINER_WIDTH - (RIGHT_CONTAI
 const BRIDGE_LENGTH = Math.sqrt(TOLERANCE*TOLERANCE+DELTA_BRIDGE*DELTA_BRIDGE)+LINE_WIDTH/2
 
 // COMPUTED CONSTANTS
-const CORRECT_ANS_Y = () => {
+const correct_ans_y = () => {
   return CONTAINER_BOTTOM - CONTAINER_HEIGHT*currentProblem.num/currentProblem.den
 }
 
@@ -37,7 +35,7 @@ const BRIDGE_START_CORDS = () => {
 
 const BRIDGE_END_CORDS = () => {
   let x = RIGHT_CONTAINER_CENTER_X-0.7*CONTAINER_WIDTH
-  let y = CORRECT_ANS_Y()
+  let y = correct_ans_y()
   return [x,y]
 }
 
@@ -48,7 +46,7 @@ const JIJI_START_CORDS = () => {
 }
 
 const JIJI_END_CORDS = () => {
-  let y = CORRECT_ANS_Y()
+  let y = correct_ans_y()
   let x = WINDOW_WIDTH*1.1
   return [x,y]
 }
@@ -138,7 +136,6 @@ app.stage.addChild(adjustableContainer)
 
 
 function submitAnswer(){
-  console.log("actionButton text",actionButton.text.text)
   if (actionButton.text.text == "Next"){
     reset()
   } else {
@@ -188,8 +185,8 @@ function createPlatformLeft(){
 function createPlatformRight(){
   let platformGraphic = new PIXI.Graphics()
   platformGraphic.lineStyle(5,COLORS.DARK_GRAY)
-  platformGraphic.moveTo(BRIDGE_END_CORDS()[0],CORRECT_ANS_Y())
-  platformGraphic.lineTo(WINDOW_WIDTH,CORRECT_ANS_Y())
+  platformGraphic.moveTo(BRIDGE_END_CORDS()[0],correct_ans_y())
+  platformGraphic.lineTo(WINDOW_WIDTH,correct_ans_y())
   platformGraphic.alpha = 0
   app.stage.addChild(platformGraphic)
   walkWayRef.push(platformGraphic)
@@ -516,11 +513,6 @@ function animateFeedBack(){
     animateFractionBlocks()
 }
 
-function onSliderStart(event){
-    this.data = event.data;
-    this.dragging = true
-}
-
 function createJijiAsset(n,d) {
 
     var block = new PIXI.Graphics();
@@ -608,6 +600,12 @@ function createFraction(n,d) {
     tileContainer.onLine = false
 
     return tileContainer
+}
+
+
+function onSliderStart(event){
+    this.data = event.data;
+    this.dragging = true
 }
 
 function onSliderEnd(){

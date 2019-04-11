@@ -5,7 +5,8 @@ const wallX = (windowWidth-wallWidth)/2
 const height = window.innerHeight/18
 let dx = window.innerHeight/15
 let dy = dx
-
+const WINDOW_WIDTH = window.innerWidth
+const WINDOW_HEIGHT = window.innerHeight
 
 const AXIS  = {
   NORMAL: -1,
@@ -98,6 +99,7 @@ RED: 0xff5121,
 PURPLE: 0x9966FF,
 BLUE: 0x216ae0,
 PINK: 0xf721ff,
+GREEN: 0x50af54,
 ORANGE: 0xffaa49,
 BROWN: 0x82521b,
 GRAY: 0xe6eaf2,
