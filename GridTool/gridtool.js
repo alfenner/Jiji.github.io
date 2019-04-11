@@ -60,7 +60,7 @@ function createSquare(event){
   let hdim = h_part_dim()
   let vdim = v_part_dim()
   var block = new PIXI.Graphics();
-  block.lineStyle(2,0x000000)
+  block.lineStyle(2,0xFFFFFF)
   block.beginFill(currentColor());
   block.drawRoundedRect(0, 0, hdim, vdim,5);
   block.endFill();
@@ -164,7 +164,7 @@ function animateHorizontalLines(inc){
   hPartitions  += inc
   if (hPartitions != 0 && hPartitions != 11){
 
-    colorIndex += 1
+  colorIndex += 1
 
   let spacing = CONTAINER_WIDTH/hPartitions
 

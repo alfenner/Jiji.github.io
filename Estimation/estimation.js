@@ -1,6 +1,7 @@
 
 // Constants
 const LINE_WIDTH = 5 // Should be some fraction of DIM or window
+const WINDOW_CENTER_X = WINDOW_WIDTH/2
 const DIM = WINDOW_WIDTH/15
 const TOP_MARGIN = DIM/2
 const CONTAINER_HEIGHT = 3*DIM+4
@@ -17,7 +18,7 @@ const GO_BUTTON_CENTER = [DIM,TOP_MARGIN]
 const TOLERANCE = 0.10*CONTAINER_HEIGHT
 const DELTA_BRIDGE = LEFT_CONTAINER_CENTER_X+0.7*CONTAINER_WIDTH - (RIGHT_CONTAINER_CENTER_X-0.7*CONTAINER_WIDTH)
 const BRIDGE_LENGTH = Math.sqrt(TOLERANCE*TOLERANCE+DELTA_BRIDGE*DELTA_BRIDGE)+LINE_WIDTH/2
-
+const ESTIMATING = false
 // COMPUTED CONSTANTS
 const correct_ans_y = () => {
   return CONTAINER_BOTTOM - CONTAINER_HEIGHT*currentProblem.num/currentProblem.den
@@ -62,8 +63,6 @@ const CHECK_ANSWER = () => {
 
 let num_cords;
 let den_cords;
-//const
-
 
 // State
 let feedBlocks = []
@@ -72,9 +71,12 @@ let frameBlocks = []
 let frameFricks = []
 let walkWayRef = []
 let problemIndex = 0
-let problemCount = PROBLEM_SET_ONE.length
-let currentProblem = PROBLEM_SET_ONE[problemIndex%problemCount]
-
+let problemSetIndex = window.localStorage['estActivityIndex']
+console.log("problem set Index",problemSetIndex)
+let problemSet = PROBLEM_SETS[problemSetIndex]
+let problemCount = problemSet.length
+let currentProblem = problemSet[problemIndex%problemCount]
+let submittedAnswer = []
 
 
 // Sprites & Containers
@@ -132,7 +134,58 @@ actionButton.x = GO_BUTTON_CENTER[0]
 actionButton.y = GO_BUTTON_CENTER[1]
 app.stage.addChild(adjustableContainer)
 
+
+if (false){
+  queMultipleChoiceFormat()
+  layoutProblem()
+}
+
 // FUNCTIONS
+function queMultipleChoiceFormat(){
+  adjustableContainer.x = WINDOW_CENTER_X
+  slider.x = adjustableContainer.x + adjustableContainer.width/2
+  water.x = adjustableContainer.x+adjustableContainer.width/2
+}
+
+function layoutProblem(){
+  water.height = adjustableContainer.height*currentProblem.num/currentProblem.den
+  slider.interactive = false
+  slider.alpha = 0
+  frac.alpha = 1
+  let answerIndex = currentProblem.answerIndex
+  currentProblem.multichoice.forEach((c,i)=>{
+    let b = createMultipleChoice(c)
+    if (i == answerIndex){
+      b.correct = true
+    }
+    app.stage.addChild(b)
+    b.y = CONTAINER_BOTTOM+1.2*b.height/2
+    b.x = WINDOW_CENTER_X + 1.2*b.width*i
+    b.on('pointerdown',checkMCAnswer)
+  })
+}
+
+function checkMCAnswer(){
+  if (b.correct){
+    console.log("ITS CORRECT")
+  }
+}
+
+
+function createMultipleChoice(n,d) {
+
+    var block = new PIXI.Graphics();
+    block.lineStyle(2,COLORS.DARK_GRAY,2)
+    block.beginFill(0xFFFFFF);
+    block.drawRoundedRect(1, 1, DIM, DIM/2,5);
+    block.endFill();
+
+    var blockTexture = app.renderer.generateTexture(block);
+    let tile = new PIXI.Sprite(blockTexture)
+    tile.anchor.set(0.5)
+
+    return tile
+}
 
 
 function submitAnswer(){
@@ -147,7 +200,6 @@ function submitAnswer(){
 function animateTo(obj,loc,callback){
     createjs.Tween.get(obj).to({x:loc[0],y:loc[1]}, 1000, createjs.Ease.getPowInOut(1)).call(callback)
 }
-
 
 function animateJiji(){
   let jiji = createJijiAsset(1,2)
@@ -406,7 +458,7 @@ function reset(){
   if (CHECK_ANSWER()){
     problemIndex += 1
   }
-  currentProblem = PROBLEM_SET_ONE[problemIndex]
+  currentProblem = problemSet[problemIndex]
   frac.n.text = currentProblem.num
   frac.d.text = currentProblem.den
 
@@ -558,7 +610,7 @@ function createFraction(n,d) {
     let num;
     let den;
 
-    if (!whole) {
+    if (true) {
       mid = new PIXI.Graphics()
       mid.lineStyle(4, 0x000000, 2)
       mid.moveTo(-w/2,0)
