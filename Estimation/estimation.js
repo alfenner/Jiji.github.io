@@ -135,7 +135,7 @@ actionButton.y = GO_BUTTON_CENTER[1]
 app.stage.addChild(adjustableContainer)
 
 
-if (false){
+if (true){
   queMultipleChoiceFormat()
   layoutProblem()
 }

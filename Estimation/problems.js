@@ -1,6 +1,6 @@
 const SET_ONE_P1  = {
-  num: 7,
-  den: 7,
+  num: 1,
+  den: 2,
   multichoice: ["1 Half","1 Fourth","1 Fifth","1 Sixth"],
   answerIndex: 1,
 }
