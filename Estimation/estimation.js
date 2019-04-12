@@ -18,7 +18,8 @@ const GO_BUTTON_CENTER = [DIM,TOP_MARGIN]
 const TOLERANCE = 0.10*CONTAINER_HEIGHT
 const DELTA_BRIDGE = LEFT_CONTAINER_CENTER_X+0.7*CONTAINER_WIDTH - (RIGHT_CONTAINER_CENTER_X-0.7*CONTAINER_WIDTH)
 const BRIDGE_LENGTH = Math.sqrt(TOLERANCE*TOLERANCE+DELTA_BRIDGE*DELTA_BRIDGE)+LINE_WIDTH/2
-const ESTIMATING = true
+console.log("local storage mc",window.localStorage['mc'])
+const ESTIMATING = window.localStorage['mc'] == 'true' ? true : false
 const ORIGINAL_WATER_LOCATION = [LEFT_CONTAINER_CENTER_X+CONTAINER_WIDTH/2,2/3*WINDOW_HEIGHT+CONTAINER_HEIGHT/2]
 const ORIGINAL_CONTAINER_LOCATION = [CENTER_CONTAINER_X,2/3*WINDOW_HEIGHT]
 // COMPUTED CONSTANTS
@@ -157,9 +158,12 @@ app.stage.addChild(adjustableContainer)
 
 
 if (ESTIMATING){
+  console.log("MC MODE")
   queMultipleChoiceFormat()
   layoutChoices()
   frac.alpha = 0
+  actionButton.alpha = 0
+  actionButton.interactive = false
 }
 
 // FUNCTIONS
@@ -244,7 +248,7 @@ function createMultipleChoice(text) {
 
 
 function submitAnswer(){
-  if (actionButton.text.text == "Next"){
+  if (actionButton.text.text == "Next" || actionButton.text.text == "Retry" ){
     reset()
   } else {
     animateAnswer(currentProblem.num,currentProblem.den)
@@ -267,6 +271,7 @@ function animateJiji(){
   let endSeq = () => {
     setTimeout(()=>{
           createjs.Tween.get(jiji).to({alpha: 0}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{app.stage.removeChild(jiji)})
+          createjs.Tween.get(actionButton).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
     },1000)
   }
 
@@ -557,8 +562,7 @@ function animateToleranceFeedBack(){
   createPlatformRight()
   animateBridge(animateJiji)
 
-  actionButton.text.text = CHECK_ANSWER() ? "Next" : "Try Again"
-  createjs.Tween.get(actionButton).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
+  actionButton.text.text = CHECK_ANSWER() ? "Next" : "Retry"
 
 }
 
@@ -688,7 +692,9 @@ function createFraction(n,d) {
       num.y = 0
     }
 
-    //tileContainer.addChild(tile)
+    if (ESTIMATING){
+      tileContainer.addChild(tile)
+    }
     tileContainer.addChild(num)
     tileContainer.hitSpot = tile
 

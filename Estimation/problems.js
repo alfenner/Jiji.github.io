@@ -1,8 +1,8 @@
 const SET_ONE_P1  = {
-  num: 1,
+  num: 3,
   den: 2,
-  multichoice: ["1 Half","1 Fourth","1 Fifth","1 Sixth"],
-  answer: "1 Fourth",
+  multichoice: ["3 Halves","1 Fourth","1 Fifth","1 Sixth"],
+  answer: "3 Halves",
 }
 const SET_ONE_P2  = {
   num: 1,
@@ -116,7 +116,8 @@ const TEXT_TO_FRAC_KEY = {
   '1 Fourth': [1,4],
   '1 Fifth': [1,5],
   '1 Sixth': [1,6],
-  '1 Third': [1,3]
+  '1 Third': [1,3],
+  '3 Halves': [3,2]
 }
 
 const PROBLEM_SET_ONE = [SET_ONE_P1,SET_ONE_P2,SET_ONE_P3,SET_ONE_P4,SET_ONE_P5]

@@ -6,22 +6,26 @@ document.getElementById("estLevelFour").addEventListener("click",queProblemSetFo
 
 
 function queProblemSetOne(){
+      window.localStorage['mc'] = 'true'
     window.localStorage['estActivityIndex'] = 0
 }
 
 function queProblemSetTwo(){
+      window.localStorage['mc'] = 'false'
     window.localStorage['estActivityIndex'] = 1
 }
 
 function queProblemSetThree(){
+      window.localStorage['mc'] = 'false'
     window.localStorage['estActivityIndex'] = 2
 }
 
 function queProblemSetFour(){
+      window.localStorage['mc'] = 'false'
     window.localStorage['estActivityIndex'] = 3
 }
 
-
+/*
 function queMCProblemSetOne(){
     window.localStorage['mc'] = true
     window.localStorage['estActivityIndex'] = 0
@@ -41,3 +45,4 @@ function queMCProblemSetFour(){
     window.localStorage['mc'] = true
     window.localStorage['estActivityIndex'] = 3
 }
+*/

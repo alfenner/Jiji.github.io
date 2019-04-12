@@ -28,6 +28,21 @@ let colorLength = colors.length
 let currentColor = () => {return colors[colorIndex%colorLength]}
 
 
+// Helpers
+
+function hideGrid(){
+  let toHide = [...verticalLines,...horizontalLines]
+  toHide.forEach(h => h.alpha = 0)
+}
+
+function bringLinesToFront(){
+  let lines = [...verticalLines,...horizontalLines]
+  lines.forEach(l =>  app.stage.addChild(l))
+}
+
+
+// Constructors
+
 function createCircleButton(text) {
 
     let h = DIM/4
@@ -57,6 +72,7 @@ function createCircleButton(text) {
 }
 
 function createSquare(event){
+  bringLinesToFront()
   let hdim = h_part_dim()
   let vdim = v_part_dim()
   var block = new PIXI.Graphics();
@@ -145,7 +161,7 @@ function animateVerticalLines(inc){
 
   let spacing = CONTAINER_WIDTH/vPartitions
 
-  verticalLines.forEach((l,i)=>{
+  verticalLines.forEach((l,i) => {
     app.stage.addChild(l)
     if (i>vPartitions){
         createjs.Tween.get(l).to({x: CONTAINER_RIGHT}, 500, createjs.Ease.getPowInOut(4))
@@ -226,12 +242,8 @@ cont.interactive = true
 cont.on('pointerdown',createSquare)
 
 
-function hideGrid(){
-  let toHide = [...verticalLines,...horizontalLines]
-  toHide.forEach(h => h.alpha = 0)
-}
-
 function onFracStart(event){
+    bringLinesToFront()
     let touchedAtX = event.data.global.x
     let touchedAtY = event.data.global.y
     this.deltaTouch = [this.x-touchedAtX,this.y-touchedAtY]
