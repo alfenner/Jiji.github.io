@@ -2,31 +2,31 @@ const SET_ONE_P1  = {
   num: 1,
   den: 2,
   multichoice: ["1 Half","1 Fourth","1 Fifth","1 Sixth"],
-  answerIndex: 1,
+  answer: "1 Fourth",
 }
 const SET_ONE_P2  = {
   num: 1,
   den: 3,
-  multichoice: ["1 Half","1 Fourth","1 Fifth","1 Sixth"],
-  answerIndex: 1,
+  multichoice: ["1 Half","1 Third","1 Fifth","1 Sixth"],
+  answer: "1 Third",
 }
 const SET_ONE_P3  = {
   num: 1,
   den: 4,
   multichoice: ["1 Half","1 Fourth","1 Fifth","1 Sixth"],
-  answerIndex: 1,
+  answer: "1 Fourth",
 }
 const SET_ONE_P4  = {
   num: 1,
   den: 5,
   multichoice: ["1 Half","1 Fourth","1 Fifth","1 Sixth"],
-  answerIndex: 1,
+  answer: "1 Fifth",
 }
 const SET_ONE_P5 = {
   num: 1,
   den: 6,
   multichoice: ["1 Half","1 Fourth","1 Fifth","1 Sixth"],
-  answerIndex: 1,
+  answer: "1 Sixth",
 }
 
 
@@ -109,6 +109,14 @@ const SET_FOUR_P5 = {
   num: 10,
   den: 12,
   multichoice: [],
+}
+
+const TEXT_TO_FRAC_KEY = {
+  '1 Half': [1,2],
+  '1 Fourth': [1,4],
+  '1 Fifth': [1,5],
+  '1 Sixth': [1,6],
+  '1 Third': [1,3]
 }
 
 const PROBLEM_SET_ONE = [SET_ONE_P1,SET_ONE_P2,SET_ONE_P3,SET_ONE_P4,SET_ONE_P5]

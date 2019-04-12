@@ -18,14 +18,26 @@ const GO_BUTTON_CENTER = [DIM,TOP_MARGIN]
 const TOLERANCE = 0.10*CONTAINER_HEIGHT
 const DELTA_BRIDGE = LEFT_CONTAINER_CENTER_X+0.7*CONTAINER_WIDTH - (RIGHT_CONTAINER_CENTER_X-0.7*CONTAINER_WIDTH)
 const BRIDGE_LENGTH = Math.sqrt(TOLERANCE*TOLERANCE+DELTA_BRIDGE*DELTA_BRIDGE)+LINE_WIDTH/2
-const ESTIMATING = false
+const ESTIMATING = true
+const ORIGINAL_WATER_LOCATION = [LEFT_CONTAINER_CENTER_X+CONTAINER_WIDTH/2,2/3*WINDOW_HEIGHT+CONTAINER_HEIGHT/2]
+const ORIGINAL_CONTAINER_LOCATION = [CENTER_CONTAINER_X,2/3*WINDOW_HEIGHT]
 // COMPUTED CONSTANTS
 const correct_ans_y = () => {
-  return CONTAINER_BOTTOM - CONTAINER_HEIGHT*currentProblem.num/currentProblem.den
+  if (ESTIMATING){
+    return CONTAINER_BOTTOM - CONTAINER_HEIGHT*submittedMCAnswer[0]/submittedMCAnswer[1]
+  } else {
+    return CONTAINER_BOTTOM - CONTAINER_HEIGHT*currentProblem.num/currentProblem.den
+  }
+
 }
 
 const SUBMITTED_ANS_Y = () => {
-  return slider.y + slider.height/2
+  if (ESTIMATING){
+    console.log("calling submitted answer y")
+    return CONTAINER_BOTTOM-water.height
+  } else {
+    return slider.y + slider.height/2
+  }
 }
 
 const BRIDGE_START_CORDS = () => {
@@ -53,14 +65,27 @@ const JIJI_END_CORDS = () => {
 }
 
 const CHECK_ANSWER = () => {
+  if (!ESTIMATING){
    let tolerance = Math.abs(CONTAINER_HEIGHT)*0.10
    let difference = Math.abs(BRIDGE_START_CORDS()[1]-BRIDGE_END_CORDS()[1])
    console.log("difference",difference)
    console.log("tolerance",tolerance)
-  return difference < tolerance ? true : false
+   return difference < tolerance ? true : false
+ }
+  else {
+    return submittedMCAnswer[0] == currentProblem.num && submittedMCAnswer[1] == currentProblem.den
+  }
 }
 
+// Problem Sets
+let problemSetIndex = window.localStorage['estActivityIndex']
+let problemSet = PROBLEM_SETS[problemSetIndex]
+let problemCount = problemSet.length
+let problemIndex = 0
+let currentProblem = problemSet[problemIndex%problemCount]
 
+
+// Where the fricks come from - why is this in function case?
 let num_cords;
 let den_cords;
 
@@ -70,13 +95,9 @@ let feedFricks = []
 let frameBlocks = []
 let frameFricks = []
 let walkWayRef = []
-let problemIndex = 0
-let problemSetIndex = window.localStorage['estActivityIndex']
-console.log("problem set Index",problemSetIndex)
-let problemSet = PROBLEM_SETS[problemSetIndex]
-let problemCount = problemSet.length
-let currentProblem = problemSet[problemIndex%problemCount]
+let multipleChoices = []
 let submittedAnswer = []
+let submittedMCAnswer = []
 
 
 // Sprites & Containers
@@ -135,9 +156,10 @@ actionButton.y = GO_BUTTON_CENTER[1]
 app.stage.addChild(adjustableContainer)
 
 
-if (true){
+if (ESTIMATING){
   queMultipleChoiceFormat()
-  layoutProblem()
+  layoutChoices()
+  frac.alpha = 0
 }
 
 // FUNCTIONS
@@ -147,32 +169,56 @@ function queMultipleChoiceFormat(){
   water.x = adjustableContainer.x+adjustableContainer.width/2
 }
 
-function layoutProblem(){
+function layoutChoices(){
+  console.log("calling layout choices")
   water.height = adjustableContainer.height*currentProblem.num/currentProblem.den
   slider.interactive = false
   slider.alpha = 0
-  frac.alpha = 1
   let answerIndex = currentProblem.answerIndex
   currentProblem.multichoice.forEach((c,i)=>{
-    let b = createMultipleChoice(c)
-    if (i == answerIndex){
+    let myFrac = TEXT_TO_FRAC_KEY[c]
+    let b = createFraction(myFrac[0],myFrac[1])
+    if (currentProblem.num == myFrac[0] && currentProblem.den == myFrac[1]){
       b.correct = true
     }
     app.stage.addChild(b)
-    b.y = CONTAINER_BOTTOM+1.2*b.height/2
-    b.x = WINDOW_CENTER_X + 1.2*b.width*i
+    b.num = myFrac[0]
+    b.den = myFrac[1]
+    b.prompt = c
+    console.log("TEXT_TO_FRAC_KEY",TEXT_TO_FRAC_KEY[c])
+    b.y = frac.y
+    b.x = WINDOW_CENTER_X + 2*b.width*i - 3*b.width
+    b.interactive = true
     b.on('pointerdown',checkMCAnswer)
+    multipleChoices.push(b)
   })
 }
 
 function checkMCAnswer(){
-  if (b.correct){
-    console.log("ITS CORRECT")
+  multipleChoices.forEach(c =>{
+    if (c == this){
+        createjs.Tween.get(c).to({x: frac.x,y: frac.y}, 1000, createjs.Ease.getPowInOut(4))
+    } else {
+        createjs.Tween.get(c).to({alpha: 0}, 500, createjs.Ease.getPowInOut(4))
+    }
+  })
+  if (this.prompt == currentProblem.answer) {
+      submittedMCAnswer = [currentProblem.num,currentProblem.den]
+      createjs.Tween.get(water).to({x: ORIGINAL_WATER_LOCATION[0],y: ORIGINAL_WATER_LOCATION[1]}, 1000, createjs.Ease.getPowInOut(4))
+      createjs.Tween.get(adjustableContainer).to({x: ORIGINAL_CONTAINER_LOCATION[0],y: ORIGINAL_CONTAINER_LOCATION[1]}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{
+      animateAnswer(currentProblem.num,currentProblem.den)
+    })
+  } else {
+      submittedMCAnswer = [this.num,this.den]
+      createjs.Tween.get(water).to({x: ORIGINAL_WATER_LOCATION[0],y: ORIGINAL_WATER_LOCATION[1]}, 1000, createjs.Ease.getPowInOut(4))
+      createjs.Tween.get(adjustableContainer).to({x: ORIGINAL_CONTAINER_LOCATION[0],y: ORIGINAL_CONTAINER_LOCATION[1]}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{
+      animateAnswer(this.num,this.den)
+    })
   }
 }
 
 
-function createMultipleChoice(n,d) {
+function createMultipleChoice(text) {
 
     var block = new PIXI.Graphics();
     block.lineStyle(2,COLORS.DARK_GRAY,2)
@@ -180,11 +226,20 @@ function createMultipleChoice(n,d) {
     block.drawRoundedRect(1, 1, DIM, DIM/2,5);
     block.endFill();
 
+    let t = new PIXI.Text(text,{fontFamily : 'Chalkboard SE', fontSize: 12, fill : 0x000000, align : 'center'});
+    t.anchor.set(0.5)
+
     var blockTexture = app.renderer.generateTexture(block);
     let tile = new PIXI.Sprite(blockTexture)
     tile.anchor.set(0.5)
 
-    return tile
+    let blockContainer = new PIXI.Container()
+
+    blockContainer.addChild(tile)
+    blockContainer.addChild(t)
+    blockContainer.textVal = t
+
+    return blockContainer
 }
 
 
@@ -278,14 +333,9 @@ function animateBridge(startTheBlock){
     let deltaBridge_X = BRIDGE_END_CORDS()[0] - BRIDGE_START_CORDS()[0]
     let deltaBridge = BRIDGE_END_CORDS()[1] - BRIDGE_START_CORDS()[1]
     let above = deltaBridge > 0 ? true : false
-    if (!CHECK_ANSWER()){
-      theta = Math.PI
-      bridgeGraphic.moveTo(0,0)
-      bridgeGraphic.lineTo(0,-BRIDGE_LENGTH)
-    } else {
-      bridgeGraphic.moveTo(0,0)
-      bridgeGraphic.lineTo(0,-BRIDGE_LENGTH)
-    }
+    theta = Math.PI
+    bridgeGraphic.moveTo(0,0)
+    bridgeGraphic.lineTo(0,-0.95*BRIDGE_LENGTH)
     bridgeGraphic.alpha = 0
     bridgeContainer.addChild(bridgeGraphic)
     app.stage.addChild(bridgeContainer)
@@ -458,9 +508,12 @@ function reset(){
   if (CHECK_ANSWER()){
     problemIndex += 1
   }
+
   currentProblem = problemSet[problemIndex]
   frac.n.text = currentProblem.num
   frac.d.text = currentProblem.den
+
+  multipleChoices.forEach(c=>app.stage.removeChild(c))
 
   walkWayRef.forEach(w=>{app.stage.removeChild(w)})
   walkWayRef = []
@@ -475,6 +528,7 @@ function reset(){
   frameBlocks = []
   frameFricks = []
 
+  if (!ESTIMATING) {
   createjs.Tween.get(adjustableContainer).to({x: CENTER_CONTAINER_X}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{
       createjs.Tween.get(slider).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4))
       createjs.Tween.get(frac).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4))
@@ -485,7 +539,14 @@ function reset(){
   createjs.Tween.get(water).to({x: CENTER_CONTAINER_X+CONTAINER_WIDTH/2}, 1000, createjs.Ease.getPowInOut(4))
   createjs.Tween.get(water).to({height: CONTAINER_WIDTH/2}, 1000, createjs.Ease.getPowInOut(4))
   createjs.Tween.get(feedBackContainer).to({alpha: 0}, 1000, createjs.Ease.getPowInOut(4))
-
+  } else {
+    console.log("Estimate reset")
+    createjs.Tween.get(adjustableContainer).to({x: WINDOW_CENTER_X}, 1000, createjs.Ease.getPowInOut(4))
+    createjs.Tween.get(water).to({height: CONTAINER_HEIGHT*currentProblem.num/currentProblem.den}, 1000, createjs.Ease.getPowInOut(4))
+    createjs.Tween.get(water).to({x: WINDOW_CENTER_X+CONTAINER_WIDTH/2}, 1000, createjs.Ease.getPowInOut(4))
+    createjs.Tween.get(feedBackContainer).to({alpha: 0}, 1000, createjs.Ease.getPowInOut(4))
+    layoutChoices()
+  }
 
 
 }
@@ -496,7 +557,7 @@ function animateToleranceFeedBack(){
   createPlatformRight()
   animateBridge(animateJiji)
 
-  actionButton.text.text = "Next"
+  actionButton.text.text = CHECK_ANSWER() ? "Next" : "Try Again"
   createjs.Tween.get(actionButton).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
 
 }
