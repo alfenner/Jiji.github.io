@@ -6,8 +6,8 @@ const DIM = WINDOW_WIDTH/15
 const TOP_MARGIN = DIM/2
 const CONTAINER_HEIGHT = 3*DIM+4
 const CONTAINER_WIDTH = 3*DIM+4
-const LEFT_CONTAINER_CENTER_X = WINDOW_WIDTH/4
-const RIGHT_CONTAINER_CENTER_X = WINDOW_WIDTH/4*3
+const LEFT_CONTAINER_CENTER_X = WINDOW_WIDTH/3
+const RIGHT_CONTAINER_CENTER_X = WINDOW_WIDTH/3*2
 const CONTAINER_CENTER_Y = 2/3*WINDOW_HEIGHT
 const CONTAINER_BOTTOM = CONTAINER_CENTER_Y+CONTAINER_HEIGHT/2
 const CONTAINER_TOP = CONTAINER_CENTER_Y-CONTAINER_HEIGHT/2
@@ -124,7 +124,7 @@ den_cords = [FRACTION_CENTER[0],FRACTION_CENTER[1]-frac.width/4]
 
 let adjustableContainer = createContainer(3*DIM)
 app.stage.addChild(adjustableContainer)
-adjustableContainer.x = CENTER_CONTAINER_X
+adjustableContainer.x = LEFT_CONTAINER_CENTER_X
 adjustableContainer.y = 2/3*WINDOW_HEIGHT
 
 let slider = createSlider(DIM)
@@ -146,7 +146,7 @@ water.width = adjustableContainer.width
 
 let feedBackContainer = createContainer(3*DIM)
 app.stage.addChild(feedBackContainer)
-feedBackContainer.x = 3/4*WINDOW_WIDTH
+feedBackContainer.x = RIGHT_CONTAINER_CENTER_X
 feedBackContainer.y = 2/3*WINDOW_HEIGHT
 feedBackContainer.alpha = 0
 
@@ -397,8 +397,8 @@ function adjustWaterLevel(val){
 function createSlider(width) {
   let height = 2/3*width
   let sliderGraphic = new PIXI.Graphics()
-  sliderGraphic.lineStyle(0,0xFFFFFF)
-  sliderGraphic.beginFill(COLORS.BLUE)
+  sliderGraphic.lineStyle(1,0x000000)
+  sliderGraphic.beginFill(COLORS.DARK_GRAY)
   sliderGraphic.moveTo(0,height/2)
   sliderGraphic.lineTo(width/3,0)
   sliderGraphic.lineTo(width,0)
@@ -406,6 +406,7 @@ function createSlider(width) {
   sliderGraphic.lineTo(width/3,height)
   sliderGraphic.lineTo(0,height/2)
   sliderGraphic.endFill()
+  sliderGraphic.alpha = 0.5
   sliderGraphic.interactive = true
   return sliderGraphic
 }
