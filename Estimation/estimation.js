@@ -1,8 +1,10 @@
 
 // Constants
+const DIM = WINDOW_WIDTH/15
+const JIJI_SPEED = 0.2
+const CONT_BORD = DIM/10
 const LINE_WIDTH = 5 // Should be some fraction of DIM or window
 const WINDOW_CENTER_X = WINDOW_WIDTH/2
-const DIM = WINDOW_WIDTH/15
 const TOP_MARGIN = DIM/2
 const CONTAINER_HEIGHT = 3*DIM+4
 const CONTAINER_WIDTH = 3*DIM+4
@@ -11,17 +13,19 @@ const RIGHT_CONTAINER_CENTER_X = WINDOW_WIDTH/3*2
 const CONTAINER_CENTER_Y = 2/3*WINDOW_HEIGHT
 const CONTAINER_BOTTOM = CONTAINER_CENTER_Y+CONTAINER_HEIGHT/2
 const CONTAINER_TOP = CONTAINER_CENTER_Y-CONTAINER_HEIGHT/2
-const CENTER_CONTAINER_X = LEFT_CONTAINER_CENTER_X
+const CENTER_CONTAINER_X = WINDOW_WIDTH/2
 const FRACTION_CENTER = [1/2*WINDOW_WIDTH,1/4*WINDOW_HEIGHT]
 const FRACT_DIM = [DIM,2*DIM]
 const GO_BUTTON_CENTER = [DIM,TOP_MARGIN]
-const TOLERANCE = 0.10*CONTAINER_HEIGHT
+const TOLERANCE = 0.01*CONTAINER_HEIGHT
 const DELTA_BRIDGE = LEFT_CONTAINER_CENTER_X+0.7*CONTAINER_WIDTH - (RIGHT_CONTAINER_CENTER_X-0.7*CONTAINER_WIDTH)
 const BRIDGE_LENGTH = Math.sqrt(TOLERANCE*TOLERANCE+DELTA_BRIDGE*DELTA_BRIDGE)+LINE_WIDTH/2
-console.log("local storage mc",window.localStorage['mc'])
 const ESTIMATING = window.localStorage['mc'] == 'true' ? true : false
 const ORIGINAL_WATER_LOCATION = [LEFT_CONTAINER_CENTER_X+CONTAINER_WIDTH/2,2/3*WINDOW_HEIGHT+CONTAINER_HEIGHT/2]
 const ORIGINAL_CONTAINER_LOCATION = [CENTER_CONTAINER_X,2/3*WINDOW_HEIGHT]
+const WATER_CENTER = CENTER_CONTAINER_X+CONTAINER_WIDTH/2-CONT_BORD/2
+const WATER_LEFT = LEFT_CONTAINER_CENTER_X + 3*DIM/2 - CONT_BORD/2
+
 // COMPUTED CONSTANTS
 const correct_ans_y = () => {
   if (ESTIMATING){
@@ -67,10 +71,8 @@ const JIJI_END_CORDS = () => {
 
 const CHECK_ANSWER = () => {
   if (!ESTIMATING){
-   let tolerance = Math.abs(CONTAINER_HEIGHT)*0.10
+   let tolerance = Math.abs(CONTAINER_HEIGHT)*0.05
    let difference = Math.abs(BRIDGE_START_CORDS()[1]-BRIDGE_END_CORDS()[1])
-   console.log("difference",difference)
-   console.log("tolerance",tolerance)
    return difference < tolerance ? true : false
  }
   else {
@@ -79,8 +81,9 @@ const CHECK_ANSWER = () => {
 }
 
 // Problem Sets
-let problemSetIndex = window.localStorage['estActivityIndex']
-let problemSet = PROBLEM_SETS[problemSetIndex]
+let activityIndex = window.localStorage['estActivityIndex']
+let activityObj = PROBLEM_SETS[activityIndex]
+let problemSet = activityObj.problems
 let problemCount = problemSet.length
 let problemIndex = 0
 let currentProblem = problemSet[problemIndex%problemCount]
@@ -101,8 +104,6 @@ let submittedAnswer = []
 let submittedMCAnswer = []
 
 
-// Sprites & Containers
-
 // Background
 let backGround = new PIXI.Graphics()
 backGround.beginFill(0xFFFFFF)
@@ -112,6 +113,9 @@ backGround.interactive = true
 backGround.static = false
 app.stage.addChild(backGround)
 backGround.on('pointerup',()=> {slider.dragging = false})
+
+
+// Initializations
 
 
 let frac = createFraction(currentProblem.num,currentProblem.den)
@@ -133,15 +137,15 @@ slider.on('pointerdown',onSliderStart)
 slider.on('pointerup',onSliderEnd)
 slider.on('pointermove',onSliderMove)
 slider.x = adjustableContainer.x+adjustableContainer.width/2
-slider.y = adjustableContainer.y-slider.height/2
+slider.y = CONTAINER_BOTTOM-slider.height/2
 
 
 let water = createWater()
 app.stage.addChild(water)
-water.y = adjustableContainer.y+adjustableContainer.height/2
-water.x = adjustableContainer.x+adjustableContainer.width/2
-water.height = adjustableContainer.height/2
-water.width = adjustableContainer.width
+water.y = CONTAINER_BOTTOM - CONT_BORD/2
+water.x = adjustableContainer.x+3*DIM/2
+water.height = 0
+water.width = 3*DIM - CONT_BORD/2
 
 
 let feedBackContainer = createContainer(3*DIM)
@@ -170,7 +174,7 @@ if (ESTIMATING){
 function queMultipleChoiceFormat(){
   adjustableContainer.x = WINDOW_CENTER_X
   slider.x = adjustableContainer.x + adjustableContainer.width/2
-  water.x = adjustableContainer.x+adjustableContainer.width/2
+  water.x = WATER_CENTER
 }
 
 function layoutChoices(){
@@ -180,15 +184,14 @@ function layoutChoices(){
   slider.alpha = 0
   let answerIndex = currentProblem.answerIndex
   currentProblem.multichoice.forEach((c,i)=>{
-    let myFrac = TEXT_TO_FRAC_KEY[c]
-    let b = createFraction(myFrac[0],myFrac[1])
-    if (currentProblem.num == myFrac[0] && currentProblem.den == myFrac[1]){
+    let b = createFraction(c[0],c[1])
+    b.num = c[0]
+    b.den = c[1]
+    b.prompt = c
+    if (currentProblem.num == c[0] && currentProblem.den == c[1]){
       b.correct = true
     }
     app.stage.addChild(b)
-    b.num = myFrac[0]
-    b.den = myFrac[1]
-    b.prompt = c
     console.log("TEXT_TO_FRAC_KEY",TEXT_TO_FRAC_KEY[c])
     b.y = frac.y
     b.x = WINDOW_CENTER_X + 2*b.width*i - 3*b.width
@@ -198,24 +201,34 @@ function layoutChoices(){
   })
 }
 
+if (activityObj.prompt != null){
+  console.log("should drop modal?")
+  dropDiscussionModal(activityObj.prompt,()=>{})
+}
+
+
+
+// Factory functions
+
 function checkMCAnswer(){
   multipleChoices.forEach(c =>{
     if (c == this){
         createjs.Tween.get(c).to({x: frac.x,y: frac.y}, 1000, createjs.Ease.getPowInOut(4))
+        createjs.Tween.get(c.border).to({alpha: 0}, 1000, createjs.Ease.getPowInOut(4))
     } else {
         createjs.Tween.get(c).to({alpha: 0}, 500, createjs.Ease.getPowInOut(4))
     }
   })
   if (this.prompt == currentProblem.answer) {
       submittedMCAnswer = [currentProblem.num,currentProblem.den]
-      createjs.Tween.get(water).to({x: ORIGINAL_WATER_LOCATION[0],y: ORIGINAL_WATER_LOCATION[1]}, 1000, createjs.Ease.getPowInOut(4))
-      createjs.Tween.get(adjustableContainer).to({x: ORIGINAL_CONTAINER_LOCATION[0],y: ORIGINAL_CONTAINER_LOCATION[1]}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{
+      createjs.Tween.get(water).to({x: WATER_LEFT,y: ORIGINAL_WATER_LOCATION[1]}, 1000, createjs.Ease.getPowInOut(4))
+      createjs.Tween.get(adjustableContainer).to({x: LEFT_CONTAINER_CENTER_X,y: ORIGINAL_CONTAINER_LOCATION[1]}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{
       animateAnswer(currentProblem.num,currentProblem.den)
     })
   } else {
       submittedMCAnswer = [this.num,this.den]
-      createjs.Tween.get(water).to({x: ORIGINAL_WATER_LOCATION[0],y: ORIGINAL_WATER_LOCATION[1]}, 1000, createjs.Ease.getPowInOut(4))
-      createjs.Tween.get(adjustableContainer).to({x: ORIGINAL_CONTAINER_LOCATION[0],y: ORIGINAL_CONTAINER_LOCATION[1]}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{
+      createjs.Tween.get(water).to({x: WATER_LEFT,y: ORIGINAL_WATER_LOCATION[1]}, 1000, createjs.Ease.getPowInOut(4))
+      createjs.Tween.get(adjustableContainer).to({x: LEFT_CONTAINER_CENTER_X,y: ORIGINAL_CONTAINER_LOCATION[1]}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{
       animateAnswer(this.num,this.den)
     })
   }
@@ -257,7 +270,15 @@ function submitAnswer(){
 
 // FEEDBACK SHIT
 function animateTo(obj,loc,callback){
-    createjs.Tween.get(obj).to({x:loc[0],y:loc[1]}, 1000, createjs.Ease.getPowInOut(1)).call(callback)
+    let x1 = loc[0]
+    let y1 = loc[1]
+    let x2 = obj.x
+    let y2 = obj.y
+    let dx = x2-x1
+    let dy = y2-y1
+    let d = Math.sqrt(dx*dx+dy*dy)
+    let t = d/JIJI_SPEED
+    createjs.Tween.get(obj).to({x:loc[0],y:loc[1]}, t, createjs.Ease.getPowInOut(1)).call(callback)
 }
 
 function animateJiji(){
@@ -271,7 +292,11 @@ function animateJiji(){
   let endSeq = () => {
     setTimeout(()=>{
           createjs.Tween.get(jiji).to({alpha: 0}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{app.stage.removeChild(jiji)})
-          createjs.Tween.get(actionButton).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
+          createjs.Tween.get(actionButton).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4)).call(()=> {
+            if (problemIndex == problemSet.length-1){
+              dropDiscussionModal(activityObj.discussion,()=>{})
+            }
+          })
     },1000)
   }
 
@@ -297,8 +322,14 @@ function createPlatformLeft(){
 function createPlatformRight(){
   let platformGraphic = new PIXI.Graphics()
   platformGraphic.lineStyle(5,COLORS.DARK_GRAY)
-  platformGraphic.moveTo(BRIDGE_END_CORDS()[0],correct_ans_y())
-  platformGraphic.lineTo(WINDOW_WIDTH,correct_ans_y())
+  let y;
+  if (ESTIMATING && CHECK_ANSWER()){
+    y = SUBMITTED_ANS_Y()
+  } else {
+    y = correct_ans_y()
+  }
+  platformGraphic.moveTo(BRIDGE_END_CORDS()[0],y)
+  platformGraphic.lineTo(WINDOW_WIDTH,y)
   platformGraphic.alpha = 0
   app.stage.addChild(platformGraphic)
   walkWayRef.push(platformGraphic)
@@ -307,18 +338,18 @@ function createPlatformRight(){
 
 
 function animateBridge(startTheBlock){
+
   let deltaBridge_X = BRIDGE_END_CORDS()[0] - BRIDGE_START_CORDS()[0]
-  let deltaBridge = BRIDGE_END_CORDS()[1] - BRIDGE_START_CORDS()[1]
+  let correctMCQuestion = CHECK_ANSWER() && ESTIMATING
+  let deltaBridge = correctMCQuestion ? 0 : BRIDGE_END_CORDS()[1] - BRIDGE_START_CORDS()[1]
   let theta = Math.PI/2+Math.atan(deltaBridge/deltaBridge_X)
-
-
 
   let start = BRIDGE_START_CORDS()
   let end = BRIDGE_END_CORDS()
   console.log("check answer",CHECK_ANSWER())
   let bridgeGraphic = new PIXI.Graphics()
   let bridgeContainer = new PIXI.Container()
-  bridgeContainer.x = BRIDGE_START_CORDS()[0]-2.5
+  bridgeContainer.x = BRIDGE_START_CORDS()[0]
   bridgeContainer.y = BRIDGE_START_CORDS()[1]
   if (CHECK_ANSWER()){
     console.log("ANSWER IS FUCKING CORRECT!!!")
@@ -355,19 +386,19 @@ function animateBridge(startTheBlock){
 
 function createContainer(width){
   let containerGraphic = new PIXI.Graphics()
-  containerGraphic.lineStyle(3,0x000000)
+  containerGraphic.lineStyle(CONT_BORD,0x000000)
   containerGraphic.moveTo(0,0)
   containerGraphic.lineTo(0,width)
   containerGraphic.lineTo(width,width)
   containerGraphic.lineTo(width,0)
   containerGraphic.interactive = true
-  containerGraphic.x = 1.5
+  containerGraphic.x = CONT_BORD/2.5
 
   let containerTexture = app.renderer.generateTexture(containerGraphic)
   let containerSprite = new PIXI.Sprite(containerTexture)
   containerSprite.anchor.set(0.5)
-  containerSprite.width = containerGraphic.width + 1.5
-  containerSprite.height = containerGraphic.height + 1.5
+  containerSprite.width = containerGraphic.width
+  containerSprite.height = containerGraphic.height
   return containerSprite
 }
 
@@ -389,9 +420,8 @@ function createWater(){
 
 function adjustWaterLevel(val){
   water.height = val
-  water.width = adjustableContainer.width
   water.y = adjustableContainer.y+adjustableContainer.height/2
-  water.x = adjustableContainer.x+CONTAINER_WIDTH/2
+  water.x = LEFT_CONTAINER_CENTER_X+CONTAINER_WIDTH/2-CONT_BORD/2
 }
 
 function createSlider(width) {
@@ -453,11 +483,11 @@ function createFrick(a,b){
   return frickGraphic
 }
 
-function createFeedBlock(h,w){
+function createFeedBlock(w,h){
   let blockGraphic = new PIXI.Graphics();
   blockGraphic.lineStyle(2, 0x000000)
   blockGraphic.beginFill(COLORS.ORANGE);
-  blockGraphic.drawRoundedRect(0,0,h,w,5);
+  blockGraphic.drawRoundedRect(4,0,w,h,1);
   blockGraphic.endFill();
   blockGraphic.alpha = 0
   app.stage.addChild(blockGraphic)
@@ -477,7 +507,7 @@ function animateAnswer(num,den,numCords,denCords){
   let dy = CONTAINER_WIDTH/den
   let animateTo = [RIGHT_CONTAINER_CENTER_X-CONTAINER_WIDTH/2,CONTAINER_BOTTOM]
   for (let i = 0;i<num;i++){
-    let b = createFeedBlock(CONTAINER_WIDTH,dy)
+    let b = createFeedBlock(CONTAINER_WIDTH-8,dy)
     b.x = RIGHT_CONTAINER_CENTER_X-CONTAINER_WIDTH/2
     b.y = CONTAINER_BOTTOM-dy*(i+1)
     let f = createFrick(num_cords,[b.x+b.width/2,b.y+b.height/2])
@@ -520,6 +550,7 @@ function reset(){
   frac.d.text = currentProblem.den
 
   multipleChoices.forEach(c=>app.stage.removeChild(c))
+  multipleChoices = []
 
   walkWayRef.forEach(w=>{app.stage.removeChild(w)})
   walkWayRef = []
@@ -535,22 +566,43 @@ function reset(){
   frameFricks = []
 
   if (!ESTIMATING) {
-  createjs.Tween.get(adjustableContainer).to({x: CENTER_CONTAINER_X}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{
-      createjs.Tween.get(slider).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4))
+
+      /*
+      createjs.Tween.get(adjustableContainer).to({x: LEFT_CONTAINER_CENTER_X}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{
+      createjs.Tween.get(slider).to({alpha: 0.5}, 1000, createjs.Ease.getPowInOut(4))
+      slider.y = CONTAINER_BOTTOM - slider.height/2
       createjs.Tween.get(frac).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4))
-      slider.y = CONTAINER_CENTER_Y - slider.height/2
+      createjs.Tween.get(water).to({x: CENTER_CONTAINER_X+CONTAINER_WIDTH/2}, 1000, createjs.Ease.getPowInOut(4))
+      createjs.Tween.get(water).to({height: 0}, 1000, createjs.Ease.getPowInOut(4))
+      createjs.Tween.get(feedBackContainer).to({alpha: 0}, 1000, createjs.Ease.getPowInOut(4))
+      */
+      adjustableContainer.x = LEFT_CONTAINER_CENTER_X
+      slider.alpha = 0.5
+      frac.alpha = 1
+      slider.y = CONTAINER_BOTTOM - slider.height/2
+      water.x = WATER_LEFT
+      water.height = 0
+      feedBackContainer.alpha = 0
       slider.interactive = true
       actionButton.text.text = "Go"
-  })
-  createjs.Tween.get(water).to({x: CENTER_CONTAINER_X+CONTAINER_WIDTH/2}, 1000, createjs.Ease.getPowInOut(4))
-  createjs.Tween.get(water).to({height: CONTAINER_WIDTH/2}, 1000, createjs.Ease.getPowInOut(4))
-  createjs.Tween.get(feedBackContainer).to({alpha: 0}, 1000, createjs.Ease.getPowInOut(4))
+
+
   } else {
     console.log("Estimate reset")
+    actionButton.alpha = 0
+    /*
     createjs.Tween.get(adjustableContainer).to({x: WINDOW_CENTER_X}, 1000, createjs.Ease.getPowInOut(4))
     createjs.Tween.get(water).to({height: CONTAINER_HEIGHT*currentProblem.num/currentProblem.den}, 1000, createjs.Ease.getPowInOut(4))
-    createjs.Tween.get(water).to({x: WINDOW_CENTER_X+CONTAINER_WIDTH/2}, 1000, createjs.Ease.getPowInOut(4))
+    createjs.Tween.get(water).to({x: WATER_CENTER}, 1000, createjs.Ease.getPowInOut(4))
     createjs.Tween.get(feedBackContainer).to({alpha: 0}, 1000, createjs.Ease.getPowInOut(4))
+    */
+
+    adjustableContainer.x = WINDOW_CENTER_X
+    water.height = CONTAINER_HEIGHT*currentProblem.num/currentProblem.den
+    water.x = WATER_CENTER
+    feedBackContainer.alpha = 0
+
+
     layoutChoices()
   }
 
@@ -634,16 +686,18 @@ function animateFeedBack(){
 function createJijiAsset(n,d) {
 
     var block = new PIXI.Graphics();
-    block.lineStyle(2,COLORS.DARK_GRAY,2)
+    block.lineStyle(3,COLORS.DARK_GRAY)
     block.beginFill(0xFFFFFF);
-    block.drawRoundedRect(1, 1, DIM, DIM,5);
+    block.drawRoundedRect(0,0, DIM, DIM,3);
     block.endFill();
+    block.x = 1
+    block.y = 1
 
-    var blockTexture = app.renderer.generateTexture(block);
-    let tile = new PIXI.Sprite(blockTexture)
-    tile.anchor.set(1)
+    let blockTexture = app.renderer.generateTexture(block)
+    let blockSprite = new PIXI.Sprite(blockTexture)
+    blockSprite.anchor.set(1)
 
-    return tile
+    return blockSprite
 }
 
 function createFraction(n,d) {
@@ -660,16 +714,16 @@ function createFraction(n,d) {
     w = w*sf
 
     var block = new PIXI.Graphics();
-    block.lineStyle(2,0x000000,2)
+    block.lineStyle(3,0x000000,2)
     block.beginFill(0xFFFFFF);
-    block.drawRoundedRect(1, 1, w, h,5);
+    block.drawRoundedRect(0, 0, 1.2*w, 1.2*h,5);
     block.endFill();
+    block.x = 1
+    block.y = 1
 
     var blockTexture = app.renderer.generateTexture(block);
     let tile = new PIXI.Sprite(blockTexture)
-    tile.alpha = 0.5
     tile.anchor.set(0.5)
-
 
     // All or only some of these may exist depending on if we're using a "whole" or not.
     let mid;
@@ -697,7 +751,8 @@ function createFraction(n,d) {
       tileContainer.addChild(tile)
     }
     tileContainer.addChild(num)
-    tileContainer.hitSpot = tile
+    tileContainer.border = tile
+
 
     // Line style appears grey unless we add this after the prefious if block - not sure why.
     if (mid){tileContainer.addChild(mid)
@@ -745,7 +800,7 @@ function onSliderMove(){
       let inRange = pointerPosition.y < CONTAINER_BOTTOM ? true : false
       if (inRange){
         this.position.y = pointerPosition.y - this.height/2
-        adjustWaterLevel(adjustableContainer.y+adjustableContainer.height/2-pointerPosition.y)
+        adjustWaterLevel(CONTAINER_BOTTOM-pointerPosition.y)
       }
     }
 }

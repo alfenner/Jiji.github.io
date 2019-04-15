@@ -52,7 +52,7 @@
 
   <div id="Estimator">
     <script>
-    PIXI.settings.RESOLUTION = 3
+    PIXI.settings.RESOLUTION = 4
     var app = new PIXI.Application(window.innerWidth, window.innerHeight, {backgroundColor : 0xFFFFFF});
     document.getElementById("Estimator").appendChild(app.view);
     app.renderer.autoResize = true;
@@ -61,6 +61,7 @@
     </script>
   </div>
 
+  <script src="notifications.js"></script>
   <script src="problems.js"></script>
   <script src="../Shared/const.js"></script>
   <script src="estimation.js"></script>
