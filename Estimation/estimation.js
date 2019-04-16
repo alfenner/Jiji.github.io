@@ -71,7 +71,7 @@ const JIJI_END_CORDS = () => {
 
 const CHECK_ANSWER = () => {
   if (!ESTIMATING){
-   let tolerance = Math.abs(CONTAINER_HEIGHT)*0.05
+   let tolerance = Math.abs(CONTAINER_HEIGHT)*0.075
    let difference = Math.abs(BRIDGE_START_CORDS()[1]-BRIDGE_END_CORDS()[1])
    return difference < tolerance ? true : false
  }

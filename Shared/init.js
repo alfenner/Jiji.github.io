@@ -1,6 +1,6 @@
 (function($){
-  $(function(){
-
+    $(function(){
+    $('.modal').modal();
     $('.sidenav').sidenav();
     $('.carousel').carousel();
   }); // end of document ready

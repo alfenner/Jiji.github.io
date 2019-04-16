@@ -4,9 +4,17 @@ document.getElementById("estLevelOne").addEventListener("click",queProblemSetOne
 document.getElementById("estLevelTwo").addEventListener("click",queProblemSetTwo)
 document.getElementById("estLevelThree").addEventListener("click",queProblemSetThree)
 document.getElementById("estLevelFour").addEventListener("click",queProblemSetFour)
+document.getElementById("queShit").addEventListener("click",test)
 
+function test(){
+  console.log('this',this)
+  window.localStorage['que'] = 0
+}
+
+const EST_LEVEL_ONE = "estLevelOne"
 
 function queProblemSetOne(){
+    //window.location.href = "https://www.google.com"
     window.localStorage['mc'] = 'false'
     window.localStorage['estActivityIndex'] = 0
 }
