@@ -10,19 +10,19 @@ const CONTAINER_HEIGHT = 3*DIM+4
 const CONTAINER_WIDTH = 3*DIM+4
 const LEFT_CONTAINER_CENTER_X = WINDOW_WIDTH/3
 const RIGHT_CONTAINER_CENTER_X = WINDOW_WIDTH/3*2
-const CONTAINER_CENTER_Y = 2/3*WINDOW_HEIGHT
+const CONTAINER_CENTER_Y = 3/4*WINDOW_HEIGHT
 const CONTAINER_BOTTOM = CONTAINER_CENTER_Y+CONTAINER_HEIGHT/2
 const CONTAINER_TOP = CONTAINER_CENTER_Y-CONTAINER_HEIGHT/2
 const CENTER_CONTAINER_X = WINDOW_WIDTH/2
-const FRACTION_CENTER = [1/2*WINDOW_WIDTH,1/4*WINDOW_HEIGHT]
+const FRACTION_CENTER = [1/2*WINDOW_WIDTH,TOP_MARGIN+DIM]
 const FRACT_DIM = [DIM,2*DIM]
 const GO_BUTTON_CENTER = [DIM,TOP_MARGIN]
 const TOLERANCE = 0.01*CONTAINER_HEIGHT
 const DELTA_BRIDGE = LEFT_CONTAINER_CENTER_X+0.7*CONTAINER_WIDTH - (RIGHT_CONTAINER_CENTER_X-0.7*CONTAINER_WIDTH)
 const BRIDGE_LENGTH = Math.sqrt(TOLERANCE*TOLERANCE+DELTA_BRIDGE*DELTA_BRIDGE)+LINE_WIDTH/2
 const ESTIMATING = window.localStorage['mc'] == 'true' ? true : false
-const ORIGINAL_WATER_LOCATION = [LEFT_CONTAINER_CENTER_X+CONTAINER_WIDTH/2,2/3*WINDOW_HEIGHT+CONTAINER_HEIGHT/2]
-const ORIGINAL_CONTAINER_LOCATION = [CENTER_CONTAINER_X,2/3*WINDOW_HEIGHT]
+const ORIGINAL_WATER_LOCATION = [LEFT_CONTAINER_CENTER_X+CONTAINER_WIDTH/2,CONTAINER_CENTER_Y+CONTAINER_HEIGHT/2]
+const ORIGINAL_CONTAINER_LOCATION = [CENTER_CONTAINER_X,CONTAINER_CENTER_Y]
 const WATER_CENTER = CENTER_CONTAINER_X+CONTAINER_WIDTH/2-CONT_BORD/2
 const WATER_LEFT = LEFT_CONTAINER_CENTER_X + 3*DIM/2 - CONT_BORD/2
 
@@ -129,7 +129,7 @@ den_cords = [FRACTION_CENTER[0],FRACTION_CENTER[1]-frac.width/4]
 let adjustableContainer = createContainer(3*DIM)
 app.stage.addChild(adjustableContainer)
 adjustableContainer.x = LEFT_CONTAINER_CENTER_X
-adjustableContainer.y = 2/3*WINDOW_HEIGHT
+adjustableContainer.y = CONTAINER_CENTER_Y
 
 let slider = createSlider(DIM)
 app.stage.addChild(slider)
@@ -151,7 +151,7 @@ water.width = 3*DIM - CONT_BORD/2
 let feedBackContainer = createContainer(3*DIM)
 app.stage.addChild(feedBackContainer)
 feedBackContainer.x = RIGHT_CONTAINER_CENTER_X
-feedBackContainer.y = 2/3*WINDOW_HEIGHT
+feedBackContainer.y = CONTAINER_CENTER_Y
 feedBackContainer.alpha = 0
 
 let actionButton = createActionButton("Go",submitAnswer)
@@ -192,7 +192,6 @@ function layoutChoices(){
       b.correct = true
     }
     app.stage.addChild(b)
-    console.log("TEXT_TO_FRAC_KEY",TEXT_TO_FRAC_KEY[c])
     b.y = frac.y
     b.x = WINDOW_CENTER_X + 2*b.width*i - 3*b.width
     b.interactive = true

@@ -9,9 +9,23 @@
   <!-- CSS  -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="../css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
-  <link href="../css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
 </head>
 <body>
+
+  <div id="modal1" class="modal">
+    <div class="modal-content">
+      <h4>Teacher Content</h4>
+      <p>Only your teacher can access this content</p>
+      <div class="input-field col s6">
+        <input id="last_name" type="text" class="validate">
+      <label for="last_name">Code</label>
+  </div>
+  </div>
+    <div class="modal-footer">
+      <a id = "estLevelTwo" href='../Estimation/Estimation.html' class="modal-close waves-effect waves-green btn-flat">Ok</a>
+    </div>
+  </div>
+
   <nav class="orange lighten-1" role="navigation">
     <div class="nav-wrapper container"><a id="logo-container" href='../index.html' class="brand-logo">ST Math</a>
       <ul class="right hide-on-med-and-down">
@@ -29,30 +43,19 @@
     <div class="container">
       <h1 class="header center orange-text">Estimation</h1>
       <div class="row">
-        <h3>Objective</h3>
-        <h5 class="header col s12 light">Student will be able to estimate fractions on a unit square by playing games as a class and discussing their answers in pairs.</h5>
+        <p class = 'center'>
+        <a class= "waves-effect waves-light orange btn-large">Start</a>
+      </p>
       </div>
     </div>
   </div>
 
-<!-- Modal Structure -->
-<div id="modal1" class="modal">
-  <div class="modal-content">
-    <h4>Teacher Content</h4>
-    <p>Only your teacher can access this content</p>
-    <div class="input-field col s6">
-      <input id="last_name" type="text" class="validate">
-    <label for="last_name">Code</label>
-</div>
-  </div>
-  <div class="modal-footer">
-    <a id = "estLevelTwo" href='../Estimation/Estimation.html' class="modal-close waves-effect waves-green btn-flat">Ok</a>
-  </div>
-</div>
 
   <div class="container">
+    <h3> Objective </h3>
+    <h5> Estimate proper fractions by use zero, one half and one whole as a reference point.</h5>
+    <!-- Modal Structure -->
       <div class = 'row'>
-        <div class="col s6">
           <h3>Agenda</h3>
           <div class="card">
             <div class="card-content">
@@ -65,11 +68,20 @@
           </div>
           <div class="card">
             <div class="card-content">
-              <span class="card-title activator grey-text text-darken-4">Whole Class Activity<i class="material-icons right">more_vert</i></span>
+              <span class="card-title activator grey-text text-darken-4">Whole Class Estimation<i class="material-icons right">more_vert</i></span>
               <p><a id = "queShit" data-target="modal1" class="modal-trigger" href='../Estimation/Estimation.html'>Start</a></p>
             </div>
             <div class="card-reveal">
-              <span class="card-title grey-text text-darken-4">Do This After Activity One<i class="material-icons right">close</i></span>
+              <span class="card-title grey-text text-darken-4">This is a game you'll play as a class.<i class="material-icons right">close</i></span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title activator grey-text text-darken-4">Written Activity<i class="material-icons right">more_vert</i></span>
+              <p><a href="../images/EstWorksheetLessThanOne.pdf" >Start</a></p>
+            </div>
+            <div class="card-reveal">
+              <span class="card-title grey-text text-darken-4">Your teacher will give you the worksheet for this activity.<i class="material-icons right">close</i></span>
             </div>
           </div>
           <div class="card">
@@ -78,30 +90,28 @@
               <p><a id = "estLevelThree" href='../Estimation/Estimation.html'>Start</a></p>
             </div>
             <div class="card-reveal">
-              <span class="card-title grey-text text-darken-4">Do this as a class<i class="material-icons right">close</i></span>
+              <span class="card-title grey-text text-darken-4">You'll need the A,B,C,D handout for this.<i class="material-icons right">close</i></span>
               <p></p>
             </div>
           </div>
           <div class="card">
             <div class="card-content">
-              <span class="card-title activator grey-text text-darken-4">Independent Work<i class="material-icons right">more_vert</i></span>
+              <span class="card-title activator grey-text text-darken-4">Exit Ticket<i class="material-icons right">more_vert</i></span>
               <p><a id = "estLevelFour" href='../Estimation/Estimation.html'>Start</a></p>
             </div>
             <div class="card-reveal">
-              <span class="card-title grey-text text-darken-4">Do This After Activity Two<i class="material-icons right">close</i></span>
+              <span class="card-title grey-text text-darken-4">Your teacher will provide the worksheet for this.<i class="material-icons right">close</i></span>
               <p></p>
             </div>
           </div>
         </div>
-        <div class="col s6">
           <h3> Resources </h3>
           <div class="collection">
-            <a href="../images/EstWorksheetComparingZero.png" class="collection-item">Worksheet One</a>
-            <a href="../images/EstWorksheetComparingWholes.png" class="collection-item">Worksheet Two</a>
-            <a href="../images/EstWorksheetComparingHalves.png" class="collection-item">Worksheet Three</a>
+            <a href="https://docs.google.com/document/d/1oQFTCTjQX7gv3I6jx_efUBAliBpbvh-0LSkRVyfOO1E/edit" class="collection-item">Teacher Notes</a>
+            <a href="https://docs.google.com/presentation/d/1sXSbZqdGi18CO0XAAZqg8LNfTGBQRQX6AVSdWhn5mI8" class="collection-item">Teacher Slides</a>
+            <a href="../images/EstLessThanOneWorksheet.pdf" class="collection-item">Worksheets</a>
             <a href="../images/MCFlags.png" class="collection-item">Multiple Choice Flag</a>
           </div>
-      </div>
     </div>
   </div>
 
