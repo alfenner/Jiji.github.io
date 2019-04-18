@@ -6,8 +6,7 @@ let problemSet = activityObj.problems
 let problemCount = problemSet.length
 let problemIndex = 0
 let currentProblem = problemSet[problemIndex%problemCount]
-
-
+const MULTICHOICE = activityObj.mc ? true : false
 
 // Constants
 const DIM = WINDOW_WIDTH/15
@@ -30,7 +29,6 @@ const GO_BUTTON_CENTER = [DIM,TOP_MARGIN]
 const TOLERANCE = 0.01*CONTAINER_HEIGHT
 const DELTA_BRIDGE = LEFT_CONTAINER_CENTER_X+0.7*CONTAINER_WIDTH - (RIGHT_CONTAINER_CENTER_X-0.7*CONTAINER_WIDTH)
 const BRIDGE_LENGTH = Math.sqrt(TOLERANCE*TOLERANCE+DELTA_BRIDGE*DELTA_BRIDGE)+LINE_WIDTH/2
-const ESTIMATING = activityObj.mc ? true : false
 const ORIGINAL_WATER_LOCATION = [LEFT_CONTAINER_CENTER_X+CONTAINER_WIDTH/2,CONTAINER_CENTER_Y+CONTAINER_HEIGHT/2]
 const ORIGINAL_CONTAINER_LOCATION = [CENTER_CONTAINER_X,CONTAINER_CENTER_Y]
 const WATER_CENTER = CENTER_CONTAINER_X+CONTAINER_WIDTH/2-CONT_BORD/2
@@ -38,7 +36,7 @@ const WATER_LEFT = LEFT_CONTAINER_CENTER_X + 3*DIM/2 - CONT_BORD/2
 
 // COMPUTED CONSTANTS
 const correct_ans_y = () => {
-  if (ESTIMATING){
+  if (MULTICHOICE){
     return CONTAINER_BOTTOM - CONTAINER_HEIGHT*submittedMCAnswer[0]/submittedMCAnswer[1]
   } else {
     return CONTAINER_BOTTOM - CONTAINER_HEIGHT*currentProblem.num/currentProblem.den
@@ -47,7 +45,7 @@ const correct_ans_y = () => {
 }
 
 const SUBMITTED_ANS_Y = () => {
-  if (ESTIMATING){
+  if (MULTICHOICE){
     console.log("calling submitted answer y")
     return CONTAINER_BOTTOM-water.height
   } else {
@@ -80,7 +78,7 @@ const JIJI_END_CORDS = () => {
 }
 
 const CHECK_ANSWER = () => {
-  if (!ESTIMATING){
+  if (!MULTICHOICE){
    let tolerance = Math.abs(CONTAINER_HEIGHT)*0.075
    let difference = Math.abs(BRIDGE_START_CORDS()[1]-BRIDGE_END_CORDS()[1])
    return difference < tolerance ? true : false
@@ -162,7 +160,7 @@ actionButton.y = GO_BUTTON_CENTER[1]
 app.stage.addChild(adjustableContainer)
 
 
-if (ESTIMATING){
+if (MULTICHOICE){
   console.log("MC MODE")
   queMultipleChoiceFormat()
   layoutChoices()
@@ -202,11 +200,9 @@ function layoutChoices(){
 }
 
 if (activityObj.prompt != null){
-  console.log("should drop modal?")
-  dropDiscussionModal(activityObj.prompt,()=>{})
+    console.log("should drop modal?")
+    dropDiscussionModal(activityObj.prompt,()=>{})
 }
-
-
 
 // Factory functions
 
@@ -293,8 +289,8 @@ function animateJiji(){
     setTimeout(()=>{
           createjs.Tween.get(jiji).to({alpha: 0}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{app.stage.removeChild(jiji)})
           createjs.Tween.get(actionButton).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4)).call(()=> {
-            if (problemIndex == problemSet.length-1){
-              dropDiscussionModal(activityObj.discussion,()=>{})
+            if (problemIndex == problemSet.length-1 && CHECK_ANSWER()){
+              dropDiscussionModal(activityObj.discussion,()=>{window.history.back()})
             }
           })
     },1000)
@@ -323,7 +319,7 @@ function createPlatformRight(){
   let platformGraphic = new PIXI.Graphics()
   platformGraphic.lineStyle(5,COLORS.DARK_GRAY)
   let y;
-  if (ESTIMATING && CHECK_ANSWER()){
+  if (MULTICHOICE && CHECK_ANSWER()){
     y = SUBMITTED_ANS_Y()
   } else {
     y = correct_ans_y()
@@ -340,7 +336,7 @@ function createPlatformRight(){
 function animateBridge(startTheBlock){
 
   let deltaBridge_X = BRIDGE_END_CORDS()[0] - BRIDGE_START_CORDS()[0]
-  let correctMCQuestion = CHECK_ANSWER() && ESTIMATING
+  let correctMCQuestion = CHECK_ANSWER() && MULTICHOICE
   let deltaBridge = correctMCQuestion ? 0 : BRIDGE_END_CORDS()[1] - BRIDGE_START_CORDS()[1]
   let theta = Math.PI/2+Math.atan(deltaBridge/deltaBridge_X)
 
@@ -565,7 +561,7 @@ function reset(){
   frameBlocks = []
   frameFricks = []
 
-  if (!ESTIMATING) {
+  if (!MULTICHOICE) {
 
       /*
       createjs.Tween.get(adjustableContainer).to({x: LEFT_CONTAINER_CENTER_X}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{
@@ -747,7 +743,7 @@ function createFraction(n,d) {
       num.y = 0
     }
 
-    if (ESTIMATING){
+    if (MULTICHOICE){
       tileContainer.addChild(tile)
     }
     tileContainer.addChild(num)

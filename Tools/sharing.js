@@ -28,7 +28,7 @@ function layoutPolys() {
 
 
 function drawMenu(){
-
+// Need this
 }
 
 function drawCompletedTileSpaces(n) {
@@ -51,7 +51,6 @@ function drawCompletedTileSpaces(n) {
     tiler.stage.addChild(emptyRectSprite)
 
   }
-
 }
 function loadLevel(){
 
@@ -90,7 +89,6 @@ function createButtons(level) {
 function newPoly() {
 
     if (currentType == this.type){
-    console.log("creating a new polygon")
     createPolygon(this.type,this.color)
     let newPolyX = this.x + this.width/2
     let newPolyY = this.y + this.height/2
@@ -144,15 +142,9 @@ function drawWhole(){
 
   c.interactive = true
   c.isWhole = true
-  //c.on('pointerdown', onPolyTouched)
-  //c.on('pointerup', onPolyMoveEnd)
-  //c.on('pointermove', onPolyTouchMoved);
   c.polyCords = whole
   c.actualWidth = c.width
   c.actualHeight = c.height
-  //polys.push(c)
-  //wholeSprite.x = 0
-  //wholeSprite.y = 0
 
   tiler.stage.addChild(theWhole)
 
