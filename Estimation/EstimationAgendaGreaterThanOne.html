@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>Fractions</title>
+  <link rel="icon" type="image/png" href="../images/jiji-favicon.png">
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="../css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+
+  <div id="modal1" class="modal">
+    <div class="modal-content">
+      <h4>Teacher Content</h4>
+      <p>Only your teacher can access this content</p>
+      <div class="input-field col s6">
+        <input id="last_name" type="text" class="validate">
+      <label for="last_name">Code</label>
+  </div>
+  </div>
+    <div class="modal-footer">
+      <a id = "estLevelTwo" href='../Estimation/Estimation.html' class="modal-close waves-effect waves-green btn-flat">Ok</a>
+    </div>
+  </div>
+
+  <nav class="orange lighten-1" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href='../index.html' class="brand-logo">ST Math</a>
+      <ul class="right hide-on-med-and-down">
+        <li><a href='../index.html'>Home</a></li>
+      </ul>
+
+      <ul id="nav-mobile" class="sidenav">
+        <li><a href='../index.html'>Home</a></li>
+      </ul>
+      <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
+
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <h1 class="header center orange-text">Estimation Greater Than One</h1>
+      <div class="row">
+        <p class = 'center'>
+        <a class= "waves-effect waves-light orange btn-large">Start</a>
+      </p>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="container">
+    <h3> Objective </h3>
+    <h5> Estimate proper fractions by use zero, one half and one whole as a reference point.</h5>
+    <!-- Modal Structure -->
+      <div class = 'row'>
+          <h3>Agenda</h3>
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title activator grey-text text-darken-4">Warm Up<i class="material-icons right">more_vert</i></span>
+              <p><a id = "estLevelOne" href='../Estimation/Estimation.html'>Start</a></p>
+            </div>
+            <div class="card-reveal">
+              <span class="card-title grey-text text-darken-4">Start this right away!<i class="material-icons right">close</i></span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title activator grey-text text-darken-4">Whole Class Estimation<i class="material-icons right">more_vert</i></span>
+              <p><a id = "queShit" data-target="modal1" class="modal-trigger" href='../Estimation/Estimation.html'>Start</a></p>
+            </div>
+            <div class="card-reveal">
+              <span class="card-title grey-text text-darken-4">This is a game you'll play as a class.<i class="material-icons right">close</i></span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title activator grey-text text-darken-4">Written Activity<i class="material-icons right">more_vert</i></span>
+              <p><a href="../images/EstClassworkGreaterThanOne.pdf" >Start</a></p>
+            </div>
+            <div class="card-reveal">
+              <span class="card-title grey-text text-darken-4">Your teacher will give you the worksheet for this activity.<i class="material-icons right">close</i></span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title activator grey-text text-darken-4">Multiple Choice Game<i class="material-icons right">more_vert</i></span>
+              <p><a id = "estLevelThree" href='../Estimation/Estimation.html'>Start</a></p>
+            </div>
+            <div class="card-reveal">
+              <span class="card-title grey-text text-darken-4">You'll need the A,B,C,D handout for this.<i class="material-icons right">close</i></span>
+              <p></p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title activator grey-text text-darken-4">Exit Ticket<i class="material-icons right">more_vert</i></span>
+              <p><a href="../images/EstExitTicketGreaterThanOne.pdf">Start</a></p>
+            </div>
+            <div class="card-reveal">
+              <span class="card-title grey-text text-darken-4">Your teacher will provide the worksheet for this.<i class="material-icons right">close</i></span>
+              <p></p>
+            </div>
+          </div>
+        </div>
+          <h3> Resources </h3>
+          <div class="collection">
+            <a href="https://docs.google.com/document/d/1oQFTCTjQX7gv3I6jx_efUBAliBpbvh-0LSkRVyfOO1E/edit" class="collection-item">Teacher Notes</a>
+            <a href="https://docs.google.com/presentation/d/1ZmKOdPXycp1M2AocXoknSS_lo4v5Z2aUb0UmXGLOyQ0" class="collection-item">Teacher Slides</a>
+            <a href="../images/EstExitTicketGreaterThanOne.pdf" class="collection-item">Exit Ticket</a>
+            <a href="../images/EstClassworkGreaterThanOne.pdf" class="collection-item">Classwork</a>
+            <a href="../images/MCFlags.png" class="collection-item">Multiple Choice Flag</a>
+          </div>
+    </div>
+  </div>
+
+
+  <!--  Scripts-->
+  <script src="../Estimation/setlevels.js"></script>
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="../Shared/materialize.js"></script>
+  <script src="../Shared/init.js"></script>
+
+  </body>
+</html>

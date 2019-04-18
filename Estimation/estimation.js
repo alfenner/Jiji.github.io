@@ -1,7 +1,17 @@
+// Problem Sets
+let activity = window.localStorage['activity']
+console.log("Activity!",activity)
+let activityObj = EST_ACTIVITIES[activity]
+let problemSet = activityObj.problems
+let problemCount = problemSet.length
+let problemIndex = 0
+let currentProblem = problemSet[problemIndex%problemCount]
+
+
 
 // Constants
 const DIM = WINDOW_WIDTH/15
-const JIJI_SPEED = 0.2
+const JIJI_SPEED = 0.4
 const CONT_BORD = DIM/10
 const LINE_WIDTH = 5 // Should be some fraction of DIM or window
 const WINDOW_CENTER_X = WINDOW_WIDTH/2
@@ -20,7 +30,7 @@ const GO_BUTTON_CENTER = [DIM,TOP_MARGIN]
 const TOLERANCE = 0.01*CONTAINER_HEIGHT
 const DELTA_BRIDGE = LEFT_CONTAINER_CENTER_X+0.7*CONTAINER_WIDTH - (RIGHT_CONTAINER_CENTER_X-0.7*CONTAINER_WIDTH)
 const BRIDGE_LENGTH = Math.sqrt(TOLERANCE*TOLERANCE+DELTA_BRIDGE*DELTA_BRIDGE)+LINE_WIDTH/2
-const ESTIMATING = window.localStorage['mc'] == 'true' ? true : false
+const ESTIMATING = activityObj.mc ? true : false
 const ORIGINAL_WATER_LOCATION = [LEFT_CONTAINER_CENTER_X+CONTAINER_WIDTH/2,CONTAINER_CENTER_Y+CONTAINER_HEIGHT/2]
 const ORIGINAL_CONTAINER_LOCATION = [CENTER_CONTAINER_X,CONTAINER_CENTER_Y]
 const WATER_CENTER = CENTER_CONTAINER_X+CONTAINER_WIDTH/2-CONT_BORD/2
@@ -79,15 +89,6 @@ const CHECK_ANSWER = () => {
     return submittedMCAnswer[0] == currentProblem.num && submittedMCAnswer[1] == currentProblem.den
   }
 }
-
-// Problem Sets
-let activityIndex = window.localStorage['estActivityIndex']
-let activityObj = PROBLEM_SETS[activityIndex]
-let problemSet = activityObj.problems
-let problemCount = problemSet.length
-let problemIndex = 0
-let currentProblem = problemSet[problemIndex%problemCount]
-
 
 // Where the fricks come from - why is this in function case?
 let num_cords;

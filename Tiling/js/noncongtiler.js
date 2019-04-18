@@ -76,10 +76,7 @@ function loadLevel(){
   layoutButtons()
 }
 
-
-
 loadLevel()
-
 
 // Pass it the level and it will layout the buttons for that new level.
 function createButtons(level) {
@@ -101,7 +98,6 @@ function createButtons(level) {
     colorIndex += 1
     buttons.push(graphics)
   }
-
 }
 
 function newPoly() {
@@ -127,8 +123,6 @@ function layoutButtons(){
     y = y+b.height+dx/4
   }
 }
-
-
 
 function drawWhole(){
   let whole = TYPES.WHOLE

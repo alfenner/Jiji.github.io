@@ -1,17 +1,21 @@
+document.getElementById("estWarmup").addEventListener("click",queProblems)
+document.getElementById("estHands").addEventListener("click",queProblems)
+document.getElementById("estMultichoice").addEventListener("click",queProblems)
 
-document.getElementById("estLevelOne").addEventListener("click",queProblemSetOne)
-// document.getElementById("estMCLevelOne").addEventListener("click",queMCProblemSetOne)
-document.getElementById("estLevelTwo").addEventListener("click",queProblemSetTwo)
-document.getElementById("estLevelThree").addEventListener("click",queProblemSetThree)
-document.getElementById("estLevelFour").addEventListener("click",queProblemSetFour)
-document.getElementById("queShit").addEventListener("click",test)
 
-function test(){
-  console.log('this',this)
-  window.localStorage['que'] = 0
+function queProblems(){
+  console.log("this id",this.id)
+  window.localStorage['activity'] = this.id
 }
 
-const EST_LEVEL_ONE = "estLevelOne"
+/*
+
+function queProblemSetOne(){
+    //window.location.href = "https://www.google.com"
+    window.localStorage['mc'] = 'false'
+    window.localStorage['estActivityIndex'] = 0
+}
+
 
 function queProblemSetOne(){
     //window.location.href = "https://www.google.com"
@@ -31,32 +35,6 @@ function queProblemSetThree(){
 
 function queProblemSetFour(){
       window.localStorage['mc'] = 'false'
-    window.localStorage['estActivityIndex'] = 3
-}
-
-
-/*
-function queMCProblemSetOne(){
-    window.localStorage['mc'] = true
-    window.localStorage['estActivityIndex'] = 0
-}
-*/
-
-
-/*
-
-function queMCProblemSetTwo(){
-    window.localStorage['mc'] = true
-    window.localStorage['estActivityIndex'] = 1
-}
-
-function queMCProblemSetThree(){
-    window.localStorage['mc'] = true
-    window.localStorage['estActivityIndex'] = 2
-}
-
-function queMCProblemSetFour(){
-    window.localStorage['mc'] = true
     window.localStorage['estActivityIndex'] = 3
 }
 */

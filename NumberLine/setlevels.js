@@ -1,6 +1,4 @@
-
 document.getElementById("testButton").addEventListener("click",queTestProblems)
-
 
 
 function queTestProblems(){
@@ -26,7 +24,6 @@ function queClassworkDayThree(){
 function queClassworkDayFour(){
     window.localStorage['activityIndex'] = 5
 }
-
 
 function quePostWarmupDayOne(){
     window.localStorage['activityIndex'] = 6

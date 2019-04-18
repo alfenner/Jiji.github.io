@@ -1153,7 +1153,6 @@ function onBlockDragMove(){
 
 
 
-
 // Pin Actions
 
 function onPinDragStart(event)
@@ -1171,11 +1170,6 @@ function onPinDragStart(event)
       pinsOffLineCount = 0
     }
 }
-
-
-
-
-
 
 function onPinDragEnd()
 {
@@ -1225,6 +1219,7 @@ function flipLbl(lbl){
 
 document.addEventListener('keydown', function(event) {
 
+/*
     if (event.keyCode == 40 && activeEntity.scale.y == 1) {
       event.preventDefault()
       flipLbl(activeEntity)
@@ -1234,4 +1229,6 @@ document.addEventListener('keydown', function(event) {
       event.preventDefault()
       flipLbl(activeEntity)
     }
+*/
+
 })

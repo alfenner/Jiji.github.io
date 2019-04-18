@@ -1,6 +1,3 @@
-// State Variables
-
-console.log("IS THIS SCRIPT EVEN RUNNING!!!!???")
 
 // Denominator of the row that's currently place on the number line.
 let activeRow = 12

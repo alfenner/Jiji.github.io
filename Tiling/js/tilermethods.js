@@ -14,7 +14,6 @@ function checkSumToOne(polys){
     let v = getValFromType(p.type)
     acc = acc + v
   }
-
   return 0.95 < acc && acc < 1.05
 }
 
@@ -75,7 +74,6 @@ function isTiled(container,polygons) {
       console.log("NOT In CONTAINER")
     }
   }
-
 
   for (let i = 0;i<12;i++) {
     for (let j = 0;j<12;j++) {

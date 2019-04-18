@@ -17,8 +17,6 @@ let currentLevelIndex = -1
 let currentType;
 let nextButton = {}
 
-const LEVELS = [LEVEL_ONE,LEVEL_TWO,LEVEL_THREE]
-
 let activePoly;
 let theWhole;
 
@@ -28,7 +26,10 @@ function layoutPolys() {
   }
 }
 
-dropNotification("Fill The Square!")
+
+function drawMenu(){
+
+}
 
 function drawCompletedTileSpaces(n) {
 
@@ -52,10 +53,6 @@ function drawCompletedTileSpaces(n) {
   }
 
 }
-
-drawCompletedTileSpaces(4)
-console.log("calling tile spaces")
-// Takes the level index and loads new level.
 function loadLevel(){
 
   //window.location.replace('index.html')
@@ -74,49 +71,25 @@ function loadLevel(){
   currentTileIndex = 0
   buttons = []
   polys = []
-  drawWhole()
-  createButtons(LEVELS[currentLevelIndex])
+  createButtons()
   layoutButtons()
 }
 
 // Pass it the level and it will layout the buttons for that new level.
 function createButtons(level) {
-  let colorIndex = 0
-  for (s of level.shapes ) {
-    let polyPoints = []
-    s.forEach((e) => {
-      polyPoints.push(e[0])
-      polyPoints.push(e[1])
-    })
-    var graphics = new PIXI.Graphics();
-    graphics.beginFill(COLORS[COLOR_KEYS[colorIndex]]);
-    graphics.drawPolygon(polyPoints);
+  var graphics = new PIXI.Graphics();
+    graphics.beginFill(COLORS.blue);
+    graphics.drawRoundedRect(0,0,100,100)
     graphics.endFill();
-    graphics.type = s
-    graphics.color = COLORS[COLOR_KEYS[colorIndex]]
+    graphics.color = COLORS.blue
     graphics.interactive = true
     graphics.on('pointerdown',newPoly)
-    colorIndex += 1
     buttons.push(graphics)
-  }
-
 }
 
 function newPoly() {
 
-    console.log("POLY LENGTH",polys.length)
-    console.log("LEVELS[currentLevelIndex]",LEVELS[currentLevelIndex].congruent)
-    if (polys.length == 0 && LEVELS[currentLevelIndex].congruent == true){
-      currentType = this.type
-      for (b of buttons){
-        if (b.type != this.type){
-          b.alpha = 0.1
-          b.interactive = false
-        }
-      }
-    }
-
-    if (currentType == this.type || LEVELS[currentLevelIndex].congruent == false){
+    if (currentType == this.type){
     console.log("creating a new polygon")
     createPolygon(this.type,this.color)
     let newPolyX = this.x + this.width/2
@@ -124,7 +97,7 @@ function newPoly() {
     activePoly.x = newPolyX
     activePoly.y = newPolyY
     currentType = this.type
-    createjs.Tween.get(activePoly).to({x: wholeOrigin[0]+theWhole.width/2,y: wholeOrigin[1]-theWhole.height/2}, 1000, createjs.Ease.getPowInOut(4))
+    createjs.Tween.get(activePoly).to({x: 500,y: 500}, 1000, createjs.Ease.getPowInOut(4))
     setTimeout(() => {for (p of polys){p.interactive = true}} ,500)
   }
 }
@@ -139,8 +112,6 @@ function layoutButtons(){
     y = y+b.height+dx/4
   }
 }
-
-
 
 function drawWhole(){
   let whole = TYPES.WHOLE
@@ -194,13 +165,6 @@ function drawWhole(){
   wholeOrigin[0] = theWhole.x - theWhole.height/2
   wholeOrigin[1] = theWhole.y - theWhole.height/2
 
-  //console.log("theWhole.width",theWhole.width)
-  //console.log("thewhole.height",theWhole.height)
-  //console.log("theWhole.x",theWhole.x)
-  //console.log("theWhole.y",theWhole.y)
-  //console.log("wholeOrigin[0]",wholeOrigin[0])
-  //console.log("wholeOrigin[1]",wholeOrigin[1])
-
 }
 
 function createPolygon(type,color) {
@@ -209,17 +173,11 @@ function createPolygon(type,color) {
   var graphics = new PIXI.Graphics();
       graphics.lineStyle(1,0x000000)
       graphics.beginFill(color);
-      //graphics.moveTo(cords[0][0],cords[0][1])
-
-  for (let i  = 0;i<=cords.length;i++){
-      graphics.lineTo(cords[i%cords.length][0],cords[i%cords.length][1])
-  }
-
-  graphics.endFill();
+      graphics.drawRoundedRect(0,0,100,100)
+      graphics.endFill();
 
     var texture = tiler.renderer.generateTexture(graphics);
     let tile = new PIXI.Sprite(texture)
-    tile.polyCords = offset(cords,[tile.width/2,tile.height/2])
     tile.anchor.set(0.5)
     tile.alpha = 0.8
     tile.type = type
@@ -290,12 +248,10 @@ function onNodeClicked() {
 
 
 function onPolyTouched(event) {
-  activePoly = this
-  let touchedAtX = event.data.global.x
-  let touchedAtY = event.data.global.y
+    activePoly = this
+    let touchedAtX = event.data.global.x
+    let touchedAtY = event.data.global.y
 
-
-if (isPointInPoly([touchedAtX-this.x,touchedAtY-this.y],this.polyCords)){
     tiler.stage.addChild(this)
     this.dragging = true;
     this.wasDragged = false
@@ -303,48 +259,7 @@ if (isPointInPoly([touchedAtX-this.x,touchedAtY-this.y],this.polyCords)){
     this.dragStartedAt = this.y
     this.data = event.data;
     //this.alpha = 0.5;
-} else if (!isPointInPoly([touchedAtX-this.x,touchedAtY-this.y],this.polyCords)) {
-      for (let p of polys) {
-        if (isPointInPoly([touchedAtX-p.x,touchedAtY-p.y],p.polyCords) && p != this){
-          tiler.stage.addChild(p)
-          p.dragging = true;
-          p.wasDragged = false
-          p.deltaTouch = [p.x-touchedAtX,p.y-touchedAtY]
-          p.dragStartedAt = this.y
-          p.data = event.data;
-        //  p.alpha = 0.5;
-        }
-    }
 }
-}
-
-
-
-/*
-
-function goToActivityOne() {
-  currentLevelIndex = -1
-  loadLevel()
-}
-
-function goToActivityTwo(){
-  currentLevelIndex = 3
-  loadLevel()
-}
-
-let nonCongLink = document.getElementById("non-congruent")
-let nonCongLinkSideNav = document.getElementById("non-congruent-sidenav")
-
-let congLink = document.getElementById("congruent")
-let congLinkSideNav = document.getElementById("congruent-sidenav")
-
-nonCongLink.onclick = goToActivityTwo
-nonCongLinkSideNav.onclick = goToActivityTwo
-congLink.onclick = goToActivityOne
-congLinkSideNav.onclick = goToActivityOne
-*/
-
-
 
 function createActionButton(text,action) {
 
@@ -384,86 +299,9 @@ function createActionButton(text,action) {
 
 
 function onPolyMoveEnd() {
-
-    let dI = (this.x-this.actualWidth/2)/snapX
-    let dJ = (this.y-this.actualHeight/2)/snapY
-    let deltaI = Math.round(dI) - dI
-    let deltaJ = Math.round(dJ) - dJ
     this.dragging = false;
     this.data = null;
     this.deltaTouch = []
-    if (!this.wasDragged) {
-      //reatejs.Tween.get(this.scale).to({y: -1}, 1000, createjs.Ease.getPowInOut(4))
-    }
-    if (this.isWhole){
-      this.zIndex = 20
-      createjs.Tween.get(this).to({x: this.x+deltaI*snapX-2,y: this.y+deltaJ*snapY-2}, 500, createjs.Ease.getPowInOut(4))
-    }
-
-    if (!this.isWhole) {
-        createjs.Tween.get(this).to({x: this.x+deltaI*snapX,y: this.y+deltaJ*snapY}, 500, createjs.Ease.getPowInOut(4)).call(() => {
-          let filteredPolys = polysInRect(polys,theWhole)
-
-          if (checkSumToOne(filteredPolys) && isTiled(theWhole,filteredPolys)) {
-
-            let container = new PIXI.Container()
-            for (p of polys){
-              if (inRect(p,theWhole)){
-                p.interactive = false
-                container.addChild(p)
-              }
-              else {
-                tiler.stage.removeChild(p)
-              }
-            }
-
-            resetButtons()
-
-            if (LEVELS[currentLevelIndex].congruent == true){
-              container.type = polys[0].type
-            } else {
-              container.type = null
-            }
-
-            polys = []
-
-            container.x = wholeOrigin[0]
-            container.y = wholeOrigin[1]
-            container.pivot.x = container.x
-            container.pivot.y = container.y
-
-            tiler.stage.addChild(container)
-
-            createjs.Tween.get(container.scale).to({x: 0.5,y: 0.5}, 500, createjs.Ease.getPowInOut(4))
-
-            completedTiles.push(container)
-
-            let animateTo = null
-            for (c of completedTileSpaces){
-              if (c.type == currentType) {
-                animateTo = [c.x,c.y]
-              }
-            }
-
-            if (animateTo == null){
-                animateTo = [completedTileSpaces[currentTileIndex].x,completedTileSpaces[currentTileIndex].y]
-                if (LEVELS[currentLevelIndex].congruent){
-                    completedTileSpaces[currentTileIndex].type = currentType
-                }
-                currentTileIndex += 1
-            }
-
-            console.log("animatTo",animateTo)
-
-            createjs.Tween.get(container).to({x: animateTo[0],y: animateTo[1]}, 500, createjs.Ease.getPowInOut(4)).call(()=> {
-              if (currentTileIndex > 3){
-                nextButton.interactive = true
-                createjs.Tween.get(nextButton).to({alpha: 1}, 200, createjs.Ease.getPowInOut(4))
-              }
-            })
-          }
-        })
-    }
 }
 
 function onPolyTouchMoved() {
@@ -475,16 +313,7 @@ function onPolyTouchMoved() {
     }
 }
 
-//createPolygon('fourthRect',colors['orange'])
-//createPolygon('fourthRightTriangle',colors['purple'])
-//createPolygon(TYPES.FOURTH_RIGHT_TRIANGLE,COLORS.PINK)
-//createPolygon('fourthIsoceles',colors['red'])
-//createPolygon(TYPES.HALF_RECT,COLORS.BLUE)
-//createPolygon('halfTriangle',colors['pink'])
-//createPolygon('thirdRect',colors['orange'])
 loadLevel()
-drawWhole()
-layoutPolys()
 
 nextButton = createActionButton("Next Level ->",loadLevel)
 nextButton.alpha = 0
