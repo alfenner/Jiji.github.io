@@ -56,16 +56,9 @@ function isTiled(container,polygons) {
   let dx = container.width/12
   let dy = container.height/12
 
-  console.log("dx,dy",dx,dy)
-  console.log("polygoncords1",polygons[0].polyCords)
-  console.log("polygons.count",polygons.length)
-  console.log("container top left",[container.x-container.width,container.y-container.height])
-
   // CAREFUL! this assumes that the container is anchored at the center
   let oX = container.x - container.width/2
   let oY = container.y - container.height/2
-
-  console.log("oX,oY",container.width,container.height)
 
   let testPoints =[]
 

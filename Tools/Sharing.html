@@ -35,12 +35,12 @@
   <div id="Tiler" >
     <script>
     PIXI.settings.RESOLUTION = 2
-    var tiler = new PIXI.Application(800, 600, {backgroundColor : 0xFFFFFF});
-    document.getElementById("Tiler").appendChild(tiler.view);
-    tiler.renderer.view.style.position = "absolute";
-    tiler.renderer.view.style.display = "block";
-    tiler.renderer.autoResize = true;
-    tiler.renderer.resize(window.innerWidth, window.innerHeight);
+    var app = new PIXI.Application(800, 600, {backgroundColor : 0xFFFFFF});
+    document.getElementById("Tiler").appendChild(app.view);
+    app.renderer.view.style.position = "absolute";
+    app.renderer.view.style.display = "block";
+    app.renderer.autoResize = true;
+    app.renderer.resize(window.innerWidth, window.innerHeight);
     </script>
   </div>
 

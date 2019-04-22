@@ -11,14 +11,300 @@ let wholeOrigin = []
 
 let completedTiles = []
 let completedTileSpaces = []
-let buttons = []
 let currentTileIndex = 0
 let currentLevelIndex = -1
 let currentType;
 let nextButton = {}
+let constructorBlock;
+let cuttingTool;
+let deleteTool;
+let menuItems = []
+let blocks = []
+
 
 let activePoly;
 let theWhole;
+
+
+const OBJ_TYPE = {
+  BLOCK: 0,
+  CUT: 1,
+  DELETE: 2
+}
+
+const DIM = WINDOW_WIDTH/12
+const WINDOW_CENTER_X = WINDOW_WIDTH/2
+const WINDOW_CENTER_Y = WINDOW_HEIGHT/2
+const CONTAINER_WIDTH = 4*DIM
+const CONTAINER_HEIGHT = 4*DIM
+const CONTAINER_CENTER_X = WINDOW_CENTER_X
+const CONTAINER_CENTER_Y = WINDOW_HEIGHT/3
+const CONTAINER_TOP = CONTAINER_CENTER_Y-CONTAINER_WIDTH/2
+const CONTAINER_BOTTOM = CONTAINER_CENTER_Y+CONTAINER_WIDTH/2
+const CONTAINER_LEFT = CONTAINER_CENTER_X-CONTAINER_WIDTH/2
+const CONTAINER_RIGHT = CONTAINER_CENTER_X+CONTAINER_WIDTH/2
+
+const v_part_dim = ()=> {
+  return CONTAINER_HEIGHT/hPartitions
+}
+
+const h_part_dim = ()=> {
+  return CONTAINER_WIDTH/vPartitions
+}
+
+let fractions = []
+let horizontalLines = []
+let verticalLines = []
+let vPartitions = 1
+let hPartitions = 1
+let colorIndex = 0
+let colors = [COLORS.BLUE,COLORS.RED,COLORS.GREEN,COLORS.ORANGE,COLORS.PURPLE]
+let colorLength = colors.length
+let currentColor = () => {return colors[colorIndex%colorLength]}
+
+
+// Init
+createMenuButtons()
+layoutMenu()
+initVerticalLines(1)
+initHorizontalLines(1)
+animateVerticalLines(1)
+animateHorizontalLines(1)
+createBlockConstructor()
+
+
+
+
+// Helpers
+
+function hideGrid(){
+  let toHide = [...verticalLines,...horizontalLines]
+  toHide.forEach(h => h.alpha = 0)
+}
+
+function bringLinesToFront(){
+  let lines = [...verticalLines,...horizontalLines]
+  lines.forEach(l =>  app.stage.addChild(l))
+}
+
+
+// Constructors
+
+function createTextBox(text) {
+
+    let h = DIM/4
+    let w = DIM/4
+
+    var circle = new PIXI.Graphics();
+    circle.drawRoundedRect(0,0,4*h,h,1);
+    circle.endFill();
+
+    let circleTexture = app.renderer.generateTexture(circle);
+    let circleSprite = new PIXI.Sprite(circleTexture)
+    circleSprite.alpha = 0.5
+    circleSprite.anchor.set(0.5)
+
+    let pinContainer = new PIXI.Container()
+    pinContainer.addChild(circleSprite)
+
+    let operator = new PIXI.Text(text,{fontFamily : 'Chalkboard SE', fontSize: dx/2, fill : 0x000000, align : 'center'});
+    operator.anchor.set(0.5)
+    operator.x = 0
+    operator.y = 0
+    pinContainer.addChild(operator)
+    pinContainer.interactive = true
+
+    return pinContainer
+}
+
+
+function createCircleButton(text) {
+
+    let h = DIM/4
+    let w = DIM/4
+
+    var circle = new PIXI.Graphics();
+    circle.beginFill(COLORS.GREEN);
+    circle.drawCircle(DIM/5, DIM/5,DIM/5);
+    circle.endFill();
+
+    let circleTexture = app.renderer.generateTexture(circle);
+    let circleSprite = new PIXI.Sprite(circleTexture)
+    circleSprite.alpha = 0.5
+    circleSprite.anchor.set(0.5)
+
+    let pinContainer = new PIXI.Container()
+    pinContainer.addChild(circleSprite)
+
+    let operator = new PIXI.Text(text,{fontFamily : 'Chalkboard SE', fontSize: dx/2, fill : 0x000000, align : 'center'});
+    operator.anchor.set(0.5)
+    operator.x = 0
+    operator.y = 0
+    pinContainer.addChild(operator)
+    pinContainer.interactive = true
+
+    return pinContainer
+}
+
+
+function createContainer(width){
+  let containerGraphic = new PIXI.Graphics()
+  containerGraphic.lineStyle(3,0x000000)
+  containerGraphic.moveTo(0,0)
+  containerGraphic.lineTo(0,width)
+  containerGraphic.lineTo(width,width)
+  containerGraphic.lineTo(width,0)
+  containerGraphic.lineTo(0,0)
+  containerGraphic.interactive = true
+  containerGraphic.x = 1.5
+  containerGraphic.y = 1.5
+
+  let containerTexture = app.renderer.generateTexture(containerGraphic)
+  let containerSprite = new PIXI.Sprite(containerTexture)
+  containerSprite.anchor.set(0.5)
+  containerSprite.width = containerGraphic.width + 1.5
+  containerSprite.height = containerGraphic.height + 1.5
+  return containerSprite
+}
+
+function initVerticalLines(partition){
+
+  for (let i = 0;i<11;i++){
+    let g = new PIXI.Graphics()
+    g.lineStyle(3,0x000000)
+    g.lineTo(0,CONTAINER_WIDTH)
+    g.y = CONTAINER_TOP
+    g.x = CONTAINER_LEFT
+    verticalLines.push(g)
+    app.stage.addChild(g)
+  }
+
+}
+
+function initHorizontalLines(partition){
+  for (let i = 0;i<11;i++){
+    let g = new PIXI.Graphics()
+    g.lineStyle(3,0x000000)
+    g.lineTo(CONTAINER_WIDTH,0)
+    g.y = CONTAINER_TOP
+    g.x = CONTAINER_LEFT
+    horizontalLines.push(g)
+    app.stage.addChild(g)
+  }
+}
+
+function animateVerticalLines(inc){
+
+  console.log("animating verticalLines")
+  vPartitions  += inc
+  if (vPartitions != 0 && vPartitions != 11){
+    colorIndex += 1
+
+  console.log("color Index",colorIndex)
+
+
+  let spacing = CONTAINER_WIDTH/vPartitions
+
+  verticalLines.forEach((l,i) => {
+    app.stage.addChild(l)
+    if (i>vPartitions){
+        createjs.Tween.get(l).to({x: CONTAINER_RIGHT}, 500, createjs.Ease.getPowInOut(4))
+    } else {
+        createjs.Tween.get(l).to({x: i*spacing+CONTAINER_LEFT}, 500, createjs.Ease.getPowInOut(4))
+    }
+
+    })
+  } else {
+    vPartitions -= inc
+  }
+}
+
+function animateHorizontalLines(inc){
+
+  hPartitions  += inc
+  if (hPartitions != 0 && hPartitions != 11){
+
+  colorIndex += 1
+
+  let spacing = CONTAINER_WIDTH/hPartitions
+
+  horizontalLines.forEach((l,i)=>{
+    app.stage.addChild(l)
+    if (i>hPartitions){
+        createjs.Tween.get(l).to({y: CONTAINER_BOTTOM}, 500, createjs.Ease.getPowInOut(4))
+    } else {
+        createjs.Tween.get(l).to({y: i*spacing+CONTAINER_TOP}, 500, createjs.Ease.getPowInOut(4))
+    }
+
+  })
+} else {
+  hPartitions -= inc
+}
+
+
+}
+
+let vPlus = createCircleButton("+")
+app.stage.addChild(vPlus)
+vPlus.y = CONTAINER_TOP - DIM/4
+vPlus.x = WINDOW_CENTER_X
+
+
+let vMinus = createCircleButton("-")
+app.stage.addChild(vMinus)
+vMinus.y = CONTAINER_BOTTOM + DIM/4
+vMinus.x = WINDOW_CENTER_X
+
+
+let hPlus = createCircleButton("+")
+app.stage.addChild(hPlus)
+hPlus.x = CONTAINER_RIGHT + DIM/4
+hPlus.y = CONTAINER_CENTER_Y
+
+let hMinus = createCircleButton("-")
+app.stage.addChild(hMinus)
+hMinus.x = CONTAINER_LEFT - DIM/4
+hMinus.y = CONTAINER_CENTER_Y
+
+vPlus.on("pointerdown",() => animateHorizontalLines(1))
+vMinus.on("pointerdown",() => animateHorizontalLines(-1))
+hPlus.on("pointerdown",() => animateVerticalLines(1))
+hMinus.on("pointerdown",() => animateVerticalLines(-1))
+
+
+let cont = createContainer(CONTAINER_WIDTH)
+app.stage.addChild(cont)
+cont.x = CONTAINER_CENTER_X
+cont.y = CONTAINER_CENTER_Y
+
+function onFracStart(event){
+    bringLinesToFront()
+    let touchedAtX = event.data.global.x
+    let touchedAtY = event.data.global.y
+    this.deltaTouch = [this.x-touchedAtX,this.y-touchedAtY]
+    app.stage.addChild(this)
+    this.data = event.data;
+    this.dragging = true
+}
+
+function onFracEnd(){
+    this.data = null;
+    this.dragging = false
+    if (this.x < CONTAINER_LEFT || this.y < CONTAINER_TOP){
+      let i = fractions.indexOf(this)
+      fractions.splice(i,1)
+      app.stage.removeChild(this)
+    }
+}
+
+function onFracMove(){
+    if (this.dragging){
+      let pointerPosition = this.data.getLocalPosition(this.parent);
+        this.y = pointerPosition.y + this.deltaTouch[1]
+        this.x = pointerPosition.x + this.deltaTouch[0]
+    }
+}
+
 
 function layoutPolys() {
   for (let i=0;i<polys.length;i++) {
@@ -27,8 +313,22 @@ function layoutPolys() {
 }
 
 
-function drawMenu(){
-// Need this
+function createMenuButtons(){
+  constructorBlock = createBlockConstructor()
+  cuttingTool = createTextBox("Cut")
+  deleteTool = createTextBox("Delete")
+
+  deleteTool.TYPE = OBJ_TYPE.DELETE
+  deleteTool.start = [deleteTool.x,deleteTool.y]
+  deleteTool.on('pointerdown',onPolyTouched)
+  deleteTool.on('pointerup',onPolyMoveEnd)
+  deleteTool.on('pointermove',onPolyTouchMoved)
+
+  cuttingTool.TYPE = OBJ_TYPE.CUT
+  cuttingTool.on('pointerdown',onPolyTouched)
+  cuttingTool.on('pointerup',onPolyMoveEnd)
+  cuttingTool.on('pointermove',onPolyTouchMoved)
+  menuItems = [constructorBlock,cuttingTool,deleteTool]
 }
 
 function drawCompletedTileSpaces(n) {
@@ -42,73 +342,54 @@ function drawCompletedTileSpaces(n) {
     graphics.x = -1.5
     graphics.y = -1.5
 
-    let texture = tiler.renderer.generateTexture(graphics);
+    let texture = app.renderer.generateTexture(graphics);
     let emptyRectSprite = new PIXI.Sprite(texture)
     emptyRectSprite.x = windowWidth-3*dx
     emptyRectSprite.y = i*2.2*dx + dx/2
     emptyRectSprite.alpha = 0.5
     completedTileSpaces.push(emptyRectSprite)
-    tiler.stage.addChild(emptyRectSprite)
+    app.stage.addChild(emptyRectSprite)
 
   }
-}
-function loadLevel(){
-
-  //window.location.replace('index.html')
-
-  nextButton.alpha = 0
-  for (p of polys){
-    tiler.stage.removeChild(p)
-  }
-  for (b of buttons){
-    tiler.stage.removeChild(b)
-  }
-  for (t of completedTiles) {
-    tiler.stage.removeChild(t)
-  }
-  currentLevelIndex += 1
-  currentTileIndex = 0
-  buttons = []
-  polys = []
-  createButtons()
-  layoutButtons()
 }
 
 // Pass it the level and it will layout the buttons for that new level.
-function createButtons(level) {
+function createBlockConstructor() {
   var graphics = new PIXI.Graphics();
-    graphics.beginFill(COLORS.blue);
-    graphics.drawRoundedRect(0,0,100,100)
+    graphics.beginFill(COLORS.BLUE);
+    graphics.drawRoundedRect(0,0,100,100,2)
     graphics.endFill();
-    graphics.color = COLORS.blue
+    graphics.color = COLORS.BLUE
     graphics.interactive = true
-    graphics.on('pointerdown',newPoly)
-    buttons.push(graphics)
+    graphics.on('pointerdown',newBlock)
+    return graphics
+
 }
 
-function newPoly() {
-
-    if (currentType == this.type){
-    createPolygon(this.type,this.color)
-    let newPolyX = this.x + this.width/2
-    let newPolyY = this.y + this.height/2
-    activePoly.x = newPolyX
-    activePoly.y = newPolyY
-    currentType = this.type
-    createjs.Tween.get(activePoly).to({x: 500,y: 500}, 1000, createjs.Ease.getPowInOut(4))
-    setTimeout(() => {for (p of polys){p.interactive = true}} ,500)
-  }
+function newBlock() {
+    let newBlock = createBlock(this.type,this.color)
+    app.stage.addChild(newBlock)
+    newBlock.x = this.x + this.width/2
+    newBlock.y = this.y + this.width/2
+    createjs.Tween.get(newBlock).to({x: WINDOW_CENTER_X,y: CONTAINER_CENTER_Y}, 1000, createjs.Ease.getPowInOut(4))
+    blocks.push(newBlock)
 }
 
 
-function layoutButtons(){
-  let y = dx/2
-  for (b of buttons){
-    tiler.stage.addChild(b)
-    b.x = dx
-    b.y = y
-    y = y+b.height+dx/4
+function layoutMenu(){
+  let y = DIM/2
+  console.log("these are the menu items",menuItems)
+  for (i of menuItems){
+    app.stage.addChild(i)
+      i.x = DIM/2
+      i.y = y
+      i.start = [i.x,i.y]
+      y = y+i.height+DIM/4
   }
+  cuttingTool.x = cuttingTool.x + constructorBlock.width/2
+  cuttingTool.start = [cuttingTool.x,cuttingTool.y]
+  deleteTool.x = deleteTool.x + constructorBlock.width/2
+  deleteTool.start = [deleteTool.x,deleteTool.y]
 }
 
 function drawWhole(){
@@ -124,7 +405,7 @@ function drawWhole(){
   graphics.x = 1.5
   graphics.y = 1.5
 
-  var texture = tiler.renderer.generateTexture(graphics);
+  var texture = app.renderer.generateTexture(graphics);
   theWhole = new PIXI.Sprite(texture)
 
   theWhole.anchor.set(0.5)
@@ -146,7 +427,7 @@ function drawWhole(){
   c.actualWidth = c.width
   c.actualHeight = c.height
 
-  tiler.stage.addChild(theWhole)
+  app.stage.addChild(theWhole)
 
   let i = Math.ceil(windowWidth/2/dx)
   let j = Math.floor(windowHeight/2/dx)
@@ -159,36 +440,20 @@ function drawWhole(){
 
 }
 
-function createPolygon(type,color) {
-  cords = type
-  //console.log("incoming cords",cords)
+function createBlock(size) {
   var graphics = new PIXI.Graphics();
-      graphics.lineStyle(1,0x000000)
       graphics.beginFill(color);
-      graphics.drawRoundedRect(0,0,100,100)
+      graphics.drawRoundedRect(0,0,DIM,DIM,3)
       graphics.endFill();
 
-    var texture = tiler.renderer.generateTexture(graphics);
-    let tile = new PIXI.Sprite(texture)
-    tile.anchor.set(0.5)
-    tile.alpha = 0.8
-    tile.type = type
-
-    tile.actualWidth = tile.width
-    tile.actualHeight = tile.height
-    tile.color = color
-    //tile.interactive = true
-    tile.active = false
-    tile.buttonMode = true
-    tile.axis = AXIS.NORMAL
-    tile.on('pointerdown', onPolyTouched)
-    tile.on('pointerup', onPolyMoveEnd)
-    tile.on('pointermove', onPolyTouchMoved);
-    tiler.stage.addChild(tile)
-    polys.push(tile)
-    tile.x = 0
-    tile.y = 0
-    activePoly = tile
+  let texture = app.renderer.generateTexture(graphics)
+  let sprite = new PIXI.Sprite(texture)
+  sprite.anchor.set(0.5)
+  sprite.interactive = true
+  sprite.on('pointerdown', onPolyTouched)
+  sprite.on('pointerup', onPolyMoveEnd)
+  sprite.on('pointermove', onPolyTouchMoved);
+  return sprite
 }
 
 function resizeGrid(n){
@@ -213,7 +478,7 @@ function drawGrid(n){
       c.beginFill(0x4d5259);
       c.drawCircle(3, 3, 3);
       c.endFill();
-      let cT = tiler.renderer.generateTexture(c)
+      let cT = app.renderer.generateTexture(c)
       let cS = new PIXI.Sprite(cT)
       cS.on('pointerdown',onNodeClicked)
       cS.x = dx*i
@@ -221,36 +486,10 @@ function drawGrid(n){
       cS.interactive = true
       cS.anchor.set(0.5)
       dotRow.push(cS)
-      tiler.stage.addChild(cS);
+      app.stage.addChild(cS);
     }
     dots.push(dotRow)
   }
-}
-
-//drawGrid(20)
-
-function onNodeClicked() {
-  cordsFromGrid.push([this.x,this.y])
-  if (false){
-    //console.log("drawing!!")
-    cordsFromGrid.push(cordsFromGrid[0])
-    createPolygon(cordsFromGrid)
-  }
-}
-
-
-function onPolyTouched(event) {
-    activePoly = this
-    let touchedAtX = event.data.global.x
-    let touchedAtY = event.data.global.y
-
-    tiler.stage.addChild(this)
-    this.dragging = true;
-    this.wasDragged = false
-    this.deltaTouch = [this.x-touchedAtX,this.y-touchedAtY]
-    this.dragStartedAt = this.y
-    this.data = event.data;
-    //this.alpha = 0.5;
 }
 
 function createActionButton(text,action) {
@@ -261,7 +500,7 @@ function createActionButton(text,action) {
   graphics.drawRoundedRect(0, 0,4*dx,dx ,5);
   graphics.endFill();
 
-    var texture = tiler.renderer.generateTexture(graphics);
+    var texture = app.renderer.generateTexture(graphics);
     let tile = new PIXI.Sprite(texture)
     tile.anchor.set(0.5)
 
@@ -285,15 +524,47 @@ function createActionButton(text,action) {
 
 
     tileContainer.tile = tile
-    tiler.stage.addChild(tileContainer)
+    app.stage.addChild(tileContainer)
     return tileContainer
 }
 
+function onPolyTouched(event) {
+
+
+    activePoly = this
+    let touchedAtX = event.data.global.x
+    let touchedAtY = event.data.global.y
+
+    app.stage.addChild(this)
+    this.dragging = true;
+    this.wasDragged = false
+    this.deltaTouch = [this.x-touchedAtX,this.y-touchedAtY]
+    this.dragStartedAt = this.y
+    this.data = event.data;
+}
 
 function onPolyMoveEnd() {
     this.dragging = false;
     this.data = null;
     this.deltaTouch = []
+
+    switch (this.TYPE){
+      case OBJ_TYPE.DELETE:
+      createjs.Tween.get(this).to({x: this.start[0],y: this.start[1]}, 500, createjs.Ease.getPowInOut(4))
+      console.log("blocks",blocks)
+      let blocksInThis = blocks.filter(e=>{
+        console.log("c.center?",e.center)
+        let p = new PIXI.Point(this.x,this.y)
+        console.log("isitinrect?",pointInRect(p,e))
+        return pointInRect(p,e)
+      })
+      console.log("blocksInthis",blocksInThis)
+      case OBJ_TYPE.CUT:
+      createjs.Tween.get(this).to({x: this.start[0],y: this.start[1]}, 500, createjs.Ease.getPowInOut(4))
+      case OBJ_TYPE.BLOCK:
+      console.log("this is the delete block")
+    }
+
 }
 
 function onPolyTouchMoved() {
@@ -305,86 +576,27 @@ function onPolyTouchMoved() {
     }
 }
 
-loadLevel()
+// Helpers
+function pointInRect(p,rect){
+  // This is for a rect with anchor in center
+  let top = rect.y - rect.height/2
+  let bottom = rect.y + rect.height/2
+  let left = rect.x - rect.width/2
+  let right = rect.x + rect.width/2
 
-nextButton = createActionButton("Next Level ->",loadLevel)
-nextButton.alpha = 0
-nextButton.interactive = false
+  let c1 = p.x < right
+  let c2 = p.x > left
+  let c3 = p.y < bottom
+  let c4 = p.y > top
 
-
-
-function resetButtons(){
-  for (b of buttons){
-    b.alpha = true
-    b.interactive = true
-  }
+  return c1 && c2 && c3 && c4
 }
+
+
 
 document.addEventListener('keydown', function(event) {
     if(event.keyCode == 39 && !activePoly.isWhole) {
-        activePoly.rotation = activePoly.rotation + Math.PI/2
-        //createjs.Tween.get(activePoly).to({rotation: activePoly.rotation + Math.PI/2}, 500, createjs.Ease.getPowInOut(4))
-        activePoly.polyCords = rotate(activePoly.polyCords)
-        console.log("active polycords after rotation",activePoly.polyCords)
-        let w = activePoly.actualWidth
-        let h = activePoly.actualHeight
-        activePoly.actualWidth = h
-        activePoly.actualHeight = w
-        activePoly.axis = activePoly.axis*(-1)
 
-        //console.log("AFTER ROTATION")
-        //console.log("active polycords",activePoly.polyCords)
-        //console.log("Active poly rotation",activePoly.rotation)
-        //console.log("scale x,y",activePoly.scale.x,activePoly.scale.y)
-
-      }
-
-      // Lets have this be a vertical flip.
-    if(event.keyCode == 38 && !activePoly.isWhole) {
-        //createjs.Tween.get(activePoly.scale).to({y: activePoly.scale.y*(-1)}, 500, createjs.Ease.getPowInOut(4))
-
-        if (activePoly.axis == AXIS.NORMAL) {
-          console.log("Flipping X")
-          activePoly.polyCords = flipX(activePoly.polyCords)
-          activePoly.scale.y = activePoly.scale.y*(-1)
-        } else {
-          console.log("flipping Y")
-
-          activePoly.polyCords = flipX(activePoly.polyCords)
-          activePoly.scale.x = activePoly.scale.x*(-1)
-        }
-
-        //console.log("AFTER FLIPPED")
-        //console.log("active polycords",activePoly.polyCords)
-        //console.log("Active poly rotation",activePoly.rotation)
-        //console.log("scale x,y",activePoly.scale.x,activePoly.scale.y)
-    }
-
-    if (event.keyCode == 68){
-      if (activePoly.isWhole){
-        drawWhole()
-      } else {
-        let x = activePoly.x
-        let y = activePoly.y
-        createPolygon(activePoly.type,activePoly.color)
-        activePoly.interactive = true
-        createjs.Tween.get(activePoly).to({x: x,y: y}, 500, createjs.Ease.getPowInOut(4))
-      }
-    }
-    if (event.keyCode == 8){
-      tiler.stage.removeChild(activePoly)
-      let i = polys.indexOf(activePoly)
-      console.log("active Poly index",i)
-      polys.splice(i,1)
-      if (polys.length == 0){
-        activePoly = polys[0]
-        if (LEVELS[currentLevelIndex].congruent){
-          resetButtons()
-        }
-      }
-    }
-    if (event.keyCode == 13){
-        loadLevel()
     }
 
 });
