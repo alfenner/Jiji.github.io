@@ -39,8 +39,8 @@ const WINDOW_CENTER_X = WINDOW_WIDTH/2
 const WINDOW_CENTER_Y = WINDOW_HEIGHT/2
 const CONTAINER_WIDTH = DIM
 const CONTAINER_HEIGHT = DIM
-const CONTAINER_CENTER_X = 2.5*DIM
-const CONTAINER_CENTER_Y = DIM
+const CONTAINER_CENTER_X = DIM
+const CONTAINER_CENTER_Y = 4*DIM
 const CONTAINER_TOP = CONTAINER_CENTER_Y-CONTAINER_WIDTH/2
 const CONTAINER_BOTTOM = CONTAINER_CENTER_Y+CONTAINER_WIDTH/2
 const CONTAINER_LEFT = CONTAINER_CENTER_X-CONTAINER_WIDTH/2
@@ -75,6 +75,8 @@ animateHorizontalLines(1)
 createBlockConstructor()
 
 
+
+dropNotification("How can two Jiji's share Three Blocks?")
 
 function cutBlock(block,pieces){
 
@@ -162,14 +164,14 @@ function createContainer(width){
   containerGraphic.lineTo(width,0)
   containerGraphic.lineTo(0,0)
   containerGraphic.interactive = true
-  containerGraphic.x = 1.5
-  containerGraphic.y = 1.5
+  containerGraphic.x = 1
+  containerGraphic.y = 1
 
   let containerTexture = app.renderer.generateTexture(containerGraphic)
   let containerSprite = new PIXI.Sprite(containerTexture)
   containerSprite.anchor.set(0.5)
-  containerSprite.width = containerGraphic.width + 1.5
-  containerSprite.height = containerGraphic.height + 1.5
+  containerSprite.width = containerGraphic.width
+  containerSprite.height = containerGraphic.height 
   return containerSprite
 }
 

@@ -4,12 +4,12 @@
 function createNotification(messege){
   let note = new PIXI.Container()
   var graphics = new PIXI.Graphics();
-  graphics.lineStyle(1, 0x000000, 3)
+  //graphics.lineStyle(1, 0x000000, 3)
   graphics.beginFill(0xFFFFFF);
   graphics.drawRoundedRect(0, 0,8*dx,dx ,5);
   graphics.endFill();
 
-    var texture = tiler.renderer.generateTexture(graphics);
+    var texture = app.renderer.generateTexture(graphics);
     let tile = new PIXI.Sprite(texture)
     tile.anchor.set(0.5)
 
@@ -39,7 +39,7 @@ function hideNotification() {
 
 function dropNotification(messege){
   let note = createNotification(messege)
-  tiler.stage.addChild(note)
+  app.stage.addChild(note)
   note.on('pointerdown',hideNotification)
       createjs.Tween.get(note).to({x: windowWidth/2,y: dx}, 500, createjs.Ease.getPowInOut(4))
 }
