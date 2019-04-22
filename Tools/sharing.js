@@ -9,6 +9,8 @@ let density = 4
 let dB = dx*2/3
 let wholeOrigin = []
 
+
+let lastBlockXY = []
 let completedTiles = []
 let completedTileSpaces = []
 let currentTileIndex = 0
@@ -25,7 +27,7 @@ let blocks = []
 let activePoly;
 let theWhole;
 
-
+// ENUM
 const OBJ_TYPE = {
   BLOCK: 0,
   CUT: 1,
@@ -35,10 +37,10 @@ const OBJ_TYPE = {
 const DIM = WINDOW_WIDTH/12
 const WINDOW_CENTER_X = WINDOW_WIDTH/2
 const WINDOW_CENTER_Y = WINDOW_HEIGHT/2
-const CONTAINER_WIDTH = 4*DIM
-const CONTAINER_HEIGHT = 4*DIM
-const CONTAINER_CENTER_X = WINDOW_CENTER_X
-const CONTAINER_CENTER_Y = WINDOW_HEIGHT/3
+const CONTAINER_WIDTH = DIM
+const CONTAINER_HEIGHT = DIM
+const CONTAINER_CENTER_X = 2.5*DIM
+const CONTAINER_CENTER_Y = DIM
 const CONTAINER_TOP = CONTAINER_CENTER_Y-CONTAINER_WIDTH/2
 const CONTAINER_BOTTOM = CONTAINER_CENTER_Y+CONTAINER_WIDTH/2
 const CONTAINER_LEFT = CONTAINER_CENTER_X-CONTAINER_WIDTH/2
@@ -66,13 +68,17 @@ let currentColor = () => {return colors[colorIndex%colorLength]}
 // Init
 createMenuButtons()
 layoutMenu()
-initVerticalLines(1)
+//initVerticalLines(1)
 initHorizontalLines(1)
-animateVerticalLines(1)
+animateVerticalLines(0)
 animateHorizontalLines(1)
 createBlockConstructor()
 
 
+
+function cutBlock(block,pieces){
+
+}
 
 
 // Helpers
@@ -136,7 +142,7 @@ function createCircleButton(text) {
     let pinContainer = new PIXI.Container()
     pinContainer.addChild(circleSprite)
 
-    let operator = new PIXI.Text(text,{fontFamily : 'Chalkboard SE', fontSize: dx/2, fill : 0x000000, align : 'center'});
+    let operator = new PIXI.Text(text,{fontFamily : 'Chalkboard SE', fontSize: DIM/4, fill : 0x000000, align : 'center'});
     operator.anchor.set(0.5)
     operator.x = 0
     operator.y = 0
@@ -149,7 +155,7 @@ function createCircleButton(text) {
 
 function createContainer(width){
   let containerGraphic = new PIXI.Graphics()
-  containerGraphic.lineStyle(3,0x000000)
+  containerGraphic.lineStyle(2,0x000000)
   containerGraphic.moveTo(0,0)
   containerGraphic.lineTo(0,width)
   containerGraphic.lineTo(width,width)
@@ -171,7 +177,7 @@ function initVerticalLines(partition){
 
   for (let i = 0;i<11;i++){
     let g = new PIXI.Graphics()
-    g.lineStyle(3,0x000000)
+    g.lineStyle(2,0x000000)
     g.lineTo(0,CONTAINER_WIDTH)
     g.y = CONTAINER_TOP
     g.x = CONTAINER_LEFT
@@ -184,7 +190,7 @@ function initVerticalLines(partition){
 function initHorizontalLines(partition){
   for (let i = 0;i<11;i++){
     let g = new PIXI.Graphics()
-    g.lineStyle(3,0x000000)
+    g.lineStyle(2,0x000000)
     g.lineTo(CONTAINER_WIDTH,0)
     g.y = CONTAINER_TOP
     g.x = CONTAINER_LEFT
@@ -244,14 +250,14 @@ function animateHorizontalLines(inc){
 
 }
 
-let vPlus = createCircleButton("+")
+let vPlus = createCircleButton("Ok")
 app.stage.addChild(vPlus)
 vPlus.y = CONTAINER_TOP - DIM/4
-vPlus.x = WINDOW_CENTER_X
+vPlus.x = CONTAINER_CENTER_X
 
 
 let vMinus = createCircleButton("-")
-app.stage.addChild(vMinus)
+//app.stage.addChild(vMinus)
 vMinus.y = CONTAINER_BOTTOM + DIM/4
 vMinus.x = WINDOW_CENTER_X
 
@@ -266,10 +272,10 @@ app.stage.addChild(hMinus)
 hMinus.x = CONTAINER_LEFT - DIM/4
 hMinus.y = CONTAINER_CENTER_Y
 
-vPlus.on("pointerdown",() => animateHorizontalLines(1))
-vMinus.on("pointerdown",() => animateHorizontalLines(-1))
-hPlus.on("pointerdown",() => animateVerticalLines(1))
-hMinus.on("pointerdown",() => animateVerticalLines(-1))
+hPlus.on("pointerdown",() => animateHorizontalLines(1))
+hMinus.on("pointerdown",() => animateHorizontalLines(-1))
+//hPlus.on("pointerdown",() => animateVerticalLines(1))
+//hMinus.on("pointerdown",() => animateVerticalLines(-1))
 
 
 let cont = createContainer(CONTAINER_WIDTH)
@@ -357,7 +363,7 @@ function drawCompletedTileSpaces(n) {
 function createBlockConstructor() {
   var graphics = new PIXI.Graphics();
     graphics.beginFill(COLORS.BLUE);
-    graphics.drawRoundedRect(0,0,100,100,2)
+    graphics.drawRoundedRect(0,0,DIM,DIM,2)
     graphics.endFill();
     graphics.color = COLORS.BLUE
     graphics.interactive = true
@@ -371,7 +377,7 @@ function newBlock() {
     app.stage.addChild(newBlock)
     newBlock.x = this.x + this.width/2
     newBlock.y = this.y + this.width/2
-    createjs.Tween.get(newBlock).to({x: WINDOW_CENTER_X,y: CONTAINER_CENTER_Y}, 1000, createjs.Ease.getPowInOut(4))
+    createjs.Tween.get(newBlock).to({x: WINDOW_CENTER_X+blocks.length*10,y: CONTAINER_CENTER_Y+blocks.length*10}, 1000, createjs.Ease.getPowInOut(4))
     blocks.push(newBlock)
 }
 
@@ -392,67 +398,22 @@ function layoutMenu(){
   deleteTool.start = [deleteTool.x,deleteTool.y]
 }
 
-function drawWhole(){
-  let whole = TYPES.WHOLE
-  let c = new PIXI.Container()
-
-  var graphics = new PIXI.Graphics();
-  //graphics.moveTo(0,0)
-  graphics.lineStyle(3, 0x000000);
-  for (let i = 0;i <= whole.length;i++){
-      graphics.lineTo(whole[i%4][0],whole[i%4][1])
-  }
-  graphics.x = 1.5
-  graphics.y = 1.5
-
-  var texture = app.renderer.generateTexture(graphics);
-  theWhole = new PIXI.Sprite(texture)
-
-  theWhole.anchor.set(0.5)
-
-  var grabber= new PIXI.Graphics();
-  grabber.beginFill(0xFFFFFF)
-  grabber.moveTo(4*dx,4*dx)
-  grabber.alpha = 0.5
-  for (let i = 0;i <= whole.length;i++){
-      grabber.lineTo(whole[i%4][0],whole[i%4][1])
-  }
-  grabber.endFill()
-  //c.addChild(graphics)
-  c.addChild(grabber)
-
-  c.interactive = true
-  c.isWhole = true
-  c.polyCords = whole
-  c.actualWidth = c.width
-  c.actualHeight = c.height
-
-  app.stage.addChild(theWhole)
-
-  let i = Math.ceil(windowWidth/2/dx)
-  let j = Math.floor(windowHeight/2/dx)
-
-  theWhole.x = i*dx
-  theWhole.y = j*dy
-
-  wholeOrigin[0] = theWhole.x - theWhole.height/2
-  wholeOrigin[1] = theWhole.y - theWhole.height/2
-
-}
-
 function createBlock(size) {
-  var graphics = new PIXI.Graphics();
-      graphics.beginFill(color);
+  let graphics = new PIXI.Graphics();
+      graphics.lineStyle(1,0xFFFFFF)
+      graphics.beginFill(COLORS.BLUE);
       graphics.drawRoundedRect(0,0,DIM,DIM,3)
       graphics.endFill();
+      graphics.x = 0.5
+      graphics.y = 0.5
 
-  let texture = app.renderer.generateTexture(graphics)
-  let sprite = new PIXI.Sprite(texture)
-  sprite.anchor.set(0.5)
-  sprite.interactive = true
-  sprite.on('pointerdown', onPolyTouched)
-  sprite.on('pointerup', onPolyMoveEnd)
-  sprite.on('pointermove', onPolyTouchMoved);
+      let texture = app.renderer.generateTexture(graphics)
+      let sprite = new PIXI.Sprite(texture)
+      sprite.anchor.set(0.5)
+      sprite.interactive = true
+      sprite.on('pointerdown', onPolyTouched)
+      sprite.on('pointerup', onPolyMoveEnd)
+      sprite.on('pointermove', onPolyTouchMoved);
   return sprite
 }
 
@@ -529,8 +490,6 @@ function createActionButton(text,action) {
 }
 
 function onPolyTouched(event) {
-
-
     activePoly = this
     let touchedAtX = event.data.global.x
     let touchedAtY = event.data.global.y
