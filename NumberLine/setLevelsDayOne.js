@@ -1,7 +1,15 @@
 
+console.log("SCRIPT RUNNING!!!")
+
 document.getElementById("dayOneWarmup").addEventListener("click", queDayOneWarmup)
 //document.getElementById("dayOneSettingNumbers").addEventListener("click", queDayOneSettingNumbers)
 document.getElementById("dayOneClasswork").addEventListener("click", queDayOneClasswork)
+
+function queActivity(){
+    window.localStorage['activityIndex'] = this.id
+    window.localStorage['teacherMode'] = 'false'
+}
+
 
 function queDayOneWarmup(){
     window.localStorage['activityIndex'] = 1
@@ -23,6 +31,7 @@ function queDayOneClasswork(){
 document.getElementById("dayOneClassworkTeacher").addEventListener("click", queDayOneClassworkTeacher)
 
 function queDayOneWarmupTeacher(){
+    console.log("THIS IS BALLS")
     window.localStorage['activityIndex'] = 1
     window.localStorage['teacherMode'] = 'true'
 }
@@ -33,6 +42,7 @@ function queDayOneSettingNumbersTeacher(){
 }
 
 function queDayOneClassworkTeacher(){
+    console.log("BALLLLLLLLSSSZZZZ")
     window.localStorage['activityIndex'] = 3
     window.localStorage['teacherMode'] = 'true'
 }
