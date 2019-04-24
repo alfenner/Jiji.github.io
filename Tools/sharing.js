@@ -1,59 +1,24 @@
 
-let dots = []
-
-let cordsFromGrid = []
-let polys = []
-let snapX = dx/3
-let snapY = dx/3
-let density = 4
-let dB = dx*2/3
-let wholeOrigin = []
-
-
-let lastBlockXY = []
-let completedTiles = []
-let completedTileSpaces = []
-let currentTileIndex = 0
-let currentLevelIndex = -1
-let currentType;
-let nextButton = {}
-let constructorBlock;
-let cuttingTool;
-let deleteTool;
-let menuItems = []
-let blocks = []
-
-
-let activePoly;
-let theWhole;
-
-// ENUM
-const OBJ_TYPE = {
-  BLOCK: 0,
-  CUT: 1,
-  DELETE: 2
-}
-
 const DIM = WINDOW_WIDTH/12
 const WINDOW_CENTER_X = WINDOW_WIDTH/2
 const WINDOW_CENTER_Y = WINDOW_HEIGHT/2
 const CONTAINER_WIDTH = DIM
 const CONTAINER_HEIGHT = DIM
 const CONTAINER_CENTER_X = DIM
-const CONTAINER_CENTER_Y = 4*DIM
+const CONTAINER_CENTER_Y = 2.5*DIM
 const CONTAINER_TOP = CONTAINER_CENTER_Y-CONTAINER_WIDTH/2
 const CONTAINER_BOTTOM = CONTAINER_CENTER_Y+CONTAINER_WIDTH/2
 const CONTAINER_LEFT = CONTAINER_CENTER_X-CONTAINER_WIDTH/2
 const CONTAINER_RIGHT = CONTAINER_CENTER_X+CONTAINER_WIDTH/2
 
-const v_part_dim = ()=> {
-  return CONTAINER_HEIGHT/hPartitions
-}
 
-const h_part_dim = ()=> {
-  return CONTAINER_WIDTH/vPartitions
-}
-
+let constructorBlock;
+let cuttingTool;
+let deleteTool;
+let menuItems = []
+let blocks = []
+let activeBlock;
+let cutterContainer = new PIXI.Container()
 let fractions = []
 let horizontalLines = []
 let verticalLines = []
@@ -63,6 +28,36 @@ let colorIndex = 0
 let colors = [COLORS.BLUE,COLORS.RED,COLORS.GREEN,COLORS.ORANGE,COLORS.PURPLE]
 let colorLength = colors.length
 let currentColor = () => {return colors[colorIndex%colorLength]}
+let vPlus;
+let vMinus;
+let hPlus;
+let hMinus;
+let cont;
+let cutting = false
+let blockBeingCut;
+let cutOperators = []
+
+/*
+BYC Yoga26
+6935 Oakland Mills Rd suite l, Columbia, MD 21045
+(410) 381-1866
+*/
+
+
+// ENUM
+const OBJ_TYPE = {
+  BLOCK: 0,
+  CUT: 1,
+  DELETE: 2
+}
+
+const v_part_dim = ()=> {
+  return CONTAINER_HEIGHT/hPartitions
+}
+
+const h_part_dim = ()=> {
+  return CONTAINER_WIDTH/vPartitions
+}
 
 
 // Init
@@ -73,26 +68,106 @@ initHorizontalLines(1)
 animateVerticalLines(0)
 animateHorizontalLines(1)
 createBlockConstructor()
+vPlus = createCircleButton("Ok")
+hPlus = createCircleButton("+")
+hMinus = createCircleButton("-")
+cont = createContainer(CONTAINER_WIDTH)
+createCutterContainer()
+cutOperators = [vPlus,hPlus,hMinus]
+vPlus.alpha = 0
+hPlus.alpha = 0
+hMinus.alpha = 0
+
+// Rouge Init
+
+
+deleteTool = createTextBox("Delete")
+app.stage.addChild(deleteTool)
+deleteTool.x = DIM
+deleteTool.y = 3.5*DIM
+console.log("delete tool h,w",deleteTool.height,deleteTool.width)
+
+
+cont.x = CONTAINER_CENTER_X
+cont.y = CONTAINER_CENTER_Y
+
+vPlus.y = CONTAINER_TOP - DIM/4
+vPlus.x = CONTAINER_CENTER_X
+
+hPlus.x = CONTAINER_RIGHT + DIM/4
+hPlus.y = CONTAINER_CENTER_Y
+
+hMinus.x = CONTAINER_LEFT - DIM/4
+hMinus.y = CONTAINER_CENTER_Y
+
+hPlus.on("pointerdown",() => animateHorizontalLines(1))
+hMinus.on("pointerdown",() => animateHorizontalLines(-1))
+vPlus.on("pointerdown",()=>cutBlock(blockBeingCut,hPartitions))
+//hPlus.on("pointerdown",() => animateVerticalLines(1))
+//hMinus.on("pointerdown",() => animateVerticalLines(-1))
 
 
 
-dropNotification("How can two Jiji's share Three Blocks?")
+//dropNotification("How can two Jiji's share Three Blocks?")
+
+
+// Factory Functions
+
+
+function createCutterContainer(){
+  cutterContainer.interactive = true
+  cutterContainer.TYPE = OBJ_TYPE.CUT
+  for (l of horizontalLines){
+    console.log("adding child")
+    cutterContainer.addChild(l)
+    console.log(l.y)
+  }
+  cutterContainer.addChild(hPlus)
+  cutterContainer.addChild(vPlus)
+  cutterContainer.addChild(hMinus)
+  cutterContainer.addChild(cont)
+  cutterContainer.on('pointerdown', onPolyTouched)
+  cutterContainer.on('pointerup', onPolyMoveEnd)
+  cutterContainer.on('pointermove', onPolyTouchMoved);
+  cutterContainer.x = CONTAINER_LEFT
+  cutterContainer.y = CONTAINER_TOP
+  cutterContainer.pivot.x = cutterContainer.x
+  cutterContainer.pivot.y = cutterContainer.y
+  cutterContainer.start = [cutterContainer.x,cutterContainer.y]
+  app.stage.addChild(cutterContainer)
+  console.log("cutterCont ",cutterContainer.width,cutterContainer.height)
+}
+
 
 function cutBlock(block,pieces){
 
+  let h = block.height/pieces
+  let w = block.width
+  console.log("w,y,x,y",h,w,block.x,block.y)
+  for (let i = 0;i<pieces;i++){
+    let newBlock = createBlock(w,h)
+    newBlock.isFrac = true
+    newBlock.type = OBJ_TYPE.BLOCK
+    newBlock.x = block.x
+    newBlock.y = block.y-block.height/2+h/2+h*(i)
+    app.stage.addChild(newBlock)
+  }
+  let i = blocks.indexOf(block)
+  blocks.splice(i,1)
+  app.stage.removeChild(block)
+  animateOperatorAlpha(0)
+  hPartitions = 2
+  animateHorizontalLines(0)
+  createjs.Tween.get(cutterContainer).to({x: cutterContainer.start[0],y: cutterContainer.start[1]}, 500, createjs.Ease.getPowInOut(4))
+  //return null
 }
 
 
 // Helpers
 
-function hideGrid(){
-  let toHide = [...verticalLines,...horizontalLines]
-  toHide.forEach(h => h.alpha = 0)
-}
-
 function bringLinesToFront(){
   let lines = [...verticalLines,...horizontalLines]
-  lines.forEach(l =>  app.stage.addChild(l))
+  //lines.forEach(l =>  app.stage.addChild(l))
 }
 
 
@@ -171,7 +246,7 @@ function createContainer(width){
   let containerSprite = new PIXI.Sprite(containerTexture)
   containerSprite.anchor.set(0.5)
   containerSprite.width = containerGraphic.width
-  containerSprite.height = containerGraphic.height 
+  containerSprite.height = containerGraphic.height
   return containerSprite
 }
 
@@ -194,10 +269,9 @@ function initHorizontalLines(partition){
     let g = new PIXI.Graphics()
     g.lineStyle(2,0x000000)
     g.lineTo(CONTAINER_WIDTH,0)
-    g.y = CONTAINER_TOP
+    g.y = CONTAINER_BOTTOM
     g.x = CONTAINER_LEFT
     horizontalLines.push(g)
-    app.stage.addChild(g)
   }
 }
 
@@ -237,8 +311,9 @@ function animateHorizontalLines(inc){
   let spacing = CONTAINER_WIDTH/hPartitions
 
   horizontalLines.forEach((l,i)=>{
-    app.stage.addChild(l)
     if (i>hPartitions){
+      console.log("containerbottom",CONTAINER_BOTTOM)
+      console.log("cutterContainerxy",cutterContainer.x,cutterContainer.y)
         createjs.Tween.get(l).to({y: CONTAINER_BOTTOM}, 500, createjs.Ease.getPowInOut(4))
     } else {
         createjs.Tween.get(l).to({y: i*spacing+CONTAINER_TOP}, 500, createjs.Ease.getPowInOut(4))
@@ -251,39 +326,6 @@ function animateHorizontalLines(inc){
 
 
 }
-
-let vPlus = createCircleButton("Ok")
-app.stage.addChild(vPlus)
-vPlus.y = CONTAINER_TOP - DIM/4
-vPlus.x = CONTAINER_CENTER_X
-
-
-let vMinus = createCircleButton("-")
-//app.stage.addChild(vMinus)
-vMinus.y = CONTAINER_BOTTOM + DIM/4
-vMinus.x = WINDOW_CENTER_X
-
-
-let hPlus = createCircleButton("+")
-app.stage.addChild(hPlus)
-hPlus.x = CONTAINER_RIGHT + DIM/4
-hPlus.y = CONTAINER_CENTER_Y
-
-let hMinus = createCircleButton("-")
-app.stage.addChild(hMinus)
-hMinus.x = CONTAINER_LEFT - DIM/4
-hMinus.y = CONTAINER_CENTER_Y
-
-hPlus.on("pointerdown",() => animateHorizontalLines(1))
-hMinus.on("pointerdown",() => animateHorizontalLines(-1))
-//hPlus.on("pointerdown",() => animateVerticalLines(1))
-//hMinus.on("pointerdown",() => animateVerticalLines(-1))
-
-
-let cont = createContainer(CONTAINER_WIDTH)
-app.stage.addChild(cont)
-cont.x = CONTAINER_CENTER_X
-cont.y = CONTAINER_CENTER_Y
 
 function onFracStart(event){
     bringLinesToFront()
@@ -321,22 +363,12 @@ function layoutPolys() {
 }
 
 
+
+// This is silly
 function createMenuButtons(){
   constructorBlock = createBlockConstructor()
   cuttingTool = createTextBox("Cut")
-  deleteTool = createTextBox("Delete")
-
-  deleteTool.TYPE = OBJ_TYPE.DELETE
-  deleteTool.start = [deleteTool.x,deleteTool.y]
-  deleteTool.on('pointerdown',onPolyTouched)
-  deleteTool.on('pointerup',onPolyMoveEnd)
-  deleteTool.on('pointermove',onPolyTouchMoved)
-
-  cuttingTool.TYPE = OBJ_TYPE.CUT
-  cuttingTool.on('pointerdown',onPolyTouched)
-  cuttingTool.on('pointerup',onPolyMoveEnd)
-  cuttingTool.on('pointermove',onPolyTouchMoved)
-  menuItems = [constructorBlock,cuttingTool,deleteTool]
+  menuItems = [constructorBlock]
 }
 
 function drawCompletedTileSpaces(n) {
@@ -369,16 +401,16 @@ function createBlockConstructor() {
     graphics.endFill();
     graphics.color = COLORS.BLUE
     graphics.interactive = true
-    graphics.on('pointerdown',newBlock)
+    console.log("graphics dims",graphics.width,graphics.height)
+    graphics.on('pointerdown',() => newBlock(graphics.width,graphics.height,constructorBlock.x+constructorBlock.width/2,constructorBlock.y+constructorBlock.height/2))
     return graphics
-
 }
 
-function newBlock() {
-    let newBlock = createBlock(this.type,this.color)
+function newBlock(w,h,x,y) {
+    let newBlock = createBlock(w,h)
     app.stage.addChild(newBlock)
-    newBlock.x = this.x + this.width/2
-    newBlock.y = this.y + this.width/2
+    newBlock.x = x
+    newBlock.y = y
     createjs.Tween.get(newBlock).to({x: WINDOW_CENTER_X+blocks.length*10,y: CONTAINER_CENTER_Y+blocks.length*10}, 1000, createjs.Ease.getPowInOut(4))
     blocks.push(newBlock)
 }
@@ -394,104 +426,37 @@ function layoutMenu(){
       i.start = [i.x,i.y]
       y = y+i.height+DIM/4
   }
-  cuttingTool.x = cuttingTool.x + constructorBlock.width/2
-  cuttingTool.start = [cuttingTool.x,cuttingTool.y]
-  deleteTool.x = deleteTool.x + constructorBlock.width/2
-  deleteTool.start = [deleteTool.x,deleteTool.y]
 }
 
-function createBlock(size) {
+function createBlock(w,h) {
   let graphics = new PIXI.Graphics();
       graphics.lineStyle(1,0xFFFFFF)
       graphics.beginFill(COLORS.BLUE);
-      graphics.drawRoundedRect(0,0,DIM,DIM,3)
+      graphics.drawRoundedRect(0,0,w,h,3)
       graphics.endFill();
       graphics.x = 0.5
       graphics.y = 0.5
-
       let texture = app.renderer.generateTexture(graphics)
       let sprite = new PIXI.Sprite(texture)
       sprite.anchor.set(0.5)
       sprite.interactive = true
+      sprite.TYPE = OBJ_TYPE.BLOCK
       sprite.on('pointerdown', onPolyTouched)
       sprite.on('pointerup', onPolyMoveEnd)
       sprite.on('pointermove', onPolyTouchMoved);
   return sprite
 }
 
-function resizeGrid(n){
-  let newDx = density/n*dx
-  dx = newDx
-  //console.log(dots)
-  for (let i = 0;i<dots.length;i++){
-    for (let j = 0;j<dots[0].length;j++){
-       createjs.Tween.get(dots[i][j]).to({x: i*newDx,y: j*newDx}, 1000, createjs.Ease.getPowInOut(4))
-    }
+
+
+function animateOperatorAlpha(a){
+  for (o of cutOperators){
+      createjs.Tween.get(o).to({alpha: a}, 500, createjs.Ease.getPowInOut(4))
   }
-}
-
-
-function drawGrid(n){
-  //console.log("windowWidth",windowWidth)
-  let gridCont = new PIXI.Container()
-  for (let i = 0;i<2*n;i++){
-    let dotRow = []
-    for (let j = 0;j<n;j++){
-      let c = new PIXI.Graphics()
-      c.beginFill(0x4d5259);
-      c.drawCircle(3, 3, 3);
-      c.endFill();
-      let cT = app.renderer.generateTexture(c)
-      let cS = new PIXI.Sprite(cT)
-      cS.on('pointerdown',onNodeClicked)
-      cS.x = dx*i
-      cS.y = dx*j
-      cS.interactive = true
-      cS.anchor.set(0.5)
-      dotRow.push(cS)
-      app.stage.addChild(cS);
-    }
-    dots.push(dotRow)
-  }
-}
-
-function createActionButton(text,action) {
-
-  var graphics = new PIXI.Graphics();
-  graphics.lineStyle(0, 0xb7b7b7, 1)
-  graphics.beginFill(COLORS.ORANGE);
-  graphics.drawRoundedRect(0, 0,4*dx,dx ,5);
-  graphics.endFill();
-
-    var texture = app.renderer.generateTexture(graphics);
-    let tile = new PIXI.Sprite(texture)
-    tile.anchor.set(0.5)
-
-    let den = new PIXI.Text(text,{fontFamily : 'Chalkboard SE', fontSize: dx/2, fill : 0xFFFFFF, align : 'center'});
-    den.anchor.set(0.5)
-
-    let tileContainer = new PIXI.Container()
-
-    tileContainer.addChild(tile)
-    tileContainer.addChild(den)
-
-    tileContainer.active = false
-    tileContainer.interactive = true;
-    tileContainer.buttonMode = true;
-
-    tileContainer.on('pointerdown', action)
-
-    // move the sprite to its designated position
-    tileContainer.x = wholeOrigin[0]+2*dx
-    tileContainer.y = dx
-
-
-    tileContainer.tile = tile
-    app.stage.addChild(tileContainer)
-    return tileContainer
 }
 
 function onPolyTouched(event) {
+  console.log("poly touched!!!")
     activePoly = this
     let touchedAtX = event.data.global.x
     let touchedAtY = event.data.global.y
@@ -521,9 +486,29 @@ function onPolyMoveEnd() {
       })
       console.log("blocksInthis",blocksInThis)
       case OBJ_TYPE.CUT:
-      createjs.Tween.get(this).to({x: this.start[0],y: this.start[1]}, 500, createjs.Ease.getPowInOut(4))
+      let blocksInCutter = blocks.filter(e=>{
+        console.log("c.center?",e.center)
+        let p = new PIXI.Point(this.x+CONTAINER_HEIGHT/2,this.y+CONTAINER_HEIGHT/2)
+        console.log("isitinrect?",pointInRect(p,e))
+        return pointInRect(p,e) && !e.isFrac
+      })
+      if (blocksInCutter.length == 0){
+          createjs.Tween.get(this).to({x: this.start[0],y: this.start[1]}, 500, createjs.Ease.getPowInOut(4))
+      } else {
+          blockBeingCut = blocksInCutter[0]
+          animateOperatorAlpha(1)
+          createjs.Tween.get(this).to({x: blocksInCutter[0].x-CONTAINER_WIDTH/2,y: blocksInCutter[0].y-CONTAINER_HEIGHT/2}, 500, createjs.Ease.getPowInOut(4))
+      }
       case OBJ_TYPE.BLOCK:
-      console.log("this is the delete block")
+      console.log("this is a block")
+       let testPoint = new PIXI.Point(this.x,this.y)
+       let inDelete = pointInRect(testPoint,deleteTool)
+       if (inDelete){
+         console.log("in delete?")
+         let i = blocks.indexOf(this)
+         blocks.splice(i,1)
+         app.stage.removeChild(this)
+       }
     }
 
 }
@@ -552,7 +537,6 @@ function pointInRect(p,rect){
 
   return c1 && c2 && c3 && c4
 }
-
 
 
 document.addEventListener('keydown', function(event) {
