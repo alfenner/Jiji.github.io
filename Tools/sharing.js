@@ -13,6 +13,9 @@ const CONTAINER_RIGHT = CONTAINER_CENTER_X+CONTAINER_WIDTH/2
 
 
 let constructorBlock;
+let jijis = []
+let plusJiji;
+let minusJiji;
 let cuttingTool;
 let deleteTool;
 let menuItems = []
@@ -68,9 +71,10 @@ initHorizontalLines(1)
 animateVerticalLines(0)
 animateHorizontalLines(1)
 createBlockConstructor()
-vPlus = createCircleButton("Ok")
-hPlus = createCircleButton("+")
-hMinus = createCircleButton("-")
+drawPlusMinusButtons()
+vPlus = createCircleButton("Ok",COLORS.GREEN)
+hPlus = createCircleButton("+",COLORS.GREEN)
+hMinus = createCircleButton("-",COLORS.GREEN)
 cont = createContainer(CONTAINER_WIDTH)
 createCutterContainer()
 cutOperators = [vPlus,hPlus,hMinus]
@@ -113,6 +117,48 @@ vPlus.on("pointerdown",()=>cutBlock(blockBeingCut,hPartitions))
 
 // Factory Functions
 
+function createJijiAsset() {
+
+    var block = new PIXI.Graphics();
+    block.lineStyle(3,COLORS.DARK_GRAY)
+    block.beginFill(0xFFFFFF);
+    block.drawRoundedRect(0,0, DIM, DIM,3);
+    block.endFill();
+    block.x = 1
+    block.y = 1
+
+    let blockTexture = app.renderer.generateTexture(block)
+    let blockSprite = new PIXI.Sprite(blockTexture)
+    blockSprite.anchor.set(1)
+
+    return blockSprite
+}
+
+function newJiji(){
+  let newJiji = createJijiAsset()
+  app.stage.addChild(newJiji)
+  jijis.push(newJiji)
+}
+
+function alignJijis(){
+  for (let i = 0;i<jijis.length;i++){
+
+  }
+}
+
+function drawPlusMinusButtons(){
+  plusJiji = createCircleButton("+",0xFFFFFF)
+  minusJiji = createCircleButton("-",0xFFFFFF)
+  plusJiji.interactive = true
+  minusJiji.interactive = true
+  plusJiji.on('pointerdown')
+  app.stage.addChild(plusJiji)
+  app.stage.addChild(minusJiji)
+  plusJiji.x = 3*DIM/2
+  plusJiji.y = 4*DIM
+  minusJiji.x = DIM/2
+  minusJiji.y = 4*DIM
+}
 
 function createCutterContainer(){
   cutterContainer.interactive = true
@@ -201,13 +247,13 @@ function createTextBox(text) {
 }
 
 
-function createCircleButton(text) {
+function createCircleButton(text,color) {
 
     let h = DIM/4
     let w = DIM/4
 
     var circle = new PIXI.Graphics();
-    circle.beginFill(COLORS.GREEN);
+    circle.beginFill(color);
     circle.drawCircle(DIM/5, DIM/5,DIM/5);
     circle.endFill();
 

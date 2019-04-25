@@ -155,7 +155,6 @@ const DAY1_WARM_UP_P1 = {
   labels: [],
   unique: true,
   endPins: true,
-  //discussionQuestion: true
 }
 
 const DAY1_WARM_UP_P2 = {
@@ -192,6 +191,7 @@ const DAY1_WARM_UP_P3 = {
   labels: [],
   unique: true,
   endPins: true,
+  discussionQuestion: true
 }
 
 

@@ -12,6 +12,7 @@ function queActivity(){
 
 
 function queDayOneWarmup(){
+  console.log("Queing day one warmup")
     window.localStorage['activityIndex'] = 1
     window.localStorage['teacherMode'] = 'false'
 }
@@ -26,9 +27,9 @@ function queDayOneClasswork(){
     window.localStorage['teacherMode'] = 'false'
 }
 
-//document.getElementById("dayOneWarmupTeacher").addEventListener("click", queDayOneWarmupTeacher)
+document.getElementById("dayOneWarmupTeacher").addEventListener("click", queDayOneWarmupTeacher)
 //document.getElementById("dayOneSettingNumbersTeacher").addEventListener("click", queDayOneSettingNumbersTeacher)
-document.getElementById("dayOneClassworkTeacher").addEventListener("click", queDayOneClassworkTeacher)
+//document.getElementById("dayOneClassworkTeacher").addEventListener("click", queDayOneClassworkTeacher)
 
 function queDayOneWarmupTeacher(){
     console.log("THIS IS BALLS")
