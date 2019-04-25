@@ -28,7 +28,7 @@ function layoutPolys() {
   }
 }
 
-dropNotification("Fill The Square!")
+//dropNotification("Fill The Square!")
 
 function drawCompletedTileSpaces(n) {
 
