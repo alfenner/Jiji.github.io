@@ -15,7 +15,6 @@ function dumpPolys(polygons,origin) {
       createjs.Tween.get(c).to({x: completedTileSpaces[0].x ,y: completedTileSpaces[0].y}, 500, createjs.Ease.getPowInOut(4))
       createjs.Tween.get(c.scale).to({x: 0.5 ,y: 0.5}, 500, createjs.Ease.getPowInOut(4)).call(()=>{
       createjs.Tween.get(c).to({alpha: 0}, 500, createjs.Ease.getPowInOut(4)).call(()=> {
-        //dropNotification("Your turn!")
       })
       })
     })

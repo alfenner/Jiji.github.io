@@ -1,16 +1,7 @@
-document.getElementById("dayTwoClasswork").addEventListener("click", queDayTwoClasswork)
-document.getElementById("dayTwoClassworkTeacher").addEventListener("click", queDayTwoClassworkTeacher)
+document.getElementById("DAY_TWO_CLASSWORK").addEventListener("click", queActivity)
+document.getElementById("DAY_TWO_TEACHER_CLASSWORK").addEventListener("click", queActivity)
 
 
-function queDayTwoClasswork(){
-  console.log("queing day two classwork bitch!!!")
-    window.localStorage['activityIndex'] = 4
-    window.localStorage['teacherMode'] = 'false'
-}
-
-
-function queDayTwoClassworkTeacher(){
-  console.log("queing day two classwork bitch!!!")
-    window.localStorage['activityIndex'] = 4
-    window.localStorage['teacherMode'] = 'true'
+function queActivity(){
+    window.localStorage['activityIndex'] = this.id
 }

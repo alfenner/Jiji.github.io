@@ -1,25 +1,8 @@
 // Problem que setup
-
 let PROBLEM_QUE;
-
-const TEACHER_MODE = window.localStorage['teacherMode']
-const QUE_INDEX = window.localStorage['activityIndex']
-if (QUE_INDEX){
-    console.log("HEY I GOT MY QUE INDEX")
-    PROBLEM_QUE = ACTIVITY_QUE[QUE_INDEX]
-} else {
-  PROBLEM_QUE = ACTIVITY_QUE[0]
-}
-
-if (TEACHER_MODE == 'true'){
-  console.log("hey it's teacher mode!!!")
-  PROBLEM_QUE = PROBLEM_QUE.filter(e => e.discussionQuestion == true)
-  console.log("HERES THE FILTERED SHIT",PROBLEM_QUE)
-}
-
-
+const ACTIVITY_ID = window.localStorage['activityIndex']
+PROBLEM_QUE = NUMBERLINE_ACTIVITIES[ACTIVITY_ID]
 let numberOfProblems = PROBLEM_QUE.length
-
 let PROBLEM_INDEX = 0
 
 

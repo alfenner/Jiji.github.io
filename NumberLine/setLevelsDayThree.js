@@ -1,13 +1,7 @@
-document.getElementById("dayThreeClasswork").addEventListener("click", queDayThreeClasswork)
+document.getElementById('DAY_THREE_CLASSWORK').addEventListener("click", queActivity)
 
-function queDayThreeClasswork(){
-    window.localStorage['activityIndex'] = 5
-    window.localStorage['teacherMode'] = 'false'
-}
+document.getElementById('DAY_THREE_TEACHER_CLASSWORK').addEventListener("click", queActivity)
 
-document.getElementById("dayThreeClassworkTeacher").addEventListener("click", queDayThreeClassworkTeacher)
-
-function queDayThreeClassworkTeacher(){
-    window.localStorage['activityIndex'] = 5
-    window.localStorage['teacherMode'] = 'true'
+function queActivity(){
+    window.localStorage['activityIndex'] = this.id
 }
