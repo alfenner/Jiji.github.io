@@ -1,4 +1,3 @@
-
 const DIM = WINDOW_WIDTH/12
 const WINDOW_CENTER_X = WINDOW_WIDTH/2
 const WINDOW_CENTER_Y = WINDOW_HEIGHT/2
@@ -11,14 +10,25 @@ const CONTAINER_BOTTOM = CONTAINER_CENTER_Y+CONTAINER_WIDTH/2
 const CONTAINER_LEFT = CONTAINER_CENTER_X-CONTAINER_WIDTH/2
 const CONTAINER_RIGHT = CONTAINER_CENTER_X+CONTAINER_WIDTH/2
 
+let backGround = new PIXI.Sprite.from('../images/blue-gradient.png')
+backGround.width = WINDOW_WIDTH
+backGround.height = WINDOW_HEIGHT
+backGround.x = 0
+backGround.y = 0
+backGround.alpha = 0
+app.stage.addChild(backGround)
+createjs.Tween.get(backGround).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
+
+
 
 let constructorBlock;
 let jijis = []
 let plusJiji;
 let minusJiji;
+let jijiDIM;
 let cuttingTool;
 let deleteTool;
-let menuItems = []
+let resetTool;
 let blocks = []
 let activeBlock;
 let cutterContainer = new PIXI.Container()
@@ -29,8 +39,6 @@ let vPartitions = 1
 let hPartitions = 1
 let colorIndex = 0
 let colors = [COLORS.BLUE,COLORS.RED,COLORS.GREEN,COLORS.ORANGE,COLORS.PURPLE]
-let colorLength = colors.length
-let currentColor = () => {return colors[colorIndex%colorLength]}
 let vPlus;
 let vMinus;
 let hPlus;
@@ -39,13 +47,6 @@ let cont;
 let cutting = false
 let blockBeingCut;
 let cutOperators = []
-
-/*
-BYC Yoga26
-6935 Oakland Mills Rd suite l, Columbia, MD 21045
-(410) 381-1866
-*/
-
 
 // ENUM
 const OBJ_TYPE = {
@@ -64,9 +65,13 @@ const h_part_dim = ()=> {
 
 
 // Init
-createMenuButtons()
-layoutMenu()
+//createMenuButtons()
+//layoutMenu()
 //initVerticalLines(1)
+constructorBlock = createBlockConstructor()
+app.stage.addChild(constructorBlock)
+constructorBlock.x = DIM/2
+constructorBlock.y = DIM/2
 initHorizontalLines(1)
 animateVerticalLines(0)
 animateHorizontalLines(1)
@@ -78,6 +83,7 @@ hMinus = createCircleButton("-",COLORS.GREEN)
 cont = createContainer(CONTAINER_WIDTH)
 createCutterContainer()
 cutOperators = [vPlus,hPlus,hMinus]
+animateOperatorAlpha(0)
 vPlus.alpha = 0
 hPlus.alpha = 0
 hMinus.alpha = 0
@@ -85,12 +91,15 @@ hMinus.alpha = 0
 // Rouge Init
 
 
+resetTool = createTextBox("Reset")
+app.stage.addChild(resetTool)
+resetTool.x = DIM
+resetTool.y = 4*DIM
+
 deleteTool = createTextBox("Delete")
 app.stage.addChild(deleteTool)
 deleteTool.x = DIM
 deleteTool.y = 3.5*DIM
-console.log("delete tool h,w",deleteTool.height,deleteTool.width)
-
 
 cont.x = CONTAINER_CENTER_X
 cont.y = CONTAINER_CENTER_Y
@@ -118,21 +127,27 @@ vPlus.on("pointerdown",()=>cutBlock(blockBeingCut,hPartitions))
 // Factory Functions
 
 function createJijiAsset() {
-
-    var block = new PIXI.Graphics();
-    block.lineStyle(3,COLORS.DARK_GRAY)
-    block.beginFill(0xFFFFFF);
-    block.drawRoundedRect(0,0, DIM, DIM,3);
-    block.endFill();
-    block.x = 1
-    block.y = 1
-
-    let blockTexture = app.renderer.generateTexture(block)
-    let blockSprite = new PIXI.Sprite(blockTexture)
-    blockSprite.anchor.set(1)
-
+    let blockSprite = new PIXI.Sprite.from('../images/jiji.png')
+    blockSprite.width = DIM
+    blockSprite.height = DIM
+    blockSprite.anchor.set(0.5)
     return blockSprite
 }
+
+
+
+function initJijis(n){
+  let startX = WINDOW_CENTER_X - DIM*n/2
+  for (let i = 0;i<n;i++){
+    let jiji = createJijiAsset()
+    app.stage.addChild(jiji)
+    jiji.x = startX+i*DIM
+    jiji.y = WINDOW_HEIGHT/2
+  }
+}
+
+initJijis(5)
+
 
 function newJiji(){
   let newJiji = createJijiAsset()
@@ -146,6 +161,7 @@ function alignJijis(){
   }
 }
 
+//
 function drawPlusMinusButtons(){
   plusJiji = createCircleButton("+",0xFFFFFF)
   minusJiji = createCircleButton("-",0xFFFFFF)
@@ -155,9 +171,9 @@ function drawPlusMinusButtons(){
   app.stage.addChild(plusJiji)
   app.stage.addChild(minusJiji)
   plusJiji.x = 3*DIM/2
-  plusJiji.y = 4*DIM
+  plusJiji.y = 4.5*DIM
   minusJiji.x = DIM/2
-  minusJiji.y = 4*DIM
+  minusJiji.y = 4.5*DIM
 }
 
 function createCutterContainer(){
@@ -168,6 +184,9 @@ function createCutterContainer(){
     cutterContainer.addChild(l)
     console.log(l.y)
   }
+  hPlus.alpha = 0
+  vPlus.alpha = 0
+  hMinus.alpha = 0
   cutterContainer.addChild(hPlus)
   cutterContainer.addChild(vPlus)
   cutterContainer.addChild(hMinus)
@@ -181,7 +200,7 @@ function createCutterContainer(){
   cutterContainer.pivot.y = cutterContainer.y
   cutterContainer.start = [cutterContainer.x,cutterContainer.y]
   app.stage.addChild(cutterContainer)
-  console.log("cutterCont ",cutterContainer.width,cutterContainer.height)
+  return cutterContainer
 }
 
 
@@ -383,61 +402,6 @@ function onFracStart(event){
     this.dragging = true
 }
 
-function onFracEnd(){
-    this.data = null;
-    this.dragging = false
-    if (this.x < CONTAINER_LEFT || this.y < CONTAINER_TOP){
-      let i = fractions.indexOf(this)
-      fractions.splice(i,1)
-      app.stage.removeChild(this)
-    }
-}
-
-function onFracMove(){
-    if (this.dragging){
-      let pointerPosition = this.data.getLocalPosition(this.parent);
-        this.y = pointerPosition.y + this.deltaTouch[1]
-        this.x = pointerPosition.x + this.deltaTouch[0]
-    }
-}
-
-
-function layoutPolys() {
-  for (let i=0;i<polys.length;i++) {
-      createjs.Tween.get(polys[i]).to({x:  4*dx,y: 4*dx}, 500, createjs.Ease.getPowInOut(4))
-  }
-}
-
-
-
-// This is silly
-function createMenuButtons(){
-  constructorBlock = createBlockConstructor()
-  cuttingTool = createTextBox("Cut")
-  menuItems = [constructorBlock]
-}
-
-function drawCompletedTileSpaces(n) {
-
-  for (let i = 0; i<n; i++){
-    var graphics = new PIXI.Graphics();
-    graphics.lineStyle(3, 0x000000,3)
-
-    graphics.drawRoundedRect(3, 3, 2*dx, 2*dx,3);
-    graphics.alpha = 0.2
-    graphics.x = -1.5
-    graphics.y = -1.5
-
-    let texture = app.renderer.generateTexture(graphics);
-    let emptyRectSprite = new PIXI.Sprite(texture)
-    emptyRectSprite.x = windowWidth-3*dx
-    emptyRectSprite.y = i*2.2*dx + dx/2
-    emptyRectSprite.alpha = 0.5
-    completedTileSpaces.push(emptyRectSprite)
-    app.stage.addChild(emptyRectSprite)
-
-  }
-}
 
 // Pass it the level and it will layout the buttons for that new level.
 function createBlockConstructor() {
@@ -459,19 +423,6 @@ function newBlock(w,h,x,y) {
     newBlock.y = y
     createjs.Tween.get(newBlock).to({x: WINDOW_CENTER_X+blocks.length*10,y: CONTAINER_CENTER_Y+blocks.length*10}, 1000, createjs.Ease.getPowInOut(4))
     blocks.push(newBlock)
-}
-
-
-function layoutMenu(){
-  let y = DIM/2
-  console.log("these are the menu items",menuItems)
-  for (i of menuItems){
-    app.stage.addChild(i)
-      i.x = DIM/2
-      i.y = y
-      i.start = [i.x,i.y]
-      y = y+i.height+DIM/4
-  }
 }
 
 function createBlock(w,h) {
@@ -497,6 +448,11 @@ function createBlock(w,h) {
 
 function animateOperatorAlpha(a){
   for (o of cutOperators){
+      if (a == 0){
+        o.interactive = false
+      } else {
+        o.interactive = true
+      }
       createjs.Tween.get(o).to({alpha: a}, 500, createjs.Ease.getPowInOut(4))
   }
 }
@@ -539,6 +495,7 @@ function onPolyMoveEnd() {
         return pointInRect(p,e) && !e.isFrac
       })
       if (blocksInCutter.length == 0){
+          animateOperatorAlpha(0)
           createjs.Tween.get(this).to({x: this.start[0],y: this.start[1]}, 500, createjs.Ease.getPowInOut(4))
       } else {
           blockBeingCut = blocksInCutter[0]
