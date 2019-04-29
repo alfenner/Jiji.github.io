@@ -1,4 +1,6 @@
 const DIM = WINDOW_WIDTH/12
+const JIJI_CONT_LEFT = 3*DIM
+const JIJI_CONT_TOP = DIM
 const WINDOW_CENTER_X = WINDOW_WIDTH/2
 const WINDOW_CENTER_Y = WINDOW_HEIGHT/2
 const CONTAINER_WIDTH = DIM
@@ -30,6 +32,7 @@ let cuttingTool;
 let deleteTool;
 let resetTool;
 let blocks = []
+let jijiIcon;
 let activeBlock;
 let cutterContainer = new PIXI.Container()
 let fractions = []
@@ -55,12 +58,21 @@ const OBJ_TYPE = {
   DELETE: 2
 }
 
+const jiji_width = ()=> {
+  return jijis.length < 6 ? DIM : DIM*6/jijis.length
+}
+
 const v_part_dim = ()=> {
   return CONTAINER_HEIGHT/hPartitions
 }
 
 const h_part_dim = ()=> {
   return CONTAINER_WIDTH/vPartitions
+}
+
+const jiji_left = () => {
+  let w = jiji_width()
+  return WINDOW_WIDTH/2-1.2*w*jijis.length/2
 }
 
 
@@ -77,9 +89,9 @@ animateVerticalLines(0)
 animateHorizontalLines(1)
 createBlockConstructor()
 drawPlusMinusButtons()
-vPlus = createCircleButton("Ok",COLORS.GREEN)
-hPlus = createCircleButton("+",COLORS.GREEN)
-hMinus = createCircleButton("-",COLORS.GREEN)
+vPlus = createCircleButton("Ok",0xFFFFFF)
+hPlus = createCircleButton("+",0xFFFFFF)
+hMinus = createCircleButton("-",0xFFFFFF)
 cont = createContainer(CONTAINER_WIDTH)
 createCutterContainer()
 cutOperators = [vPlus,hPlus,hMinus]
@@ -87,19 +99,23 @@ animateOperatorAlpha(0)
 vPlus.alpha = 0
 hPlus.alpha = 0
 hMinus.alpha = 0
+initJijis(1)
+
 
 // Rouge Init
 
 
-resetTool = createTextBox("Reset")
+resetTool = createReset()
+resetTool.interactive = true
+resetTool.on('pointerdown',reset)
 app.stage.addChild(resetTool)
-resetTool.x = DIM
-resetTool.y = 4*DIM
+resetTool.x = WINDOW_WIDTH - DIM/2
+resetTool.y = DIM/2
 
-deleteTool = createTextBox("Delete")
+deleteTool = createTrashCan()
 app.stage.addChild(deleteTool)
 deleteTool.x = DIM
-deleteTool.y = 3.5*DIM
+deleteTool.y = 4.5*DIM
 
 cont.x = CONTAINER_CENTER_X
 cont.y = CONTAINER_CENTER_Y
@@ -116,38 +132,75 @@ hMinus.y = CONTAINER_CENTER_Y
 hPlus.on("pointerdown",() => animateHorizontalLines(1))
 hMinus.on("pointerdown",() => animateHorizontalLines(-1))
 vPlus.on("pointerdown",()=>cutBlock(blockBeingCut,hPartitions))
-//hPlus.on("pointerdown",() => animateVerticalLines(1))
-//hMinus.on("pointerdown",() => animateVerticalLines(-1))
-
-
-
-//dropNotification("How can two Jiji's share Three Blocks?")
-
 
 // Factory Functions
 
+function createReset(){
+  let reset = new PIXI.Sprite.from('../images/reset.png')
+  reset.width = DIM/2
+  reset.height = DIM/2
+  reset.anchor.set(0.5)
+  return reset
+}
+
+function createTrashCan(){
+  let trashCan = new PIXI.Sprite.from('../images/trash-can.png')
+  trashCan.width = DIM/2
+  trashCan.height = DIM/2
+  trashCan.anchor.set(0.5)
+  return trashCan
+}
+
 function createJijiAsset() {
     let blockSprite = new PIXI.Sprite.from('../images/jiji.png')
-    blockSprite.width = DIM
-    blockSprite.height = DIM
+    let w = jiji_width()
+    blockSprite.width = w
+    blockSprite.height = w
     blockSprite.anchor.set(0.5)
     return blockSprite
 }
 
-
-
 function initJijis(n){
-  let startX = WINDOW_CENTER_X - DIM*n/2
+  let startX = JIJI_CONT_LEFT
   for (let i = 0;i<n;i++){
     let jiji = createJijiAsset()
+    jijis.push(jiji)
     app.stage.addChild(jiji)
-    jiji.x = startX+i*DIM
-    jiji.y = WINDOW_HEIGHT/2
+    jiji.x = startX+i*jiji.width
+    jiji.y = JIJI_CONT_TOP
   }
 }
 
-initJijis(5)
+function incJiji(n){
+  console.log("INCING JIJI")
+  console.log("n",n)
+  if (n == 1){
+    let jiji = createJijiAsset()
+    jiji.alpha = 0
+    jiji.y = DIM
+    jiji.x = WINDOW_WIDTH/2
+    createjs.Tween.get(jiji).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4))
+    jijis.push(jiji)
+    app.stage.addChild(jiji)
+  } else if (n == -1){
+    let toRemove = jijis.pop()
+    app.stage.removeChild(toRemove)
+  }
+  layoutJijis()
+}
 
+function layoutJijis(){
+  console.log('hello!!!')
+  console.log("jiji's length",jijis.length)
+  let w = jiji_width()
+  let left = WINDOW_WIDTH/2-1.2*w*jijis.length/2
+  console.log("left")
+  jijis.forEach((e,i)=>{
+      createjs.Tween.get(e).to({x: left+1.2*w*i+w/2}, 1000, createjs.Ease.getPowInOut(4))
+      createjs.Tween.get(e).to({width: w,height: w}, 1000, createjs.Ease.getPowInOut(4))
+
+  })
+}
 
 function newJiji(){
   let newJiji = createJijiAsset()
@@ -155,25 +208,56 @@ function newJiji(){
   jijis.push(newJiji)
 }
 
-function alignJijis(){
-  for (let i = 0;i<jijis.length;i++){
 
+function reset(){
+  console.log("reset")
+  for (b of blocks){
+    app.stage.removeChild(b)
   }
+  for (f of fractions){
+    app.stage.removeChild(f)
+  }
+  blocks = []
+  fractions = []
 }
+
+function nearestJiji(xVal){
+  let delta  = 100000
+  let nearestX;
+  console.log("xVal",xVal)
+  jijis.forEach(e => {
+    console.log("e.x,nearestX",e.x)
+    if (Math.abs(e.x - xVal) < delta){
+      console.log("nearest x!!!!")
+      delta = Math.abs(e.x - xVal)
+      nearestX = e.x
+    }
+  })
+  return nearestX
+}
+
 
 //
 function drawPlusMinusButtons(){
   plusJiji = createCircleButton("+",0xFFFFFF)
   minusJiji = createCircleButton("-",0xFFFFFF)
+  jijiIcon = createJijiAsset()
+  jijiIcon.width = DIM/3
+  jijiIcon.height = DIM/3
   plusJiji.interactive = true
   minusJiji.interactive = true
-  plusJiji.on('pointerdown')
+  plusJiji.on('pointerdown',()=>{incJiji(1)})
+  minusJiji.on('pointerdown',()=>{incJiji(-1)})
   app.stage.addChild(plusJiji)
   app.stage.addChild(minusJiji)
+  app.stage.addChild(jijiIcon)
   plusJiji.x = 3*DIM/2
-  plusJiji.y = 4.5*DIM
+  plusJiji.y = 3.5*DIM
+  jijiIcon.y = 3.5*DIM
+  jijiIcon.x = DIM
   minusJiji.x = DIM/2
-  minusJiji.y = 4.5*DIM
+  minusJiji.y = 3.5*DIM
+
 }
 
 function createCutterContainer(){
@@ -215,6 +299,7 @@ function cutBlock(block,pieces){
     newBlock.type = OBJ_TYPE.BLOCK
     newBlock.x = block.x
     newBlock.y = block.y-block.height/2+h/2+h*(i)
+    fractions.push(newBlock)
     app.stage.addChild(newBlock)
   }
   let i = blocks.indexOf(block)
@@ -223,8 +308,7 @@ function cutBlock(block,pieces){
   animateOperatorAlpha(0)
   hPartitions = 2
   animateHorizontalLines(0)
-  createjs.Tween.get(cutterContainer).to({x: cutterContainer.start[0],y: cutterContainer.start[1]}, 500, createjs.Ease.getPowInOut(4))
-  //return null
+  createjs.Tween.get(cutterContainer).to({x: cutterContainer.start[0],y: cutterContainer.start[1]}, 500, createjs.Ease.getPowInOut(4)).call(()=> {cutting = false})
 }
 
 
@@ -412,7 +496,9 @@ function createBlockConstructor() {
     graphics.color = COLORS.BLUE
     graphics.interactive = true
     console.log("graphics dims",graphics.width,graphics.height)
-    graphics.on('pointerdown',() => newBlock(graphics.width,graphics.height,constructorBlock.x+constructorBlock.width/2,constructorBlock.y+constructorBlock.height/2))
+    graphics.on('pointerdown',() => {
+      setTimeout(()=>{newBlock(graphics.width,graphics.height,constructorBlock.x+constructorBlock.width/2,constructorBlock.y+constructorBlock.height/2)},100)
+    })
     return graphics
 }
 
@@ -458,7 +544,10 @@ function animateOperatorAlpha(a){
 }
 
 function onPolyTouched(event) {
-  console.log("poly touched!!!")
+
+  if (this.TYPE == OBJ_TYPE.CUT){
+    cutting = true
+  }
     activePoly = this
     let touchedAtX = event.data.global.x
     let touchedAtY = event.data.global.y
@@ -496,13 +585,14 @@ function onPolyMoveEnd() {
       })
       if (blocksInCutter.length == 0){
           animateOperatorAlpha(0)
-          createjs.Tween.get(this).to({x: this.start[0],y: this.start[1]}, 500, createjs.Ease.getPowInOut(4))
+          createjs.Tween.get(this).to({x: this.start[0],y: this.start[1]}, 500, createjs.Ease.getPowInOut(4)).call(()=>{cutting = false})
       } else {
           blockBeingCut = blocksInCutter[0]
           animateOperatorAlpha(1)
           createjs.Tween.get(this).to({x: blocksInCutter[0].x-CONTAINER_WIDTH/2,y: blocksInCutter[0].y-CONTAINER_HEIGHT/2}, 500, createjs.Ease.getPowInOut(4))
       }
       case OBJ_TYPE.BLOCK:
+      if (!cutting){
       console.log("this is a block")
        let testPoint = new PIXI.Point(this.x,this.y)
        let inDelete = pointInRect(testPoint,deleteTool)
@@ -511,8 +601,13 @@ function onPolyMoveEnd() {
          let i = blocks.indexOf(this)
          blocks.splice(i,1)
          app.stage.removeChild(this)
+       } else {
+         let newX = nearestJiji(this.x)
+         console.log("newX",newX)
+         createjs.Tween.get(this).to({x: newX}, 300, createjs.Ease.getPowInOut(4))
        }
     }
+  }
 
 }
 
@@ -540,6 +635,9 @@ function pointInRect(p,rect){
 
   return c1 && c2 && c3 && c4
 }
+
+
+layoutJijis()
 
 
 document.addEventListener('keydown', function(event) {

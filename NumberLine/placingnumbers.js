@@ -771,17 +771,11 @@ function eatLeftovers(leftovers,dessert){
 
     numberline.stage.addChild(customFeedBlock)
 
-    createjs.Tween.get(customFeedBlock).to({alpha: 1},1000,createjs.Ease.getPowInOut(4)).call(()=> {
-      createjs.Tween.get(customFeedBlock).to({alpha: 0},1000,createjs.Ease.getPowInOut(4)).call(()=> {
-
-
     createjs.Tween.get(curr).to({x: curr.originalLocation[0],y: curr.originalLocation[1]},1000,createjs.Ease.getPowInOut(4)).call(()=>{
       curr.onLine = false
       numberline.stage.removeChild(customFeedBlock)
       eatLeftovers(leftovers,dessert)
     })
-   })
- })
   }
 }
 
