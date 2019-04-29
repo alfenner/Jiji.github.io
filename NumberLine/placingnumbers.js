@@ -5,14 +5,23 @@ PROBLEM_QUE = NUMBERLINE_ACTIVITIES[ACTIVITY_ID]
 let numberOfProblems = PROBLEM_QUE.length
 let PROBLEM_INDEX = 0
 
+let backDrop = new PIXI.Sprite.from('../images/blue-gradient.png')
+backDrop.width = WINDOW_WIDTH
+backDrop.height = WINDOW_HEIGHT
+backDrop.x = 0
+backDrop.y = 0
+backDrop.alpha = 0
+numberline.stage.addChild(backDrop)
+createjs.Tween.get(backDrop).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
 
-let backGround = new PIXI.Graphics()
-backGround.beginFill(0xFFFFFF)
-backGround.drawRoundedRect(0,0,windowWidth,windowHeight)
-backGround.endFill()
+
+let backGround = new PIXI.Sprite.from('../images/blue-gradient.png')
+backGround.width = WINDOW_WIDTH
+backGround.height = WINDOW_HEIGHT
 backGround.interactive = true
 backGround.static = false
 numberline.stage.addChild(backGround)
+createjs.Tween.get(backGround).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
 
 // CONSTANTS
 
@@ -83,7 +92,6 @@ function createPrompt(prompt){
   let note = new PIXI.Container()
   var graphics = new PIXI.Graphics();
   graphics.lineStyle(0, 0x000000, 3)
-  graphics.beginFill(0xFFFFFF);
   graphics.drawRoundedRect(0, 0,10*dim,0.9*topMargin ,5);
   graphics.endFill();
 
@@ -93,7 +101,7 @@ function createPrompt(prompt){
 
     let promptLength = prompt.length
     console.log("promptLength",promptLength)
-    let textSize = promptLength*0.5*topMargin > 10*dim ? 15*dim/(promptLength) : 0.5*topMargin
+    let textSize = promptLength*0.5*topMargin > 10*dim ? 20*dim/(promptLength) : 0.5*topMargin
 
     let den = new PIXI.Text(prompt,{fontFamily : 'Chalkboard SE', fontSize: textSize, fill : 0x000000, align : 'center'});
     den.anchor.set(0.5)
@@ -194,7 +202,7 @@ function setTicks(numberOfTicks){
 
 function createTick(nodeIndex,width){
   let tick = new PIXI.Graphics()
-  tick.lineStyle(3, 0xb7b7b7, 1)
+  tick.lineStyle(3, 0x000000, 1)
   tick.moveTo(0,0)
   tick.lineTo(0,dim/4)
   tick.x = dim + width*nodeIndex
@@ -214,7 +222,7 @@ function createActionButton(text,action) {
     let tile = new PIXI.Sprite(texture)
     tile.anchor.set(0.5)
 
-    let den = new PIXI.Text(text,{fontFamily : 'Chalkboard SE', fontSize: dx/2, fill : 0xFFFFFF, align : 'center'});
+    let den = new PIXI.Text(text,{fontFamily : 'Chalkboard SE', fontSize: dim/3, fill : 0xFFFFFF, align : 'center'});
     den.anchor.set(0.5)
 
     let tileContainer = new PIXI.Container()
@@ -333,7 +341,7 @@ if (this.text.text == "Next Problem"){
         //numberline.stage.removeChild(b)
       }
     } else {
-      dropNotification("Make sure to set all the pins!")
+      dropNotification("Make sure everything is in place.")
     }
   } else {
     this.checkAnswer = true
@@ -420,6 +428,10 @@ function loadProblem(problem) {
   globalPinRef = pinsInPlay
 
   pinsInPlay = pinsInPlay.filter(p => p.onLine == false)
+  pinsInPlay.forEach((p,i)=>{
+          p.x = 11*dim-1.2*p.width*i
+          p.y = 4*dim})
+
 
 }
 
@@ -954,21 +966,23 @@ function createFractionLbl(frac) {
 
     let n = frac[0]
     let d = frac[1]
-
     let whole = d == 1 ? true : false
 
     let h = d == 1 ? dim/4 : 1/2*dim
     let w = dim/4
+    let textSize = 0.7*w
+
 
     var block = new PIXI.Graphics();
-    block.lineStyle(2,0x000000,2)
+    block.lineStyle(2,0x000000)
     block.beginFill(0xFFFFFF);
-    block.drawRoundedRect(1, 1, w, h,5);
+    block.drawRoundedRect(0, 0, w, h,3);
     block.endFill();
+    block.x = 1
+    block.y = 1
 
     var blockTexture = numberline.renderer.generateTexture(block);
     let tile = new PIXI.Sprite(blockTexture)
-    tile.alpha = 0.5
     tile.anchor.set(0.5)
 
 
@@ -987,18 +1001,18 @@ function createFractionLbl(frac) {
       mid.lineStyle(2, 0x000000, 2)
       mid.moveTo(-dim/10,0)
       mid.lineTo(dim/10,0)
-      num = new PIXI.Text(n,{fontFamily : 'Chalkboard SE', fontSize: 12, fill : 0x000000, align : 'center'});
+      num = new PIXI.Text(n,{fontFamily : 'Chalkboard SE', fontSize: textSize, fill : 0x000000, align : 'center'});
       num.anchor.set(0.5)
-      num.y = -h/6
-      den = new PIXI.Text(d,{fontFamily : 'Chalkboard SE', fontSize: 12, fill : 0x000000, align : 'center'});
+      num.y = -h/5
+      den = new PIXI.Text(d,{fontFamily : 'Chalkboard SE', fontSize: textSize, fill : 0x000000, align : 'center'});
       den.anchor.set(0.5)
-      den.y = h/6
+      den.y = h/5
     } else {
       l = new PIXI.Graphics();
       l.lineStyle(2, 0x000000, 2)
       l.moveTo(0,dim/8)
       l.lineTo(0,dim/2)
-      num = new PIXI.Text(n,{fontFamily : 'Chalkboard SE', fontSize: 12, fill : 0x000000, align : 'center'});
+      num = new PIXI.Text(n,{fontFamily : 'Chalkboard SE', fontSize: textSize, fill : 0x000000, align : 'center'});
       num.anchor.set(0.5)
       num.y = 0
     }
@@ -1035,7 +1049,7 @@ numberline.stage.addChild(line)
 
 function createNumberLine(den) {
   let line = new PIXI.Graphics();
-  line.lineStyle(4, 0xb7b7b7, 1);
+  line.lineStyle(4, 0x000000, 1);
   line.moveTo(dim, 3*dim);
   line.lineTo(dim+10*dim, 3*dim);
   return line
