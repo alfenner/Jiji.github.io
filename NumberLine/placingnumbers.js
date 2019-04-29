@@ -355,7 +355,6 @@ if (this.text.text == "Next Problem"){
     } else {
        resetGame()
     }
-
   }
 }
 
@@ -659,10 +658,9 @@ function animateFeedBack(blocks,start,pins,labels,i){
       console.log("HELLO THE FUCKING GAME IS OVER!!!!!")
       goButton.interactive = true
       goButton.text.text = "Next Problem"
-      //dropGameOverModal(loadNextGame)
+      dropGameOverModal(loadNextGame)
       return
     } else {
-
       for (p of pins) {
         if (!currentProblem.pinWidget){
           createjs.Tween.get(p).to({x: p.originalLocation[0],y: p.originalLocation[1]}, 500, createjs.Ease.getPowInOut(4))
@@ -925,17 +923,19 @@ function createPin() {
     let w = dim/4
 
     var circle = new PIXI.Graphics();
-    circle.lineStyle(1, 0x000000)
+    circle.lineStyle(2, 0x000000)
     circle.beginFill(0xFFFFFF);
     // why dim/5? - cause that's what I decided.
-    circle.drawCircle(dim/5+1, dim/5+1,dim/5);
+    circle.drawCircle(dim/5, dim/5,dim/5);
     circle.endFill();
+    circle.x = 0.5
+    circle.y = 0.5
 
     let circleTexture = numberline.renderer.generateTexture(circle);
     let circleSprite = new PIXI.Sprite(circleTexture)
     circleSprite.alpha = 0.5
     circleSprite.anchor.set(0.5)
-    circleSprite.texture = pinkCircleTexture
+    //circleSprite.texture = pinkCircleTexture
 
     var stem = new PIXI.Graphics();
     stem.lineStyle(2, 0x000000, 10)
