@@ -222,7 +222,7 @@ function createActionButton(text,action) {
     let tile = new PIXI.Sprite(texture)
     tile.anchor.set(0.5)
 
-    let den = new PIXI.Text(text,{fontFamily : 'Chalkboard SE', fontSize: dim/3, fill : 0xFFFFFF, align : 'center'});
+    let den = new PIXI.Text(text,{fontFamily : 'Chalkboard SE', fontSize: dim/4, fill : 0xFFFFFF, align : 'center'});
     den.anchor.set(0.5)
 
     let tileContainer = new PIXI.Container()
