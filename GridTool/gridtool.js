@@ -1,4 +1,14 @@
 
+let backGround = new PIXI.Sprite.from('../images/blue-gradient.png')
+backGround.width = WINDOW_WIDTH
+backGround.height = WINDOW_HEIGHT
+backGround.x = 0
+backGround.y = 0
+backGround.alpha = 0
+app.stage.addChild(backGround)
+createjs.Tween.get(backGround).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
+
+
 const DIM = WINDOW_WIDTH/12
 const WINDOW_CENTER_X = WINDOW_WIDTH/2
 const WINDOW_CENTER_Y = WINDOW_HEIGHT/2
@@ -49,13 +59,16 @@ function createCircleButton(text) {
     let w = DIM/4
 
     var circle = new PIXI.Graphics();
-    circle.beginFill(COLORS.GREEN);
+    circle.lineStyle(2,0xb7b7b7)
+    circle.beginFill(0xFFFFFF);
     circle.drawCircle(DIM/5, DIM/5,DIM/5);
     circle.endFill();
+    circle.x = 1
+    circle.y = 1
 
     let circleTexture = app.renderer.generateTexture(circle);
     let circleSprite = new PIXI.Sprite(circleTexture)
-    circleSprite.alpha = 0.5
+    circleSprite.alpha = 0.8
     circleSprite.anchor.set(0.5)
 
     let pinContainer = new PIXI.Container()

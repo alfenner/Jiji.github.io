@@ -1,4 +1,14 @@
 // Problem Sets
+let backDrop = new PIXI.Sprite.from('../images/blue-gradient.png')
+backDrop.width = WINDOW_WIDTH
+backDrop.height = WINDOW_HEIGHT
+backDrop.x = 0
+backDrop.y = 0
+backDrop.alpha = 0
+app.stage.addChild(backDrop)
+createjs.Tween.get(backDrop).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
+
+
 let activity = window.localStorage['activity']
 console.log("Activity!",activity)
 let activityObj = EST_ACTIVITIES[activity]
@@ -103,7 +113,7 @@ let submittedAnswer = []
 let submittedMCAnswer = []
 
 
-// Background
+/*
 let backGround = new PIXI.Graphics()
 backGround.beginFill(0xFFFFFF)
 backGround.drawRoundedRect(0,0,windowWidth,windowHeight)
@@ -112,7 +122,7 @@ backGround.interactive = true
 backGround.static = false
 app.stage.addChild(backGround)
 backGround.on('pointerup',()=> {slider.dragging = false})
-
+*/
 
 // Initializations
 
@@ -679,22 +689,14 @@ function animateFeedBack(){
     animateFractionBlocks()
 }
 
-function createJijiAsset(n,d) {
-
-    var block = new PIXI.Graphics();
-    block.lineStyle(3,COLORS.DARK_GRAY)
-    block.beginFill(0xFFFFFF);
-    block.drawRoundedRect(0,0, DIM, DIM,3);
-    block.endFill();
-    block.x = 1
-    block.y = 1
-
-    let blockTexture = app.renderer.generateTexture(block)
-    let blockSprite = new PIXI.Sprite(blockTexture)
+function createJijiAsset() {
+    let blockSprite = new PIXI.Sprite.from('../images/side-jiji.png')
+    blockSprite.width = DIM
+    blockSprite.height = DIM
     blockSprite.anchor.set(1)
-
     return blockSprite
 }
+
 
 function createFraction(n,d) {
 

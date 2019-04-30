@@ -57,7 +57,7 @@ function createGameModal(action){
     let tile = new PIXI.Sprite(texture)
     tile.anchor.set(0.5)
 
-    let den = new PIXI.Text("You did it!",{fontFamily : 'Chalkboard SE', fontSize: 40, fill : 0x000000, align : 'center'});
+    let den = new PIXI.Text("All Done!",{fontFamily : 'Chalkboard SE', fontSize: 40, fill : 0x000000, align : 'center'});
     den.anchor.set(0.5)
 
     let tileContainer = new PIXI.Container()

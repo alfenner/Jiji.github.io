@@ -291,7 +291,11 @@ function checkAnswer() {
 console.log("Active Pins",pinsInPlay.length)
 
 if (this.text.text == "Next Problem"){
-  loadNextGame()
+  if (PROBLEM_INDEX+1 >= PROBLEM_QUE.length){
+      dropGameOverModal(()=>{window.history.back()})
+  } else {
+      loadNextGame()
+  }
   return
 }
 
@@ -621,10 +625,8 @@ function loadNextGame(){
 }
 
 function itemsLessThan(x,items){
-  console.log("items passed to itemsLessThan!!!!",items)
   let itemsLess = []
   if (items.length != 0){
-  console.log("not less than zero")
   for (l of items){
     console.log("in loop")
       if (l.x < x && l.onLine == true){
@@ -658,7 +660,7 @@ function animateFeedBack(blocks,start,pins,labels,i){
       console.log("HELLO THE FUCKING GAME IS OVER!!!!!")
       goButton.interactive = true
       goButton.text.text = "Next Problem"
-      dropGameOverModal(loadNextGame)
+      //dropGameOverModal(loadNextGame)
       return
     } else {
       for (p of pins) {

@@ -1,4 +1,14 @@
 
+let backGround = new PIXI.Sprite.from('../images/blue-gradient.png')
+backGround.width = WINDOW_WIDTH
+backGround.height = WINDOW_HEIGHT
+backGround.x = 0
+backGround.y = 0
+backGround.alpha = 0
+wall.stage.addChild(backGround)
+createjs.Tween.get(backGround).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
+
+
 // Denominator of the row that's currently place on the number line.
 let activeRow = 12
 
@@ -131,8 +141,6 @@ function drawNumberLine(den) {
   wall.stage.addChild(line);
 }
 
-drawNumberLine()
-initTickArray(12)
 
 function animateTicks(den) {
     tickArray.forEach((t,i) => {
@@ -185,7 +193,7 @@ function createTile(x,y,w,h,d) {
     let tile = new PIXI.Sprite(texture)
     tile.anchor.set(0.5)
 
-    let den = new PIXI.Text(labels[d],{fontFamily : 'Arial', fontSize: 12, fill : 0xFFFFFF, align : 'center'});
+    let den = new PIXI.Text(labels[d],{fontFamily : 'Arial', fontSize: h/2, fill : 0xFFFFFF, align : 'center'});
     den.anchor.set(0.5)
 
     let tileContainer = new PIXI.Container()
