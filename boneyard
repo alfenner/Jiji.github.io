@@ -1,0 +1,28 @@
+<footer class="page-footer orange">
+  <div class="container">
+    <div class="row">
+      <div class="col l6 s12">
+        <h5 class="white-text">About</h5>
+        <p class="grey-text text-lighten-4">We do fractions!</p>
+      </div>
+      <div class="col l3 s12">
+        <h5 class="white-text">Lessons</h5>
+        <ul>
+          <li><a class="white-text" href='Tiling/TilingAgenda.html'>Tiling</a></li>
+          <li><a class="white-text" href="#!">Number Lines</a></li>
+        </ul>
+      </div>
+      <div class="col l3 s12">
+        <h5 class="white-text">Tools</h5>
+        <ul>
+          <li><a class="white-text" href='https://www.stmath.com/play/informative-feedback-2?hsCtaTracking=9d2fc80f-9625-4598-985b-7d614942545c%7Ce6f7a72d-21ea-403b-b7f7-b10f598b65da'>Fraction Wall</a></li>
+          <li><a class="white-text" href='images/oop-test.pdf'>Factoring Tool</a></li>
+      </div>
+    </div>
+  </div>
+  <div class="footer-copyright">
+    <div class="container">
+    Find out more about <a class="orange-text text-lighten-3" href="https://www.stmath.com/">ST Math</a>
+    </div>
+  </div>
+</footer>
