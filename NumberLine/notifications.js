@@ -40,8 +40,12 @@ function dropNotification(messege){
   let note = createNotification(messege)
   numberline.stage.addChild(note)
   note.on('pointerdown',hideNotification)
-      createjs.Tween.get(note).to({x: windowWidth/2,y: dx}, 500, createjs.Ease.getPowInOut(4))
+
+  createjs.Tween.get(note).to({x: windowWidth/2,y: dx}, 500, createjs.Ease.getPowInOut(4)).call(()=>{
+        setTimeout(()=>{
+          createjs.Tween.get(note).to({y: -windowHeight/2}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{numberline.stage.removeChild(note)})},1000)})
 }
+
 
 
 
