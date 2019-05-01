@@ -327,7 +327,8 @@ if (this.text.text == "Next Problem"){
        minStep = 10*dim/currentProblem.partitionsPerLine
     }
     // Generate Feed Blocks Here
-    feedBlocks = currentProblem.pinKeys.map((k)=>{return createFeedBlock(minStep,1,currentProblem.partitionsPerWhole,true)} )
+    let label = currentProblem.noFeedBlockLabel ? false : true
+    feedBlocks = currentProblem.pinKeys.map((k)=>{return createFeedBlock(minStep,1,currentProblem.partitionsPerWhole,label)} )
     //feedBackLabels = createFeedBackLbl(labelsOnLine)
 
 

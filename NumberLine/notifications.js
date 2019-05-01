@@ -47,8 +47,6 @@ function dropNotification(messege){
 }
 
 
-
-
 function createGameModal(action){
   let note = new PIXI.Container()
   var graphics = new PIXI.Graphics();

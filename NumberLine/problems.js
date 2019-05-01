@@ -46,6 +46,7 @@ const DAY1_WARM_UP_P1 = {
   labels: [],
   unique: true,
   endPins: true,
+  noFeedBlockLabel: true,
 }
 
 const DAY1_WARM_UP_P2 = {
@@ -64,6 +65,7 @@ const DAY1_WARM_UP_P2 = {
   labels: [],
   unique: true,
   endPins: true,
+  noFeedBlockLabel: true,
 }
 
 const DAY1_WARM_UP_P3 = {
@@ -82,7 +84,8 @@ const DAY1_WARM_UP_P3 = {
   labels: [],
   unique: true,
   endPins: true,
-  discussionQuestion: true
+  discussionQuestion: true,
+  noFeedBlockLabel: true,
 }
 
 const DAY1_WARM_UP_P4 = {
@@ -101,7 +104,8 @@ const DAY1_WARM_UP_P4 = {
   labels: [],
   unique: true,
   endPins: true,
-  discussionQuestion: true
+  discussionQuestion: true,
+  noFeedBlockLabel: true,
 }
 
 const DAY1_WARM_UP_P5 = {
@@ -120,7 +124,8 @@ const DAY1_WARM_UP_P5 = {
   labels: [],
   unique: true,
   endPins: true,
-  discussionQuestion: true
+  discussionQuestion: true,
+  noFeedBlockLabel: true,
 }
 
 const DAY1_WARM_UP_P6 = {
@@ -139,7 +144,8 @@ const DAY1_WARM_UP_P6 = {
   labels: [],
   unique: true,
   endPins: true,
-  discussionQuestion: true
+  discussionQuestion: true,
+  noFeedBlockLabel: true,
 }
 
 const DAY1_WARM_UP_P7 = {
@@ -158,7 +164,8 @@ const DAY1_WARM_UP_P7 = {
   labels: [],
   unique: true,
   endPins: true,
-  discussionQuestion: true
+  discussionQuestion: true,
+  noFeedBlockLabel: true,
 }
 
 const DAY1_WARM_UP_P8 = {
@@ -177,7 +184,8 @@ const DAY1_WARM_UP_P8 = {
   labels: [],
   unique: true,
   endPins: true,
-  discussionQuestion: true
+  discussionQuestion: true,
+  noFeedBlockLabel: true,
 }
 
 const DAY1_WARM_UP_P9 = {
@@ -196,7 +204,8 @@ const DAY1_WARM_UP_P9 = {
   labels: [],
   unique: true,
   endPins: true,
-  discussionQuestion: true
+  discussionQuestion: true,
+  noFeedBlockLabel: true,
 }
 
 const DAY1_WARM_UP_P10 = {
@@ -215,7 +224,8 @@ const DAY1_WARM_UP_P10 = {
   labels: [],
   unique: true,
   endPins: true,
-  discussionQuestion: true
+  discussionQuestion: true,
+  noFeedBlockLabel: true,
 }
 
 const DAY1_WARM_UP_P11 = {
@@ -234,7 +244,8 @@ const DAY1_WARM_UP_P11 = {
   labels: [],
   unique: true,
   endPins: true,
-  discussionQuestion: true
+  discussionQuestion: true,
+  noFeedBlockLabel: true,
 }
 
 const DAY1_POSTWARMUP_P1 = {
