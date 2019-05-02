@@ -20,6 +20,7 @@ const MULTICHOICE = activityObj.mc ? true : false
 
 // Constants
 const DIM = WINDOW_WIDTH/15
+const LETTERS = ["A","B","C","D"]
 const JIJI_SPEED = 0.4
 const CONT_BORD = DIM/10
 const LINE_WIDTH = 5 // Should be some fraction of DIM or window
@@ -126,6 +127,7 @@ backGround.on('pointerup',()=> {slider.dragging = false})
 
 // Initializations
 
+let letters = []
 
 let frac = createFraction(currentProblem.num,currentProblem.den)
 app.stage.addChild(frac)
@@ -186,6 +188,12 @@ function queMultipleChoiceFormat(){
   water.x = WATER_CENTER
 }
 
+function makeLetter(letter){
+  let l = new PIXI.Text(letter,{fontFamily : 'Chalkboard SE', fontSize: 0.5*DIM, fill : 0x000000, align : 'center'});
+  l.anchor.set(0.5)
+  return l
+}
+
 function layoutChoices(){
   console.log("calling layout choices")
   water.height = adjustableContainer.height*currentProblem.num/currentProblem.den
@@ -193,6 +201,9 @@ function layoutChoices(){
   slider.alpha = 0
   let answerIndex = currentProblem.answerIndex
   currentProblem.multichoice.forEach((c,i)=>{
+    let letter = makeLetter(LETTERS[i])
+    app.stage.addChild(letter)
+    letters.push(letter)
     let b = createFraction(c[0],c[1])
     b.num = c[0]
     b.den = c[1]
@@ -205,6 +216,8 @@ function layoutChoices(){
     b.x = WINDOW_CENTER_X + 2*b.width*i - 3*b.width
     b.interactive = true
     b.on('pointerdown',checkMCAnswer)
+    letter.x = b.x
+    letter.y = b.y+b.height/2
     multipleChoices.push(b)
   })
 }
@@ -217,12 +230,14 @@ if (activityObj.prompt != null){
 // Factory functions
 
 function checkMCAnswer(){
-  multipleChoices.forEach(c =>{
+  multipleChoices.forEach((c,i) =>{
     if (c == this){
         createjs.Tween.get(c).to({x: frac.x,y: frac.y}, 1000, createjs.Ease.getPowInOut(4))
         createjs.Tween.get(c.border).to({alpha: 0}, 1000, createjs.Ease.getPowInOut(4))
+        createjs.Tween.get(letters[i]).to({x: frac.x}, 1000, createjs.Ease.getPowInOut(4))
     } else {
         createjs.Tween.get(c).to({alpha: 0}, 500, createjs.Ease.getPowInOut(4))
+        createjs.Tween.get(letters[i]).to({alpha: 0}, 500, createjs.Ease.getPowInOut(4))
     }
   })
   if (this.prompt == currentProblem.answer) {
@@ -568,6 +583,8 @@ function reset(){
   feedFricks = []
   frameBlocks = []
   frameFricks = []
+  letters.forEach(l=>app.stage.removeChild(l))
+  letters = []
 
   if (!MULTICHOICE) {
 

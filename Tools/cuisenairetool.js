@@ -67,8 +67,6 @@ const OBJ_TYPE = {
 //createMenuButtons()
 //layoutMenu()
 //initVerticalLines(1)
-constructorBlock = createBlockConstructor()
-app.stage.addChild(constructorBlock)
 
 
 // Rouge Init
@@ -118,9 +116,7 @@ function reset(){
   for (b of blocks){
     app.stage.removeChild(b)
   }
-  for (f of fractions){
-    app.stage.removeChild(f)
-  }
+
   blocks = []
   fractions = []
 }
@@ -176,28 +172,7 @@ function createCutterContainer(){
 }
 
 
-function cutBlock(block,pieces){
 
-  let h = block.height/pieces
-  let w = block.width
-  console.log("w,y,x,y",h,w,block.x,block.y)
-  for (let i = 0;i<pieces;i++){
-    let newBlock = createBlock(w,h)
-    newBlock.isFrac = true
-    newBlock.type = OBJ_TYPE.BLOCK
-    newBlock.x = block.x
-    newBlock.y = block.y-block.height/2+h/2+h*(i)
-    fractions.push(newBlock)
-    app.stage.addChild(newBlock)
-  }
-  let i = blocks.indexOf(block)
-  blocks.splice(i,1)
-  app.stage.removeChild(block)
-  animateOperatorAlpha(0)
-  hPartitions = 2
-  animateHorizontalLines(0)
-  createjs.Tween.get(cutterContainer).to({x: cutterContainer.start[0],y: cutterContainer.start[1]}, 500, createjs.Ease.getPowInOut(4)).call(()=> {cutting = false})
-}
 
 
 // Helpers
@@ -341,6 +316,7 @@ function animateVerticalLines(inc){
 
 // Pass it the level and it will layout the buttons for that new level.
 function createBlockConstructor(w,h,i) {
+  let blockContainer = new PIXI.Container()
   var graphics = new PIXI.Graphics();
    let color = COLORS[COLOR_KEYS[i%9]]
    graphics.lineStyle(1,0xFFFFFF)
@@ -348,16 +324,32 @@ function createBlockConstructor(w,h,i) {
     graphics.drawRoundedRect(0,0,w,h,2)
     graphics.endFill();
     graphics.color = color
-    graphics.interactive = true
     console.log("graphics dims",graphics.width,graphics.height)
-    graphics.on('pointerdown',() => {
-      setTimeout(()=>{newBlock(graphics,constructorBlock.x+constructorBlock.width/2,constructorBlock.y+constructorBlock.height/2)},100)
+    let graphicsTexture = app.renderer.generateTexture(graphics)
+    let graphicsSprite = new PIXI.Sprite(graphicsTexture)
+    blockContainer.addChild(graphicsSprite)
+    blockContainer.interactive = true
+    blockContainer.color = color
+    blockContainer.den = i
+    let fracText = i == 1 ? "1" : "1/"+i
+    let frac = new PIXI.Text(fracText,{fontFamily : 'Chalkboard SE', fontSize: graphicsSprite.height/3, fill : 0x000000, align : 'center'});
+
+    frac.anchor.set(0.5)
+    frac.x = graphicsSprite.width/2
+    frac.y = graphicsSprite.height/2
+    blockContainer.on('pointerdown',() => {
+      setTimeout(()=>{
+        newBlock(blockContainer)},100)
     })
-    return graphics
+
+    blockContainer.addChild(graphicsSprite)
+    blockContainer.addChild(frac)
+
+    return blockContainer
 }
 
-function newBlock(g,x,y) {
-    let newBlock = createBlock(g.width,g.height,g.color)
+function newBlock(g,frac) {
+    let newBlock = createBlock(g.width,g.height,g.color,g.den)
     app.stage.addChild(newBlock)
     newBlock.x = g.x
     newBlock.y = g.y
@@ -365,7 +357,6 @@ function newBlock(g,x,y) {
     rows[mostRecentRow].push(newBlock)
     newBlock.currentRow = mostRecentRow
     createjs.Tween.get(newBlock).to({x: TWELFTH_WIDTH+rowMax,y: CONTAINER_ORIGIN_Y+mostRecentRow*TWELFTH_WIDTH}, 700, createjs.Ease.getPowInOut(4))
-    blocks.push(newBlock)
 }
 
 function createCuisenaireMenu(){
@@ -397,20 +388,33 @@ function condenseAfter(row,k,width){
   }
 }
 
-function createBlock(w,h,color) {
-  let graphics = new PIXI.Graphics();
-      graphics.lineStyle(1,0xFFFFFF)
-      graphics.beginFill(color);
-      graphics.drawRoundedRect(0,0,w,h,3)
-      graphics.endFill();
-      let texture = app.renderer.generateTexture(graphics)
-      let sprite = new PIXI.Sprite(texture)
-      sprite.interactive = true
-      sprite.TYPE = OBJ_TYPE.BLOCK
-      sprite.on('pointerdown', onPolyTouched)
-      sprite.on('pointerup', onPolyMoveEnd)
-      sprite.on('pointermove', onPolyTouchMoved);
-  return sprite
+function createBlock(w,h,color,i) {
+  let blockContainer = new PIXI.Container()
+  var graphics = new PIXI.Graphics();
+   graphics.lineStyle(1,0xFFFFFF)
+    graphics.beginFill(color);
+    graphics.drawRoundedRect(0,0,w,h,2)
+    graphics.endFill();
+    graphics.color = color
+    console.log("graphics dims",graphics.width,graphics.height)
+    let graphicsTexture = app.renderer.generateTexture(graphics)
+    let graphicsSprite = new PIXI.Sprite(graphicsTexture)
+    blockContainer.addChild(graphicsSprite)
+    blockContainer.interactive = true
+    blockContainer.color = color
+    let fracText = i == 1 ? "1" : "1/"+i
+    let frac = new PIXI.Text(fracText,{fontFamily : 'Chalkboard SE', fontSize: graphicsSprite.height/3, fill : 0x000000, align : 'center'});
+
+    frac.anchor.set(0.5)
+    frac.x = graphicsSprite.width/2
+    frac.y = graphicsSprite.height/2
+    blockContainer.addChild(graphicsSprite)
+    blockContainer.addChild(frac)
+
+    blockContainer.on('pointerdown', onPolyTouched)
+    blockContainer.on('pointerup', onPolyMoveEnd)
+    blockContainer.on('pointermove', onPolyTouchMoved);
+  return blockContainer
 }
 
 
@@ -439,34 +443,31 @@ function onPolyMoveEnd() {
     this.dragging = false;
     this.data = null;
     this.deltaTouch = []
-    let y = roundY(this.y)
-    let x = roundX(this.x)
     let p = new PIXI.Point(this.x+this.width/2,this.y+this.height/2)
     let inTrash = pointInRect(p,trashCan)
+    console.log("inTrash",inTrash)
+    if (inTrash){
+      let i = rows[this.currentRow].indexOf(this)
+      rows[this.currentRow].splice(i,1)
+      app.stage.removeChild(this)
+    } else {
+    let y = roundY(this.y)
+    let x = roundX(this.x)
     let r = getRow(this.y)
+    let i = rows[this.currentRow].indexOf(this)
+    rows[this.currentRow].splice(i,1)
+    condenseAfter(rows[this.currentRow],i,this.width)
     mostRecentRow = r
     if (r != this.currentRow){
       newXVal = CONTAINER_ORIGIN_X+getRowMax(rows[r])
-      let i = rows[this.currentRow].indexOf(this)
-      console.log("this is the index of what's about to be switched",i)
-      // Remove from current row
-      rows[this.currentRow].splice(i,1)
-      // Add to the new row
       rows[r].push(this)
-      condenseAfter(rows[this.currentRow],i,this.width)
       this.currentRow = r
     } else {
-      console.log("DIDNT CHANGE ROWS!!!")
-      console.log("rows!",rows)
-      console.log('ROWMAX',x)
+      rows[this.currentRow].push(this)
       newXVal = CONTAINER_ORIGIN_X+getRowMax(rows[r]) - this.width
     }
-    console.log("ROW",getRow(this.y))
-    if (inTrash){
-      app.stage.removeChild(this)
-    } else {
       createjs.Tween.get(this).to({x: newXVal,y: y}, 500, createjs.Ease.getPowInOut(4))
-    }
+  }
 }
 
 function getRowMax(row){
