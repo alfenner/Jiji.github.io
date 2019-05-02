@@ -35,7 +35,7 @@ const CONTAINER_TOP = CONTAINER_CENTER_Y-CONTAINER_HEIGHT/2
 const CENTER_CONTAINER_X = WINDOW_WIDTH/2
 const FRACTION_CENTER = [1/2*WINDOW_WIDTH,TOP_MARGIN+DIM]
 const FRACT_DIM = [DIM,2*DIM]
-const GO_BUTTON_CENTER = [DIM,TOP_MARGIN]
+const GO_BUTTON_CENTER = [DIM,TOP_MARGIN+0.5*DIM]
 const TOLERANCE = 0.01*CONTAINER_HEIGHT
 const DELTA_BRIDGE = LEFT_CONTAINER_CENTER_X+0.7*CONTAINER_WIDTH - (RIGHT_CONTAINER_CENTER_X-0.7*CONTAINER_WIDTH)
 const BRIDGE_LENGTH = Math.sqrt(TOLERANCE*TOLERANCE+DELTA_BRIDGE*DELTA_BRIDGE)+LINE_WIDTH/2
@@ -300,12 +300,11 @@ function animateJiji(){
           createjs.Tween.get(jiji).to({alpha: 0}, 1000, createjs.Ease.getPowInOut(4)).call(()=>{app.stage.removeChild(jiji)})
           createjs.Tween.get(actionButton).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4)).call(()=> {
             if (problemIndex == problemSet.length-1 && CHECK_ANSWER()){
-              dropDiscussionModal(activityObj.discussion,()=>{window.history.back()})
+              dropDiscussionModal("All Done!",()=>{window.history.back()})
             }
           })
     },1000)
   }
-
 
   let a3 = () => {animateTo(jiji,JIJI_END_CORDS(),endSeq)}
   let a2 = CHECK_ANSWER() ? () => {animateTo(jiji,BRIDGE_END_CORDS(),a3)} : endSeq
@@ -358,7 +357,6 @@ function animateBridge(startTheBlock){
   bridgeContainer.x = BRIDGE_START_CORDS()[0]
   bridgeContainer.y = BRIDGE_START_CORDS()[1]
   if (CHECK_ANSWER()){
-    console.log("ANSWER IS FUCKING CORRECT!!!")
     bridgeGraphic.lineStyle(5,COLORS.DARK_GRAY)
     bridgeGraphic.moveTo(0,0)
     bridgeGraphic.lineTo(0,-BRIDGE_LENGTH)
@@ -785,7 +783,6 @@ function onSliderEnd(){
     let pointerPosition = this.data.getLocalPosition(this.parent);
     let inRange = pointerPosition.y < CONTAINER_BOTTOM ? true : false
     if (!inRange){
-        console.log("Animating back")
         createjs.Tween.get(this).to({y: CONTAINER_BOTTOM-this.height/2}, 500, createjs.Ease.getPowInOut(4))
     }
     this.data = null;

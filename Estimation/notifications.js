@@ -104,7 +104,7 @@ function createDiscussionModal(prompt,action){
     circleButton.y = -graphics.height/2+circleButton.height
     tileContainer.addChild(circleButton)
 
-    circleButton.on('pointerdown',()=>{createjs.Tween.get(tileContainer).to({x: windowWidth/2,y: -windowHeight/2}, 500, createjs.Ease.getPowInOut(4)).call(()=> {
+    tileContainer.on('pointerdown',()=>{createjs.Tween.get(tileContainer).to({x: windowWidth/2,y: -windowHeight/2}, 500, createjs.Ease.getPowInOut(4)).call(()=> {
       app.stage.removeChild(tileContainer)})
       action()
     })

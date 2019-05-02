@@ -388,6 +388,14 @@ function createCuisenaireMenu(){
 
 createCuisenaireMenu()
 
+function condenseAfter(row,k,width){
+  console.log("row,k,width",row,k,width)
+  for (let i = 0;i<row.length;i++){
+    if (i >= k){
+      createjs.Tween.get(row[i]).to({x: row[i].x-width}, 500, createjs.Ease.getPowInOut(4))
+    }
+  }
+}
 
 function createBlock(w,h,color) {
   let graphics = new PIXI.Graphics();
@@ -445,6 +453,7 @@ function onPolyMoveEnd() {
       rows[this.currentRow].splice(i,1)
       // Add to the new row
       rows[r].push(this)
+      condenseAfter(rows[this.currentRow],i,this.width)
       this.currentRow = r
     } else {
       console.log("DIDNT CHANGE ROWS!!!")
