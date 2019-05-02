@@ -5,6 +5,8 @@ const JIJI_CONT_TOP = DIM
 const TWELFTH_WIDTH = WHOLE_WIDTH/12
 const WINDOW_CENTER_X = WINDOW_WIDTH/2
 const WINDOW_CENTER_Y = WINDOW_HEIGHT/2
+const CONTAINER_ORIGIN_X = TWELFTH_WIDTH
+const CONTAINER_ORIGIN_Y = 2*DIM
 const CONTAINER_WIDTH = DIM
 const CONTAINER_HEIGHT = DIM
 const CONTAINER_CENTER_X = DIM
@@ -13,7 +15,6 @@ const CONTAINER_TOP = CONTAINER_CENTER_Y-CONTAINER_WIDTH/2
 const CONTAINER_BOTTOM = CONTAINER_CENTER_Y+CONTAINER_WIDTH/2
 const CONTAINER_LEFT = CONTAINER_CENTER_X-CONTAINER_WIDTH/2
 const CONTAINER_RIGHT = CONTAINER_CENTER_X+CONTAINER_WIDTH/2
-
 
 
 let backGround = new PIXI.Sprite.from('../images/blue-gradient.png')
@@ -26,8 +27,8 @@ app.stage.addChild(backGround)
 createjs.Tween.get(backGround).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
 
 
-
-let rows = 0
+let mostRecentRow = 0
+let rows = [[],[],[],[],[],[],[],[]]
 let constructorBlock;
 let jijis = []
 let plusJiji;
@@ -62,7 +63,6 @@ const OBJ_TYPE = {
   DELETE: 2
 }
 
-
 // Init
 //createMenuButtons()
 //layoutMenu()
@@ -72,7 +72,6 @@ app.stage.addChild(constructorBlock)
 
 
 // Rouge Init
-
 
 resetTool = createReset()
 resetTool.interactive = true
@@ -85,8 +84,6 @@ trashCan = createTrashCan()
 app.stage.addChild(trashCan)
 trashCan.x = WINDOW_WIDTH - DIM/2
 trashCan.y = 1.5*DIM
-
-
 
 // Factory Functions
 
@@ -157,9 +154,7 @@ function createCutterContainer(){
   cutterContainer.interactive = true
   cutterContainer.TYPE = OBJ_TYPE.CUT
   for (l of horizontalLines){
-    console.log("adding child")
     cutterContainer.addChild(l)
-    console.log(l.y)
   }
   hPlus.alpha = 0
   vPlus.alpha = 0
@@ -272,13 +267,13 @@ function createCircleButton(text,color) {
 }
 
 
-function createContainer(width){
+function createContainer(w,h){
   let containerGraphic = new PIXI.Graphics()
   containerGraphic.lineStyle(2,0x000000)
   containerGraphic.moveTo(0,0)
-  containerGraphic.lineTo(0,width)
-  containerGraphic.lineTo(width,width)
-  containerGraphic.lineTo(width,0)
+  containerGraphic.lineTo(0,h)
+  containerGraphic.lineTo(w,h)
+  containerGraphic.lineTo(w,0)
   containerGraphic.lineTo(0,0)
   containerGraphic.interactive = true
   containerGraphic.x = 1
@@ -286,11 +281,15 @@ function createContainer(width){
 
   let containerTexture = app.renderer.generateTexture(containerGraphic)
   let containerSprite = new PIXI.Sprite(containerTexture)
-  containerSprite.anchor.set(0.5)
   containerSprite.width = containerGraphic.width
   containerSprite.height = containerGraphic.height
   return containerSprite
 }
+
+let container = createContainer(2*WHOLE_WIDTH,8*TWELFTH_WIDTH)
+app.stage.addChild(container)
+container.x = CONTAINER_ORIGIN_X
+container.y = CONTAINER_ORIGIN_Y
 
 function initVerticalLines(partition){
 
@@ -344,6 +343,7 @@ function animateVerticalLines(inc){
 function createBlockConstructor(w,h,i) {
   var graphics = new PIXI.Graphics();
    let color = COLORS[COLOR_KEYS[i%9]]
+   graphics.lineStyle(1,0xFFFFFF)
     graphics.beginFill(COLORS[COLOR_KEYS[i%9]]);
     graphics.drawRoundedRect(0,0,w,h,2)
     graphics.endFill();
@@ -361,7 +361,10 @@ function newBlock(g,x,y) {
     app.stage.addChild(newBlock)
     newBlock.x = g.x
     newBlock.y = g.y
-    createjs.Tween.get(newBlock).to({x: TWELFTH_WIDTH,y: 5*TWELFTH_WIDTH}, 700, createjs.Ease.getPowInOut(4))
+    let rowMax = getRowMax(rows[mostRecentRow])
+    rows[mostRecentRow].push(newBlock)
+    newBlock.currentRow = mostRecentRow
+    createjs.Tween.get(newBlock).to({x: TWELFTH_WIDTH+rowMax,y: CONTAINER_ORIGIN_Y+mostRecentRow*TWELFTH_WIDTH}, 700, createjs.Ease.getPowInOut(4))
     blocks.push(newBlock)
 }
 
@@ -388,6 +391,7 @@ createCuisenaireMenu()
 
 function createBlock(w,h,color) {
   let graphics = new PIXI.Graphics();
+      graphics.lineStyle(1,0xFFFFFF)
       graphics.beginFill(color);
       graphics.drawRoundedRect(0,0,w,h,3)
       graphics.endFill();
@@ -423,22 +427,56 @@ function onPolyTouched(event) {
 }
 
 function onPolyMoveEnd() {
+    let newXVal;
     this.dragging = false;
     this.data = null;
     this.deltaTouch = []
-    let y = round(this.y)
-    let x = round(this.x)
+    let y = roundY(this.y)
+    let x = roundX(this.x)
     let p = new PIXI.Point(this.x+this.width/2,this.y+this.height/2)
     let inTrash = pointInRect(p,trashCan)
+    let r = getRow(this.y)
+    mostRecentRow = r
+    if (r != this.currentRow){
+      newXVal = CONTAINER_ORIGIN_X+getRowMax(rows[r])
+      let i = rows[this.currentRow].indexOf(this)
+      console.log("this is the index of what's about to be switched",i)
+      // Remove from current row
+      rows[this.currentRow].splice(i,1)
+      // Add to the new row
+      rows[r].push(this)
+      this.currentRow = r
+    } else {
+      console.log("DIDNT CHANGE ROWS!!!")
+      console.log("rows!",rows)
+      console.log('ROWMAX',x)
+      newXVal = CONTAINER_ORIGIN_X+getRowMax(rows[r]) - this.width
+    }
+    console.log("ROW",getRow(this.y))
     if (inTrash){
       app.stage.removeChild(this)
     } else {
-      createjs.Tween.get(this).to({x: x,y: y}, 500, createjs.Ease.getPowInOut(4))
+      createjs.Tween.get(this).to({x: newXVal,y: y}, 500, createjs.Ease.getPowInOut(4))
     }
 }
 
-function round(val){
-  let i = Math.round(val/(WHOLE_WIDTH/12))
+function getRowMax(row){
+  let sum = 0
+  row.forEach(r => {sum = sum + r.width})
+  return sum
+}
+
+function getRow(yVal){
+  return Math.round((yVal-CONTAINER_ORIGIN_Y)/(WHOLE_WIDTH/12))
+}
+
+function roundY(val){
+  let i = Math.round((val-CONTAINER_ORIGIN_Y)/(WHOLE_WIDTH/12))
+  return CONTAINER_ORIGIN_Y+TWELFTH_WIDTH*i
+}
+
+function roundX(val){
+  let i = Math.round((val-CONTAINER_ORIGIN_X)/(WHOLE_WIDTH/12))
   return TWELFTH_WIDTH*i
 }
 
