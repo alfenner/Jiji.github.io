@@ -173,16 +173,6 @@ function createCutterContainer(){
 
 
 
-
-
-// Helpers
-
-function bringLinesToFront(){
-  let lines = [...verticalLines,...horizontalLines]
-  //lines.forEach(l =>  app.stage.addChild(l))
-}
-
-
 // Constructors
 
 function createTextBox(text) {
@@ -258,6 +248,7 @@ function createContainer(w,h){
   let containerSprite = new PIXI.Sprite(containerTexture)
   containerSprite.width = containerGraphic.width
   containerSprite.height = containerGraphic.height
+  console.log("container anchor",containerSprite.anchor)
   return containerSprite
 }
 
@@ -393,7 +384,7 @@ function createBlock(w,h,color,i) {
   var graphics = new PIXI.Graphics();
    graphics.lineStyle(1,0xFFFFFF)
     graphics.beginFill(color);
-    graphics.drawRoundedRect(0,0,w,h,2)
+    graphics.drawRoundedRect(0,0,w-2,h-2,2)
     graphics.endFill();
     graphics.color = color
     console.log("graphics dims",graphics.width,graphics.height)
@@ -419,8 +410,6 @@ function createBlock(w,h,color,i) {
 
 
 
-
-
 function onPolyTouched(event) {
 
   if (this.TYPE == OBJ_TYPE.CUT){
@@ -434,23 +423,25 @@ function onPolyTouched(event) {
     this.dragging = true;
     this.wasDragged = false
     this.deltaTouch = [this.x-touchedAtX,this.y-touchedAtY]
-    this.dragStartedAt = this.y
+    this.dragStartedAt = [this.x,this.y]
     this.data = event.data;
 }
 
 function onPolyMoveEnd() {
-    let newXVal;
     this.dragging = false;
     this.data = null;
     this.deltaTouch = []
+
+    let newXVal;
     let p = new PIXI.Point(this.x+this.width/2,this.y+this.height/2)
-    let inTrash = pointInRect(p,trashCan)
-    console.log("inTrash",inTrash)
-    if (inTrash){
-      let i = rows[this.currentRow].indexOf(this)
-      rows[this.currentRow].splice(i,1)
-      app.stage.removeChild(this)
-    } else {
+    let inContainer = pointInRect(p,container)
+    let inTrash = false
+
+    console.log("in container",inContainer)
+    //console.log("in trash",inTrash)
+
+
+    if (inContainer){
     let y = roundY(this.y)
     let x = roundX(this.x)
     let r = getRow(this.y)
@@ -467,6 +458,10 @@ function onPolyMoveEnd() {
       newXVal = CONTAINER_ORIGIN_X+getRowMax(rows[r]) - this.width
     }
       createjs.Tween.get(this).to({x: newXVal,y: y}, 500, createjs.Ease.getPowInOut(4))
+  } else {
+      let i = rows[this.currentRow].indexOf(this)
+      rows[this.currentRow].splice(i,1)
+      app.stage.removeChild(this)
   }
 }
 
@@ -501,10 +496,23 @@ function onPolyTouchMoved() {
 
 function pointInRect(p,rect){
   // This is for a rect with anchor in center
-  let top = rect.y - rect.height/2
-  let bottom = rect.y + rect.height/2
-  let left = rect.x - rect.width/2
-  let right = rect.x + rect.width/2
+  let top;
+  let bottom;
+  let left;
+  let right;
+
+  if (rect.anchor._x == 0.5){
+    top = rect.y - rect.height/2
+    bottom = rect.y + rect.height/2
+    left = rect.x - rect.width/2
+    right = rect.x + rect.width/2
+ } else {
+   top = rect.y
+   bottom = rect.y + rect.height
+   left = rect.x
+   right = rect.x + rect.width
+ }
+  console.log("top,bottom,left,right",top,bottom,left,right)
 
   let c1 = p.x < right
   let c2 = p.x > left

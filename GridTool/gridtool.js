@@ -12,31 +12,103 @@ createjs.Tween.get(backGround).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
 const DIM = WINDOW_WIDTH/12
 const WINDOW_CENTER_X = WINDOW_WIDTH/2
 const WINDOW_CENTER_Y = WINDOW_HEIGHT/2
-const CONTAINER_WIDTH = 500
-const CONTAINER_HEIGHT = 500
-const CONTAINER_TOP = WINDOW_HEIGHT/2-CONTAINER_WIDTH/2
-const CONTAINER_BOTTOM = WINDOW_HEIGHT/2+CONTAINER_WIDTH/2
-const CONTAINER_LEFT = WINDOW_WIDTH/2-CONTAINER_WIDTH/2
-const CONTAINER_RIGHT = WINDOW_WIDTH/2+CONTAINER_WIDTH/2
+const CONTAINER_WIDTH = WINDOW_HEIGHT*0.6
+const CONTAINER_HEIGHT = CONTAINER_WIDTH
+const CONTAINER_TOP = 0
+const CONTAINER_BOTTOM = CONTAINER_HEIGHT
+const CONTAINER_LEFT = 0
+const CONTAINER_RIGHT = CONTAINER_WIDTH
+const TWELFTH_WIDTH = CONTAINER_WIDTH/12
 
-const v_part_dim = ()=> {
-  return CONTAINER_HEIGHT/hPartitions
+const containers = []
+
+let gridToolLeft = createGridTool()
+app.stage.addChild(gridToolLeft)
+gridToolLeft.x = 3/4*WINDOW_WIDTH - CONTAINER_WIDTH/2
+gridToolLeft.y = WINDOW_CENTER_Y-CONTAINER_HEIGHT/2
+containers.push(gridToolLeft)
+
+let gridToolRight = createGridTool()
+app.stage.addChild(gridToolRight)
+gridToolRight.x = WINDOW_WIDTH/4 - CONTAINER_WIDTH/2
+gridToolRight.y = WINDOW_CENTER_Y-CONTAINER_HEIGHT/2
+containers.push(gridToolRight)
+
+
+function testFunction(){
+  console.log("Calling my test fucntion")
 }
 
-const h_part_dim = ()=> {
-  return CONTAINER_WIDTH/vPartitions
-}
+function createGridTool(){
 
-let fractions = []
-let horizontalLines = []
-let verticalLines = []
-let vPartitions = 1
-let hPartitions = 1
-let colorIndex = 0
-let colors = [COLORS.BLUE,COLORS.RED,COLORS.GREEN,COLORS.ORANGE,COLORS.PURPLE]
-let colorLength = colors.length
-let currentColor = () => {return colors[colorIndex%colorLength]}
 
+  let grid = new PIXI.Container()
+
+  let vPlus = createCircleButton("+")
+  grid.addChild(vPlus)
+  vPlus.y = CONTAINER_TOP - DIM/4
+  vPlus.x = CONTAINER_WIDTH/2
+
+  let vMinus = createCircleButton("-")
+  vMinus.y = CONTAINER_BOTTOM + DIM/4
+  vMinus.x = CONTAINER_WIDTH/2
+  grid.addChild(vMinus)
+
+  let hPlus = createCircleButton("+")
+  hPlus.x = CONTAINER_RIGHT + DIM/4
+  hPlus.y = CONTAINER_HEIGHT/2
+  grid.addChild(hPlus)
+
+
+  let hMinus = createCircleButton("-")
+  hMinus.x = CONTAINER_LEFT - DIM/4
+  hMinus.y = CONTAINER_HEIGHT/2
+  grid.addChild(hMinus)
+
+
+  vPlus.on("pointerdown",() => animateHorizontalLines(1))
+  vMinus.on("pointerdown",() => animateHorizontalLines(-1))
+  hPlus.on("pointerdown",() => animateVerticalLines(1))
+  hMinus.on("pointerdown",() => animateVerticalLines(-1))
+
+
+  let cont = createContainer(CONTAINER_WIDTH)
+  grid.addChild(cont)
+  cont.x = CONTAINER_WIDTH/2
+  cont.y = CONTAINER_HEIGHT/2
+  cont.interactive = true
+  cont.on('pointerdown',createSquare)
+  grid.addChild(vPlus)
+
+
+  let fractions = []
+  let horizontalLines = []
+  let verticalLines = []
+  let vPartitions = 1
+  let hPartitions = 1
+  let colorIndex = 0
+  let colors = [COLORS.BLUE,COLORS.RED,COLORS.GREEN,COLORS.ORANGE,COLORS.PURPLE]
+  let colorLength = colors.length
+  let currentColor = () => {return colors[colorIndex%colorLength]}
+
+
+  initVerticalLines(1)
+  initHorizontalLines(1)
+  animateVerticalLines(1)
+  animateHorizontalLines(1)
+
+
+  const v_part_dim = ()=> {
+    return CONTAINER_HEIGHT/hPartitions
+  }
+
+  const h_part_dim = ()=> {
+    return CONTAINER_WIDTH/vPartitions
+  }
+
+  const total_parts = ()=> {hPartitions*vPartitions}
+
+  //grid.addChild()
 
 // Helpers
 
@@ -47,12 +119,10 @@ function hideGrid(){
 
 function bringLinesToFront(){
   let lines = [...verticalLines,...horizontalLines]
-  lines.forEach(l =>  app.stage.addChild(l))
+  lines.forEach(l =>  grid.addChild(l))
 }
 
-
 // Constructors
-
 function createCircleButton(text) {
 
     let h = DIM/4
@@ -85,6 +155,7 @@ function createCircleButton(text) {
 }
 
 function createSquare(event){
+
   bringLinesToFront()
   let hdim = h_part_dim()
   let vdim = v_part_dim()
@@ -98,18 +169,16 @@ function createSquare(event){
 
   let blockTexture = app.renderer.generateTexture(block)
   let blockSprite = new PIXI.Sprite(blockTexture)
-  blockSprite.anchor.set(0.5)
   blockSprite.alpha = 0.5
 
-  console.log("vdim",h_part_dim())
   let pos = event.data.getLocalPosition(this.parent)
-  console.log("hdim,vdim",hdim,vdim)
+
   let i = Math.floor((pos.x-CONTAINER_LEFT)/hdim)
   let j = Math.floor((pos.y-CONTAINER_TOP)/vdim)
-  console.log("i,j",i,j)
+
   app.stage.addChild(blockSprite)
-  blockSprite.x = CONTAINER_LEFT+i*hdim+hdim/2
-  blockSprite.y = CONTAINER_TOP+j*vdim+vdim/2
+  blockSprite.x = grid.x + i*hdim
+  blockSprite.y = grid.y + j*vdim
   blockSprite.interactive = true
   blockSprite.on('pointerdown',onFracStart)
   blockSprite.on('pointerup',onFracEnd)
@@ -146,7 +215,7 @@ function initVerticalLines(partition){
     g.y = CONTAINER_TOP
     g.x = CONTAINER_LEFT
     verticalLines.push(g)
-    app.stage.addChild(g)
+    grid.addChild(g)
   }
 }
 
@@ -158,7 +227,7 @@ function initHorizontalLines(partition){
     g.y = CONTAINER_TOP
     g.x = CONTAINER_LEFT
     horizontalLines.push(g)
-    app.stage.addChild(g)
+    grid.addChild(g)
   }
 }
 
@@ -175,7 +244,7 @@ function animateVerticalLines(inc){
   let spacing = CONTAINER_WIDTH/vPartitions
 
   verticalLines.forEach((l,i) => {
-    app.stage.addChild(l)
+    grid.addChild(l)
     if (i>vPartitions){
         createjs.Tween.get(l).to({x: CONTAINER_RIGHT}, 500, createjs.Ease.getPowInOut(4))
     } else {
@@ -198,7 +267,7 @@ function animateHorizontalLines(inc){
   let spacing = CONTAINER_WIDTH/hPartitions
 
   horizontalLines.forEach((l,i)=>{
-    app.stage.addChild(l)
+    grid.addChild(l)
     if (i>hPartitions){
         createjs.Tween.get(l).to({y: CONTAINER_BOTTOM}, 500, createjs.Ease.getPowInOut(4))
     } else {
@@ -210,50 +279,7 @@ function animateHorizontalLines(inc){
   hPartitions -= inc
 }
 
-
 }
-
-initVerticalLines(1)
-initHorizontalLines(1)
-animateVerticalLines(1)
-animateHorizontalLines(1)
-
-
-let vPlus = createCircleButton("+")
-app.stage.addChild(vPlus)
-vPlus.y = CONTAINER_TOP - DIM/4
-vPlus.x = WINDOW_CENTER_X
-
-
-let vMinus = createCircleButton("-")
-app.stage.addChild(vMinus)
-vMinus.y = CONTAINER_BOTTOM + DIM/4
-vMinus.x = WINDOW_CENTER_X
-
-
-let hPlus = createCircleButton("+")
-app.stage.addChild(hPlus)
-hPlus.x = CONTAINER_RIGHT + DIM/4
-hPlus.y = WINDOW_CENTER_Y
-
-let hMinus = createCircleButton("-")
-app.stage.addChild(hMinus)
-hMinus.x = CONTAINER_LEFT - DIM/4
-hMinus.y = WINDOW_CENTER_Y
-
-vPlus.on("pointerdown",() => animateHorizontalLines(1))
-vMinus.on("pointerdown",() => animateHorizontalLines(-1))
-hPlus.on("pointerdown",() => animateVerticalLines(1))
-hMinus.on("pointerdown",() => animateVerticalLines(-1))
-
-
-let cont = createContainer(500)
-app.stage.addChild(cont)
-cont.x = WINDOW_WIDTH/2
-cont.y = WINDOW_HEIGHT/2
-cont.interactive = true
-cont.on('pointerdown',createSquare)
-
 
 function onFracStart(event){
     bringLinesToFront()
@@ -265,15 +291,26 @@ function onFracStart(event){
     this.dragging = true
 }
 
+function round(val,origin){
+  let i = Math.round(Math.abs(val-origin)/(CONTAINER_WIDTH/12))
+  return origin+i*CONTAINER_WIDTH/12
+}
+
 function onFracEnd(){
     this.data = null;
     this.dragging = false
-    if (this.x < CONTAINER_LEFT || this.y < CONTAINER_TOP){
+    if (this.y+this.height > WINDOW_HEIGHT){
       let i = fractions.indexOf(this)
       fractions.splice(i,1)
       app.stage.removeChild(this)
     }
 
+    console.log("GridXY",grid.x,grid.y)
+
+    let x = round(this.x,grid.x)
+    let y = round(this.y,grid.y)
+
+    //createjs.Tween.get(this).to({x: x,y: y}, 500, createjs.Ease.getPowInOut(4))
 }
 
 function onFracMove(){
@@ -282,4 +319,25 @@ function onFracMove(){
         this.y = pointerPosition.y + this.deltaTouch[1]
         this.x = pointerPosition.x + this.deltaTouch[0]
     }
+}
+
+return grid
+
+}
+
+// Helpers
+function pointInRect(p,rect){
+  // This is for a rect with anchor in center
+
+    let top = rect.y - rect.height*rect.anchor
+    let bottom = rect.y + rect.height*rect.anchor
+    let left = rect.x - rect.width*rect.anchor
+    let right = rect.x + rect.width*rect.anchor
+
+  let c1 = p.x < right
+  let c2 = p.x > left
+  let c3 = p.y < bottom
+  let c4 = p.y > top
+
+  return c1 && c2 && c3 && c4
 }
