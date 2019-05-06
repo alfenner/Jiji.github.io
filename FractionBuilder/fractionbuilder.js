@@ -67,8 +67,8 @@ function createGridTool(){
   //grid.addChild(hMinus)
 
   let frac = createFraction(0,1)
-  frac.x = CONTAINER_LEFT
-  frac.y = CONTAINER_TOP - DIM/4
+  frac.x = (CONTAINER_RIGHT-CONTAINER_LEFT)/2
+  frac.y = CONTAINER_TOP - DIM/8
   grid.addChild(frac)
 
 
@@ -201,12 +201,13 @@ function createStack(event){
 
     if (k == 1 && currBlock.k == 1){
       currBlock.k = 0
+      currFrac[0] = 0
     } else {
       grid.addChild(blockSprite)
       blockSprite.k = k
       currBlock = blockSprite
    }
-
+      frac.write(currFrac[0],currFrac[1])
    }
 }
 
@@ -306,6 +307,9 @@ function animateHorizontalLines(inc){
 } else {
   hPartitions -= inc
   }
+
+  frac.write(currFrac[0],currFrac[1])
+
 }
 
 function onFracStart(event){
