@@ -92,6 +92,22 @@ function getValFromType(type) {
   }
 }
 
+const CUISENAIRE_COLORS = {
+  '1': 0xfff9fc,
+  '2': 0xff385c,
+  '3': 0x77e060,
+  '4': 0x781fb7,
+  '5': 0xf9f32f,
+  '6': 0x0cad85,
+  '7': 0x202628,
+  '8': 0xb24118,
+  '9': 0x1e3484,
+  '10': 0xf77613,
+  '11': 0x8b959b,
+  '12': 0xff77e8,
+}
+
+const CUISENAIRE_COLOR_KEYS = Object.keys(CUISENAIRE_COLORS)
 
 const COLORS = {
 ORANGE: 0xffaa32,

@@ -1,4 +1,15 @@
 
+let backGround = new PIXI.Sprite.from('../images/blue-gradient.png')
+backGround.width = WINDOW_WIDTH
+backGround.height = WINDOW_HEIGHT
+backGround.x = 0
+backGround.y = 0
+backGround.alpha = 0
+tiler.stage.addChild(backGround)
+createjs.Tween.get(backGround).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
+
+
+
 let dots = []
 
 let cordsFromGrid = []

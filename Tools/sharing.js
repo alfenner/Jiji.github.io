@@ -175,13 +175,15 @@ function incJiji(n){
   console.log("INCING JIJI")
   console.log("n",n)
   if (n == 1){
-    let jiji = createJijiAsset()
-    jiji.alpha = 0
-    jiji.y = DIM
-    jiji.x = WINDOW_WIDTH/2
-    createjs.Tween.get(jiji).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4))
-    jijis.push(jiji)
-    app.stage.addChild(jiji)
+    if (jijis.length < 6){
+      let jiji = createJijiAsset()
+      jiji.alpha = 0
+      jiji.y = DIM
+      jiji.x = WINDOW_WIDTH/2
+      createjs.Tween.get(jiji).to({alpha: 1}, 1000, createjs.Ease.getPowInOut(4))
+      jijis.push(jiji)
+      app.stage.addChild(jiji)
+    }
   } else if (n == -1){
     if (jijis.length > 2){
       let toRemove = jijis.pop()

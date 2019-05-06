@@ -10,10 +10,12 @@ createjs.Tween.get(backGround).to({alpha: 1}, 500, createjs.Ease.getPowInOut(4))
 
 
 const DIM = WINDOW_WIDTH/12
+const LEFT_X = 3/4*WINDOW_WIDTH
+const RIGHT_X = 1/4*WINDOW_WIDTH
 const WINDOW_CENTER_X = WINDOW_WIDTH/2
 const WINDOW_CENTER_Y = WINDOW_HEIGHT/2
-const CONTAINER_WIDTH = WINDOW_HEIGHT*0.6
-const CONTAINER_HEIGHT = CONTAINER_WIDTH
+const CONTAINER_WIDTH = WINDOW_HEIGHT*0.3
+const CONTAINER_HEIGHT = CONTAINER_WIDTH*2
 const CONTAINER_TOP = 0
 const CONTAINER_BOTTOM = CONTAINER_HEIGHT
 const CONTAINER_LEFT = 0
@@ -21,6 +23,8 @@ const CONTAINER_RIGHT = CONTAINER_WIDTH
 const TWELFTH_WIDTH = CONTAINER_WIDTH/12
 
 const containers = []
+
+let toggleButton;
 
 let gridToolLeft = createGridTool()
 app.stage.addChild(gridToolLeft)
@@ -34,38 +38,33 @@ gridToolRight.x = WINDOW_WIDTH/4 - CONTAINER_WIDTH/2
 gridToolRight.y = WINDOW_CENTER_Y-CONTAINER_HEIGHT/2
 containers.push(gridToolRight)
 
-
-
-
-function testFunction(){
-  console.log("Calling my test fucntion")
-}
-
 function createGridTool(){
-
 
   let grid = new PIXI.Container()
 
+  let currBlock = {}
+  currBlock.k == -1
+
   let vPlus = createCircleButton("+")
   grid.addChild(vPlus)
-  vPlus.y = CONTAINER_TOP - DIM/4
-  vPlus.x = CONTAINER_WIDTH/2
+  vPlus.y = CONTAINER_BOTTOM + DIM/4
+  vPlus.x = 3*CONTAINER_WIDTH/4
 
   let vMinus = createCircleButton("-")
   vMinus.y = CONTAINER_BOTTOM + DIM/4
-  vMinus.x = CONTAINER_WIDTH/2
+  vMinus.x = CONTAINER_WIDTH/4
   grid.addChild(vMinus)
 
   let hPlus = createCircleButton("+")
   hPlus.x = CONTAINER_RIGHT + DIM/4
   hPlus.y = CONTAINER_HEIGHT/2
-  grid.addChild(hPlus)
+  //grid.addChild(hPlus)
 
 
   let hMinus = createCircleButton("-")
   hMinus.x = CONTAINER_LEFT - DIM/4
   hMinus.y = CONTAINER_HEIGHT/2
-  grid.addChild(hMinus)
+  //grid.addChild(hMinus)
 
   let frac = createFraction(0,1)
   frac.x = CONTAINER_LEFT
@@ -74,36 +73,24 @@ function createGridTool(){
 
 
 
-  vPlus.on("pointerdown",() => animateHorizontalLines(1))
-  vMinus.on("pointerdown",() => animateHorizontalLines(-1))
-  hPlus.on("pointerdown",() => animateVerticalLines(1))
-  hMinus.on("pointerdown",() => animateVerticalLines(-1))
-
-
-  let cont = createContainer(CONTAINER_WIDTH)
+  let cont = createContainer(CONTAINER_WIDTH,CONTAINER_HEIGHT)
   grid.addChild(cont)
   cont.x = CONTAINER_WIDTH/2
   cont.y = CONTAINER_HEIGHT/2
   cont.interactive = true
-  cont.on('pointerdown',createSquare)
+  cont.on('pointerdown',createStack)
 
 
   let fractions = []
   let horizontalLines = []
   let verticalLines = []
-  let vPartitions = 1
+  let vPartitions = 0
   let hPartitions = 1
   let colorIndex = 0
   let colors = [COLORS.BLUE,COLORS.RED,COLORS.GREEN,COLORS.ORANGE,COLORS.PURPLE]
   let colorLength = colors.length
   let currentColor = () => {return colors[colorIndex%colorLength]}
-
-
-  initVerticalLines(1)
-  initHorizontalLines(1)
-  animateVerticalLines(1)
-  animateHorizontalLines(1)
-
+  let currFrac = [0,1]
 
   const v_part_dim = ()=> {
     return CONTAINER_HEIGHT/hPartitions
@@ -114,6 +101,18 @@ function createGridTool(){
   }
 
   const total_parts = ()=> {hPartitions*vPartitions}
+
+
+
+  //initVerticalLines(1)
+  initHorizontalLines(1)
+  animateVerticalLines(1)
+  animateHorizontalLines(1)
+
+  vPlus.on("pointerdown",() => animateHorizontalLines(1))
+  vMinus.on("pointerdown",() => animateHorizontalLines(-1))
+  hPlus.on("pointerdown",() => animateVerticalLines(1))
+  hMinus.on("pointerdown",() => animateVerticalLines(-1))
 
   //grid.addChild()
 
@@ -161,45 +160,63 @@ function createCircleButton(text) {
     return pinContainer
 }
 
-function createSquare(event){
+
+function createStack(event){
 
   bringLinesToFront()
+
+
+
   let hdim = h_part_dim()
   let vdim = v_part_dim()
-  var block = new PIXI.Graphics();
-  block.lineStyle(2,0xFFFFFF)
-  block.beginFill(currentColor());
-  block.drawRoundedRect(0, 0, hdim, vdim,5);
-  block.endFill();
-  block.x = 1
-  block.y = 1
-
-  let blockTexture = app.renderer.generateTexture(block)
-  let blockSprite = new PIXI.Sprite(blockTexture)
-  blockSprite.alpha = 0.5
-
   let pos = event.data.getLocalPosition(this.parent)
-
   let i = Math.floor((pos.x-CONTAINER_LEFT)/hdim)
   let j = Math.floor((pos.y-CONTAINER_TOP)/vdim)
+  let k = hPartitions - j
+  console.log("vPartitions",vPartitions)
+  console.log("hPartitions",hPartitions)
+  console.log("k",k)
+  if (false){
+    // do nothing
+  }
+  else {
 
-  grid.addChild(blockSprite)
-  blockSprite.x = i*hdim
-  blockSprite.y = j*vdim
-  blockSprite.interactive = true
-  blockSprite.on('pointerdown',onFracStart)
-  blockSprite.on('pointerup',onFracEnd)
-  blockSprite.on('pointermove',onFracMove)
+    var block = new PIXI.Graphics();
+    block.beginFill(COLORS.BLUE);
+    block.drawRoundedRect(0, 0, hdim,CONTAINER_HEIGHT*k/hPartitions,5);
+    currFrac = [k,hPartitions]
+    block.endFill();
+    block.x = 1
+    block.y = 1
 
+    let blockTexture = app.renderer.generateTexture(block)
+    let blockSprite = new PIXI.Sprite(blockTexture)
+    blockSprite.alpha = 0.5
+
+
+    blockSprite.x = CONTAINER_WIDTH
+    blockSprite.y = CONTAINER_HEIGHT
+    blockSprite.anchor.set(1)
+    grid.removeChild(currBlock)
+
+    if (k == 1 && currBlock.k == 1){
+      currBlock.k = 0
+    } else {
+      grid.addChild(blockSprite)
+      blockSprite.k = k
+      currBlock = blockSprite
+   }
+
+   }
 }
 
 
-function createContainer(width){
+function createContainer(width,height){
   let containerGraphic = new PIXI.Graphics()
   containerGraphic.lineStyle(3,0x000000)
   containerGraphic.moveTo(0,0)
-  containerGraphic.lineTo(0,width)
-  containerGraphic.lineTo(width,width)
+  containerGraphic.lineTo(0,height)
+  containerGraphic.lineTo(width,height)
   containerGraphic.lineTo(width,0)
   containerGraphic.lineTo(0,0)
   containerGraphic.interactive = true
@@ -218,7 +235,7 @@ function initVerticalLines(partition){
   for (let i = 0;i<11;i++){
     let g = new PIXI.Graphics()
     g.lineStyle(3,0x000000)
-    g.lineTo(0,CONTAINER_WIDTH)
+    g.lineTo(0,CONTAINER_HEIGHT)
     g.y = CONTAINER_TOP
     g.x = CONTAINER_LEFT
     verticalLines.push(g)
@@ -261,12 +278,21 @@ function animateVerticalLines(inc){
 
 function animateHorizontalLines(inc){
 
+  console.log("ANIMATING horizontalLines")
   hPartitions  += inc
   if (hPartitions != 0 && hPartitions != 11){
 
+  currFrac[1] = hPartitions
+  if (currFrac[0] > hPartitions){
+    currFrac[0] = hPartitions
+  }
+
+  let dim = h_part_dim()
+  createjs.Tween.get(currBlock).to({height: CONTAINER_HEIGHT*currFrac[0]/currFrac[1]}, 500, createjs.Ease.getPowInOut(4))
+
   colorIndex += 1
 
-  let spacing = CONTAINER_WIDTH/hPartitions
+  let spacing = CONTAINER_HEIGHT/hPartitions
 
   horizontalLines.forEach((l,i)=>{
     grid.addChild(l)
@@ -405,6 +431,11 @@ function createFraction(n,d) {
       den.text = d
     }
     return tileContainer
+}
+
+
+function toggleMode(){
+
 }
 
 // Helpers

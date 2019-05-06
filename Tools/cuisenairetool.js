@@ -6,7 +6,7 @@ const TWELFTH_WIDTH = WHOLE_WIDTH/12
 const WINDOW_CENTER_X = WINDOW_WIDTH/2
 const WINDOW_CENTER_Y = WINDOW_HEIGHT/2
 const CONTAINER_ORIGIN_X = TWELFTH_WIDTH
-const CONTAINER_ORIGIN_Y = 2*DIM
+const CONTAINER_ORIGIN_Y = 5*TWELFTH_WIDTH
 const CONTAINER_WIDTH = DIM
 const CONTAINER_HEIGHT = DIM
 const CONTAINER_CENTER_X = DIM
@@ -74,12 +74,12 @@ const OBJ_TYPE = {
 resetTool = createReset()
 resetTool.interactive = true
 resetTool.on('pointerdown',reset)
-app.stage.addChild(resetTool)
+//app.stage.addChild(resetTool)
 resetTool.x = WINDOW_WIDTH - DIM/2
 resetTool.y = DIM/2
 
 trashCan = createTrashCan()
-app.stage.addChild(trashCan)
+//app.stage.addChild(trashCan)
 trashCan.x = WINDOW_WIDTH - DIM/2
 trashCan.y = 1.5*DIM
 
@@ -297,7 +297,6 @@ function animateVerticalLines(inc){
     } else {
         createjs.Tween.get(l).to({x: i*spacing+CONTAINER_LEFT}, 500, createjs.Ease.getPowInOut(4))
     }
-
     })
   } else {
     vPartitions -= inc
@@ -309,9 +308,9 @@ function animateVerticalLines(inc){
 function createBlockConstructor(w,h,i) {
   let blockContainer = new PIXI.Container()
   var graphics = new PIXI.Graphics();
-   let color = COLORS[COLOR_KEYS[i%9]]
+   let color = CUISENAIRE_COLORS[12-(i)]
    graphics.lineStyle(1,0xFFFFFF)
-    graphics.beginFill(COLORS[COLOR_KEYS[i%9]]);
+    graphics.beginFill(color);
     graphics.drawRoundedRect(0,0,w,h,2)
     graphics.endFill();
     graphics.color = color
@@ -321,7 +320,7 @@ function createBlockConstructor(w,h,i) {
     blockContainer.addChild(graphicsSprite)
     blockContainer.interactive = true
     blockContainer.color = color
-    blockContainer.den = i
+    blockContainer.den = 12-i
     let fracText = i == 1 ? "1" : "1/"+i
     let frac = new PIXI.Text(fracText,{fontFamily : 'Chalkboard SE', fontSize: graphicsSprite.height/3, fill : 0x000000, align : 'center'});
 
@@ -334,7 +333,7 @@ function createBlockConstructor(w,h,i) {
     })
 
     blockContainer.addChild(graphicsSprite)
-    blockContainer.addChild(frac)
+    //blockContainer.addChild(frac)
 
     return blockContainer
 }
@@ -354,11 +353,11 @@ function createCuisenaireMenu(){
   let cumSum = 0
   let j = 0
   let h = WHOLE_WIDTH/12
-  for (let i = 1;i<13;i++){
-    let w = 1/i*WHOLE_WIDTH
+  for (let i = 0;i<12;i++){
+    let w = (12-i)*TWELFTH_WIDTH
     let newConstructor = createBlockConstructor(w,h,i)
     newConstructor.x = TWELFTH_WIDTH+cumSum
-    newConstructor.y = TWELFTH_WIDTH+1.2*j*h
+    newConstructor.y = TWELFTH_WIDTH/4+1.1*j*h
     cumSum = cumSum + w + 10
     if (cumSum > 1.6*WHOLE_WIDTH){
       j += 1
@@ -370,11 +369,10 @@ function createCuisenaireMenu(){
 
 createCuisenaireMenu()
 
-function condenseAfter(row,k,width){
-  console.log("row,k,width",row,k,width)
+function condenseAfter(row,k,blank){
   for (let i = 0;i<row.length;i++){
     if (i >= k){
-      createjs.Tween.get(row[i]).to({x: row[i].x-width}, 500, createjs.Ease.getPowInOut(4))
+      createjs.Tween.get(row[i]).to({x: row[i].x-blank.i*TWELFTH_WIDTH}, 500, createjs.Ease.getPowInOut(4))
     }
   }
 }
@@ -384,7 +382,7 @@ function createBlock(w,h,color,i) {
   var graphics = new PIXI.Graphics();
    graphics.lineStyle(1,0xFFFFFF)
     graphics.beginFill(color);
-    graphics.drawRoundedRect(0,0,w-2,h-2,2)
+    graphics.drawRoundedRect(0,0,w-1.5,h,2)
     graphics.endFill();
     graphics.color = color
     console.log("graphics dims",graphics.width,graphics.height)
@@ -393,6 +391,7 @@ function createBlock(w,h,color,i) {
     blockContainer.addChild(graphicsSprite)
     blockContainer.interactive = true
     blockContainer.color = color
+    blockContainer.i = i
     let fracText = i == 1 ? "1" : "1/"+i
     let frac = new PIXI.Text(fracText,{fontFamily : 'Chalkboard SE', fontSize: graphicsSprite.height/3, fill : 0x000000, align : 'center'});
 
@@ -400,7 +399,7 @@ function createBlock(w,h,color,i) {
     frac.x = graphicsSprite.width/2
     frac.y = graphicsSprite.height/2
     blockContainer.addChild(graphicsSprite)
-    blockContainer.addChild(frac)
+    //blockContainer.addChild(frac)
 
     blockContainer.on('pointerdown', onPolyTouched)
     blockContainer.on('pointerup', onPolyMoveEnd)
@@ -435,19 +434,14 @@ function onPolyMoveEnd() {
     let newXVal;
     let p = new PIXI.Point(this.x+this.width/2,this.y+this.height/2)
     let inContainer = pointInRect(p,container)
-    let inTrash = false
-
-    console.log("in container",inContainer)
-    //console.log("in trash",inTrash)
-
-
-    if (inContainer){
     let y = roundY(this.y)
     let x = roundX(this.x)
     let r = getRow(this.y)
     let i = rows[this.currentRow].indexOf(this)
+
+    if (inContainer){
     rows[this.currentRow].splice(i,1)
-    condenseAfter(rows[this.currentRow],i,this.width)
+    condenseAfter(rows[this.currentRow],i,this)
     mostRecentRow = r
     if (r != this.currentRow){
       newXVal = CONTAINER_ORIGIN_X+getRowMax(rows[r])
@@ -455,19 +449,19 @@ function onPolyMoveEnd() {
       this.currentRow = r
     } else {
       rows[this.currentRow].push(this)
-      newXVal = CONTAINER_ORIGIN_X+getRowMax(rows[r]) - this.width
+      newXVal = CONTAINER_ORIGIN_X+getRowMax(rows[r]) - this.i*TWELFTH_WIDTH
     }
       createjs.Tween.get(this).to({x: newXVal,y: y}, 500, createjs.Ease.getPowInOut(4))
   } else {
-      let i = rows[this.currentRow].indexOf(this)
       rows[this.currentRow].splice(i,1)
+      condenseAfter(rows[this.currentRow],i,this)
       app.stage.removeChild(this)
   }
 }
 
 function getRowMax(row){
   let sum = 0
-  row.forEach(r => {sum = sum + r.width})
+  row.forEach(r => {sum = sum + r.i*TWELFTH_WIDTH})
   return sum
 }
 

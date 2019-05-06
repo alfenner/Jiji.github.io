@@ -114,17 +114,6 @@ let submittedAnswer = []
 let submittedMCAnswer = []
 
 
-/*
-let backGround = new PIXI.Graphics()
-backGround.beginFill(0xFFFFFF)
-backGround.drawRoundedRect(0,0,windowWidth,windowHeight)
-backGround.endFill()
-backGround.interactive = true
-backGround.static = false
-app.stage.addChild(backGround)
-backGround.on('pointerup',()=> {slider.dragging = false})
-*/
-
 // Initializations
 
 let letters = []
